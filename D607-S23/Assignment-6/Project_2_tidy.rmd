@@ -1,0 +1,285 @@
+---
+title: "Project 2"
+author: "Nick Climaco"
+date: "2023-03-02"
+output: html_document
+---
+
+Your task is to:
+
+
+(1) Choose any three of the “wide” datasets identified in the Week 6 Discussion items. (You may use your own dataset; please don’t use my Sample Post dataset, since that was used in your Week 6 assignment!) 
+
+For each of the three chosen datasets:
+
+Create a .CSV file (or optionally, a MySQL database!) that includes all of the information
+included in the dataset. You’re encouraged to use a “wide” structure similar to how the
+information appears in the discussion item, so that you can practice tidying and
+transformations as described below.
+
+Read the information from your .CSV file into R, and use tidyr and dplyr as needed to
+tidy and transform your data. [Most of your grade will be based on this step!]
+ Perform the analysis requested in the discussion item.
+ Your code should be in an R Markdown file, posted to rpubs.com, and should include
+narrative descriptions of your data cleanup work, analysis, and conclusions.
+
+(2) Please include in your homework submission, for each of the three chosen datasets:
+ The URL to the .Rmd file in your GitHub repository, and
+ The URL for your rpubs.com web page.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, width = 80)
+```
+
+# Import Tidyverse
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+# Load the three distinct data sets...
+```{r}
+# sourced from Alice Ding's Discussion Board Entry
+student_data <- read.csv("https://gist.githubusercontent.com/Kimmirikwa/b69d0ea134820ea52f8481991ffae93e/raw/4db7b1698035ee29885d10e1a59bd902716ae168/student_results.csv")
+
+# from Jacob Silver's Discussion Board link to a google document where I dounloaded the csv file and then uploade the file to my github repo.
+nba_data <- read.csv("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/nba_players.csv")
+
+# my discussion board entry on nafta countries population from 1994 to 2000
+nafta_population <- read.csv("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/nafta_countries.csv")
+```
+
+#### Taking a look at the untidy data using the head() function
+```{r}
+head(student_data)
+```
+```{r}
+head(nafta_population)
+```
+
+```{r}
+head(nba_data)
+```
+***
+
+# Clean and Tidy
+
+* Constraints of Tidy data is where:
+    1. Every column is a variable
+    2. Every row is an observation
+    3. Every cell is a single value
+
+Reference: https://tidyr.tidyverse.org/
+
+### Tidying Student Data 
+
+In this code chunk, using the pivot_longer() function to pivot the wide data format to long format; selecting column names that start with term. to pivot, then creating a term column name to store the old column names and then creating another column name score to store the values of the old columns. After pivot_longer(), we need to separate the sex.and.age column to two distinct columns by using the separate() function. Finally, using select to arrange the column names.
+
+```{r}
+student_tidy <- student_data |> 
+    pivot_longer(cols = starts_with("term."), names_to = "term", values_to = "score") |> 
+    separate(col = "sex.and.age", into = c("sex", "age"), sep = "_") |> 
+    select(id, name, phone, sex, age, test.number, term, score) |> 
+    mutate(term = if_else(term == "term.1", 1, 
+                          if_else(term == "term.2", 2, 
+                                  if_else(term == "term.3", 3, NA_real_)))) |>
+    mutate(age = as.integer(age)) |> 
+    arrange(id, term)
+
+head(student_tidy)
+```
+
+### Tidying NAFTA Populations Data
+
+Here, we are using pivot_longer() function to pivot the columns that start with X, then using mutate to remove the letter X in front of each year.
+
+```{r}
+nafta_tidy <- nafta_population |> 
+    pivot_longer(cols = starts_with("X"), names_to = "Year", values_to = "Population") |> 
+    mutate(Year = str_remove_all(Year, "^X")) |>  
+    mutate(Year = as.integer(Year))
+kable(nafta_tidy)
+```
+
+#### Tidying NBA Players Data
+
+The NBA data is more complicated and thus requires more cleaning since we have columns that are formatted in a way that the values of a player's statistics are right in the same line. Therefore, after using the pivot_longer() function, we use the separate() function to separate the statistic and its value. Now, we want to make each statistic its own column and have its value as its entry. At the same time filling the empty row in the name column with name of the player. The next step is to use pivot_wider() so that each column is a statistic, every row is an observation, and every cell is a single value. Thus, satisfying the constraints of tidy data.
+
+```{r}
+nba_tidy <- nba_data %>% 
+    pivot_longer(cols = c(X2:X5), names_to = "old_colnames", values_to = "value") |> 
+    separate(value, c("statistic", "measure"), sep = ":") |>
+    select(-old_colnames) |> 
+    mutate(X1 = if_else(X1 == "", NA_character_, X1)) |> 
+    fill(X1) |> 
+    pivot_wider(names_from = statistic, values_from = measure) |> 
+    rename("Player_Name" = X1)  |>
+    arrange(Team, desc(Points)) |> 
+    mutate(across(c(Age, Points, `Field goals made`, `Field goal percentage`, `Offensive rebounds`, `Defensive rebounds`, Assists, Turnovers, Steals, Blocks), as.numeric))
+
+ 
+nba_tidy_sliced <- nba_tidy |>
+    slice(1:10)  
+
+kable(nba_tidy_sliced)
+```
+***
+
+# Analysis and Visualization
+
+***
+
+## Student Test Scores
+
+For students data from Alice Ding's discussion entry, she suggested to find the average test score for each student or the average test score overall and count the number male and female student, and the average age in the data.
+
+```{r, warning = FALSE}
+avg_score_term <- student_tidy |> 
+    group_by(name, term) |> 
+    summarize(average_score = round(mean(score), 2)) |> 
+    arrange(name, term)
+
+avg_score_overall <- student_tidy |> 
+    group_by(name) |> 
+    summarize(average_score = round(mean(score), 2)) |> 
+    arrange(name)
+
+avg_score_term
+avg_score_overall
+```
+
+```{r}
+avg_score_term |> 
+    ggplot(aes(x = name, y = average_score, fill = factor(term))) +
+    geom_bar(stat = "identity", position = "dodge") +
+    geom_text(aes(label = round(average_score, 1)), vjust = -0.3, position = position_dodge(0.9)) +
+    labs(x = "Name", y = "Average score", fill = "Term") + 
+    ggtitle("Average Test Score per Term")
+```
+
+
+We observe that Esther and Mike's average has shown improvement over the three terms. On the other hand, Linda and Mary's average has declined over the three terms. Academic intervention might be needed in order to help Linda and Mary's test scores.
+
+```{r}
+student_tidy |> 
+    summarize(average_age = mean(age))
+```
+The average age of the students in the data is 12.4
+
+```{r}
+student_tidy |> 
+    count(sex)
+```
+
+In this data, there are 18 female and 12 male students.
+
+## NAFTA Countries Population
+
+Here, we are adding a column for growth rate where it take the current and prior data in order to calculate the growth rate for that year. If there is not prior data, then it returns 0.
+
+```{r}
+nafta_tidy <- nafta_tidy |> 
+    group_by(Country) |> 
+    mutate(growth_rate = round((Population - lag(Population))/lag(Population) * 100, 2)) |> 
+    replace_na(list(growth_rate = 0))
+
+nafta_tidy
+```
+
+```{r, warning=FALSE}
+nafta_tidy |> ggplot(aes(x = Year, y = growth_rate, color = Country)) +
+    geom_line() +
+    geom_point() +
+    geom_text(aes(label = round(growth_rate, 2)), vjust = -0.4) +
+    labs(title = "Population Growth Rate in Years 1994 - 2000", x = "Year", y = "Percent Increase") +
+    theme_bw()
+```
+
+In the years 1994 - 2000, we can observe that United States has maintained a relatively constant growth rate of around 1.2 percent. While, Mexico and Canada's growth have not been constant. Particularly Canada, we see a decline in growth rate in 1997 and continued decreasing until 2000 where the growth rate increased from 0.82 to 0.94. Moreover, Mexico's growth has been consistently decreasing yearly meaning that more people are leaving the country and less are moving into the country or the birth to death is less than 1. i.e. more people are dying than being born.
+
+***
+
+## NBA Players Statistics
+
+In Jacob Silver's entry, he suggested to calculate: Shooting percentage and answer the question are the best teams those with the most players in the top 100 regardless of placement? or is "one guy" at the top of the mountain enough?
+
+It seems the data already comes with percent statistics such as field goal percentage and 3-pointers made.
+Now, we will try to answer the question of does the best teams necessarily have the best players?
+
+***
+
+##### Disclaimer: 
+
+
+top teams and players for this project does not reflect the actual ranking since we do not know how the NBA calculates overall ratings. For the sake of this project, we will be using weighted.mean() function based on surface level knowledge in basketball.
+
+
+Here, we summarize and arrange the data to identity the top 10 performing teams according to their overall rating. 
+```{r}
+top_teams <- nba_tidy %>%
+  group_by(Team) |> 
+  summarize(overall_rating = weighted.mean(`Field goals made`,
+                                           `3-pointers made`,
+                                           w = Points / sum(Points))) %>%
+  arrange(desc(overall_rating)) |> 
+  top_n(10, overall_rating)
+```
+
+```{r}
+top_teams |> 
+    ggplot(aes(x = Team, y = overall_rating, fill = Team)) +
+    geom_col() +
+    geom_text(aes(label = Team), hjust = 0.5, vjust = -0.5) +
+    labs(title = "Top 10 Teams by Overall Rating", x = "Team", y = "Overall Rating") +
+    theme(legend.position = "none")
+
+
+```
+
+Similarly, adding offensive and defensive ratings then arranging them in descending order to identity who the top players are based on their offensive_rating because the best players are the ones with the most points.
+```{r}
+nba_off_def_ratings <- nba_tidy |>
+    group_by(Player_Name) |> 
+    mutate(offensive_rating = weighted.mean(`Field goals made`,
+                                           `3-pointers made`,
+                                           `Offensive rebounds`,
+                                           w = Points / sum(Points)),
+           defensive_rating = weighted.mean(`Defensive rebounds`, 
+                                            Turnovers,
+                                            Steals,
+                                            Blocks,
+                                            w = `Defensive rebounds`/ sum(`Defensive rebounds`))) |> 
+    mutate(across(c(offensive_rating, defensive_rating), as.double)) |> 
+    select(Player_Name, Team, Position, offensive_rating, defensive_rating) |> 
+    arrange(desc(offensive_rating))
+
+```
+
+```{r}
+nba_off_def_ratings |> 
+    head(15) |> 
+    ggplot(aes(x = offensive_rating, y = defensive_rating, color = Team)) +
+    geom_point() +
+    labs(title = "Offense vs Defense Rating", x = "Offensive Rating", y = "Defensive Rating") +
+    scale_x_continuous(limits = c(9,11.5)) +
+    geom_text(aes(label = Player_Name), vjust = 1.5, hjust = 1, check_overlap = TRUE, nudge_y = 0.5) +
+    theme(legend.position = "none")
+```
+
+```{r}
+top_players <- nba_off_def_ratings |> 
+    head(100)
+```
+
+Next, we use inner_join() to join the two data frame so that we can count how many players of the top 100 players are in each team.
+```{r}
+top_teams |> 
+    inner_join(top_players, by = "Team") |> 
+    group_by(Team) |> 
+    summarize(top_players = n()) |> 
+    ggplot(aes(x = Team, y = top_players, fill = Team)) +
+    geom_col() +
+    theme(legend.position = "none") 
+```
+
+We can state that basketball is definitely a team sports where no one person can always carry the team. We set the top 100 players based on their offensive rating and counted how many of them are in the top 10 teams. There are around at most 3-4 players that are in the top 100 rating and are in a top 10 team. Thus, the answer to the question does the best teams necessarily have the best players? No, the best teams does not mean they have the best players according to this data.

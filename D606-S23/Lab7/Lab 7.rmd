@@ -1,0 +1,224 @@
+---
+title: 'Inference for numerical data'
+author: "Nick Climaco"
+output:
+  pdf_document: default
+  html_document:
+    includes:
+      in_header: header.html
+    css: ./lab.css
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Getting Started
+
+### Load packages
+
+In this lab, we will explore and visualize the data using the **tidyverse** suite of packages, and perform statistical inference using **infer**. The data can be found in the companion package for OpenIntro resources, **openintro**.
+
+Let's load the packages.
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(infer)
+```
+
+
+### The data
+
+Every two years, the Centers for Disease Control and Prevention conduct the Youth Risk Behavior Surveillance System (YRBSS) survey, where it takes data from high schoolers (9th through 12th grade), to analyze health patterns. You will work with a selected group of variables from a random sample of observations during one of the years the YRBSS was conducted.
+
+Load the `yrbss` data set into your workspace.
+
+```{r load-data}
+data('yrbss', package='openintro')
+```
+
+There are observations on 13 different variables, some categorical and some numerical. The meaning of each variable can be found by bringing up the help file:
+
+```{r help-nc, eval=FALSE}
+?yrbss
+```
+
+
+1.  What are the cases in this data set? How many cases are there in our sample?
+
+```{r}
+colnames(yrbss)
+```
+There are 13583 observations and 13 variables columns where some hold categorical and some numerical data.
+
+```{r str}
+glimpse(yrbss)
+```
+
+## Exploratory data analysis
+
+
+```{r summary}
+summary(yrbss$weight)
+```
+
+***
+2.  How many observations are we missing weights from?
+
+```{r}
+yrbss |> 
+    count(is.na(weight))
+```
+There are 1004 missing values in the weight column.
+
+***
+3.  Make a side-by-side boxplot of `physical_3plus` and `weight`. Is there a relationship between these two variables? What did you expect and why?
+
+```{r}
+yrbss <- yrbss |> 
+    mutate(physically_active_3plus = if_else(physically_active_7d > 2, "yes", "no")) |> 
+    na.omit()
+```
+
+```{r}
+yrbss |> 
+    ggplot(aes(x = physically_active_3plus, y = weight)) + 
+    geom_boxplot()
+
+```
+We expect that being physically active has relationship with weight due to the lower variance in weight for people who are physically active for at least 3 days in a week. Also, we notice that people who do not exercise regularly have wider range in weight. We need to conduct a hypothesis test to determine whether exercising regularly has a statistical signficant impact on one's weight.
+
+## Inference
+```{r}
+yrbss |> 
+    group_by(physically_active_3plus) |> 
+    summarize(mean_weight = mean(weight, na.rm = TRUE))
+```
+***
+4.  Are all conditions necessary for inference satisfied? Comment on each. You can compute the group sizes with the `summarize` command above by defining a new variable with the definition `n()`.
+
+The two conditions for inference are indepence and normality. So, looking at how the dataset was collected, a survey of randomly selected highschoolers from across the country. Each observation is independent. As for normality, we do not see any extreme outliers in the data so the condition is met.
+
+```{r}
+yrbss |> 
+    group_by(physically_active_3plus) |> 
+    summarize(group_size = n())
+```
+***
+5.  Write the hypotheses for testing if the average weights are different for those who exercise at least times a week and those who don't.
+
+$$
+h_0 : \mu_{diff} = 0 \\
+h_a : \mu_{diff} \neq 0
+$$
+
+The null hypothesis where mean difference is equal to zero is the status que i.e. exercise has no impact on weight
+The alternative is where mean differecen is not zero suggests that exercise does have an impact on weight
+
+```{r}
+set.seed(1998)
+```
+
+```{r}
+obs_diff <- yrbss %>%
+  specify(weight ~ physically_active_3plus) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+```
+
+```{r}
+null_dist <- yrbss %>%
+  specify(weight ~ physically_active_3plus) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+```
+```{r}
+ggplot(data = null_dist, aes(x = stat)) +
+  geom_histogram()
+```
+***
+6. How many of these `null` permutations have a difference of at least `obs_stat`?
+
+```{r}
+null_dist |> 
+    filter(stat >= obs_diff) |> 
+    nrow()
+```
+
+***
+7.  Construct and record a confidence interval for the difference between the weights of those who exercise at least three times a week and those who don't, and interpret this interval in context of the data.
+
+Those who exercise at least 3 times a week
+```{r}
+sub_yrbss <- yrbss |> 
+    na.omit() |> 
+    filter(physically_active_3plus %in% c('yes','no'))
+
+t_test <- t.test(weight ~ physically_active_3plus, data = sub_yrbss, var.equal = FALSE, conf.int = TRUE)
+t_test$conf.int
+```
+The confidence interval (-2.33, -0.72) at alpha = 0.5, suggests that the true difference in mean falls inside the interval. Since, zero is not in the interval we say that we reject the null hypothesis. Thus, we can interpret the interval as evidence that there is a statistically significant difference between the two mean which then suggests that exercise does impact a person's weight.
+
+* * *
+
+## More Practice
+
+8.  Calculate a 95% confidence interval for the average height in meters (`height`) and interpret it in context.
+```{r}
+t.test(yrbss$height, conf.level = 0.95, conf.int = TRUE)
+```
+The confidence interval (1.695, 1.699) at 95% confidence, the true average height is between these two values. So the average height is around 1.69 meters.
+
+***
+9.  Calculate a new confidence interval for the same parameter at the 90% confidence level. Comment on the width of this interval versus the one obtained in the previous exercise.
+
+```{r}
+t.test(yrbss$height, conf.level = 0.9, conf.int = TRUE)
+```
+We expected the interval to narrow as we decreased the confidence level to 90% because we are less certain that the true mean in the interval.
+
+***
+10.  Conduct a hypothesis test evaluating whether the average height is different for those who exercise at least three times a week and those who don't.
+
+```{r}
+t_test <- t.test(height ~ physically_active_3plus, data = sub_yrbss, var.equal = FALSE, conf.int = TRUE)
+t_test$conf.int
+```
+***
+11.  Now, a non-inference task: Determine the number of different options there are in the dataset for the `hours_tv_per_school_day` there are.
+```{r}
+yrbss |> 
+    count(hours_tv_per_school_day)
+```
+There are 7 unique categories including that student indicate how much time they watch tv.
+
+***
+
+12. Come up with a research question evaluating the relationship between height or weight and sleep. Formulate the question in a way that it can be answered using a hypothesis test and/or a confidence interval. Report the statistical results, and also provide an explanation in plain language. Be sure to check all assumptions, state your $\alpha$ level, and conclude in context.
+
+Question: Do the mean height of student who get enough sleep differ significantly to the mean height of student who lack sleep?
+
+We will the compare means of the two groups similar to how we compared the means of the students who exercise at least 3 days a week in relation to thier weights.
+In this compare, we will compare the mean of the students who get enough sleep and students who lack sleep in relation to their height. Determining if sleep impact the height development of the students. In addition, we will alpha level 0.05 for this test.
+
+
+```{r}
+subset_sleep <- yrbss |>
+    mutate(enough_sleep = if_else(school_night_hours_sleep >= 8 | school_night_hours_sleep == "10+", "yes", "no"))
+```
+
+```{r}
+t_test <- t.test(height ~ enough_sleep, data = subset_sleep, var.equal = FALSE, conf.int = TRUE)
+t_test$conf.int
+```
+
+At 95% confidence, the confidence interval include zero which suggests that we fail to reject the null hypothesis. We conclude that getting enough sleep does not significantly hinder the height development of students, but might still hinder other aspects of the students development which can be examined in a different tests.
+
+* * *

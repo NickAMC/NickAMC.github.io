@@ -1,0 +1,326 @@
+---
+title: 'Data 621: Homework 1'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+editor_options:
+    chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+## Overview
+
+In this homework assignment, you will explore, analyze and model a data set containing approximately 2200 records. Each record represents a professional baseball team from the years 1871 to 2006 inclusive. Each record has the performance of the team for the given year, with all of the statistics adjusted to match the performance of a 162 game season. 
+
+## Objective 
+
+The objective is to build a multiple linear regression model on the training data to predict the number of wins for the team. You can only use the variables given to you (or variables that you derive from the variables provided). 
+
+
+```{r,echo=FALSE}
+library(tidyverse)
+library(zoo)
+library(kableExtra)
+library(knitr)
+library(broom)
+library(DT)
+library(faraway)
+library(caret)
+library(corrplot)
+library(mlbench)
+library(randomForest)
+```
+
+```{r,echo=FALSE}
+setwd("C:/Users/Nick Climaco/Documents/DataScience/DATA_621_F23/Homework-1")
+set.seed(12041998)
+```
+
+***
+
+## Data Exploration 
+
+
+
+```{r,echo=FALSE}
+eval_df <- read_csv("moneyball-evaluation-data.csv")
+train_df <- read_csv("moneyball-training-data.csv")
+```
+
+```{r,echo=FALSE}
+# returns the size of the dataframe
+dim(train_df)
+```
+
+The training data has a size of 2276 observations and 17 attributes. With two of the column are the index column and number of wins column which would be our target variable. Exploring this training dataset can help us gain insights on how to approach the problem at hand. The following visualization is the histogram of each predictor for this assignment. The current column names are difficult to read since we don't know what they mean, but for now we have an idea of what each predictor variable's distribution looks like. Predictor variables such as "BATTING_HBP", "PITCHING_H", and "PITCHING_SO", seems to have good amount of outlier for which we can handle in the next section of this assignment which is the data cleaning and wrangling to "tidy" this dataset.
+
+
+####  Summary Statistics Visualized for Predictor Variable
+```{r,echo=FALSE}
+par(mfrow = c(4,4), mar = c(3,3,1,1))
+
+for (col_name in names(train_df)[-1]) {
+    hist(train_df[[col_name]], main = paste(col_name), xlab = "Value")
+}
+
+par(mfrow = c(1,1))
+```
+
+Looking at these distribution only give us rough idea of the data. The following table gives us the values of the summary statistics to get a better understanding of the data. We can treat these two visualizations as supplementary of each other. 
+
+```{r, echo=FALSE}
+kable(tidy(train_df[-1]), "pipe")
+```
+
+As expected, there are missing values in this dataset that will need to removed or imputed whichever method has the least impact on the distributions. We want to keep the data in its truest form while performing data cleaning. Skew and kurtosis return a NA value since it was not able to compute those columns due to missingness. First and foremost, we need to change the column names to more easily understood.
+
+***
+
+## Data Preparation
+
+```{r,echo=FALSE}
+#rename the the columns
+colnames(train_df) <- c("Index", "Wins", "Hits_P","Double_Hits_P","Triple_Hits_P", "Homerun_P","Walks_P", "Batter_Hit_P", "Strike_Out_N",
+                        "Stolen_Base_P", "Caught_Stealing_N", "Errors_N","Double_Play_P", "Walks_Allowed_N", "Hits_Allowed_N", "Homeruns_Allowed_N",
+                        "Strike_Out_Pitcher_P")
+
+eval_df <- eval_df[-1]
+colnames(eval_df) <- c("Hits_P","Double_Hits_P","Triple_Hits_P", "Homerun_P","Walks_P", "Batter_Hit_P", "Strike_Out_N",
+                        "Stolen_Base_P", "Caught_Stealing_N", "Errors_N","Double_Play_P", "Walks_Allowed_N", "Hits_Allowed_N", "Homeruns_Allowed_N",
+                        "Strike_Out_Pitcher_P")
+
+
+train_df <- as.data.frame(na.fill(train_df, fill = 0))
+train_df <- train_df[-1]
+
+eval_df <- as.data.frame(na.fill(eval_df, fill = 0))
+```
+
+In the context of this dataset, opting to replace NA values with zeros instead of performing mean or median imputation appears to be the most suitable approach. This choice is justified by the fact that each row may represent either the same team across different years or different teams within the same year. In sports data, it is evident that teams either have a recorded score or do not, with no in-between.
+
+Moreover, the column names have been updated to be more easily understood for readers with little to no knowledge of baseball and no longer requires the table explaining what the acronyms means. Also, added a "P" or "N" at the end of each column name to represent the theoretical impact on winning a game based on the table given for this assignment.
+
+Due to many features available in the dataset, we wont be performing any transformation because we want to use the data in its truest form. We are interested if we get sufficient results doing so. 
+
+```{r,echo=FALSE}
+colnames(train_df)
+```
+
+The following chart show the correlation between each column in the data. We can observe the "Homeruns_Allowed_N" and "Strike_Out_Pitcher_P" has the strongest negative correlation in the dataset. This will help us determine which features are best in builing the models later.
+
+```{r, echo=FALSE}
+correlation_Matrix <- cor(train_df[,2:16])
+
+corrplot(correlation_Matrix,method = "color", type = "full", order = "hclust")
+```
+
+Here, we are using LM model to estimate the variable important which rates each feature on the impact it has on the model. It shows that Hits_P is the most important feature in this data followed by Homeruns_Allowed_N and Strike_Out_Pitcher_P; and Double_Play_P to be the least important. This is another tool that can help in the feature selection process.
+
+```{r, echo=FALSE}
+control <- trainControl(method = "repeatedcv", number = 10, repeats =3)
+
+# train the model
+model <- train(Wins~., data=train_df, method="lm", preProcess="scale", trControl=control)
+# estimate variable importance
+importance <- varImp(model, scale=FALSE)
+# plot importance
+plot(importance)
+```
+
+***
+
+## Model Building
+
+After exploring and cleaning the data, we should have a good idea of what features we want to use in building the lm models. 
+
+### Everything Model
+
+```{r,echo=FALSE}
+# Model 1 all features model
+model_1 <- lm(Wins ~ Hits_P + Double_Hits_P + Triple_Hits_P +  Walks_P + Strike_Out_N +
+                  Stolen_Base_P + Caught_Stealing_N + Errors_N + Double_Play_P + Walks_Allowed_N +  
+                  Homeruns_Allowed_N + Strike_Out_Pitcher_P, 
+              data = train_df)
+
+summary(model_1)
+```
+
+```{r, echo=FALSE}
+plot(model_1, 1:2)
+```
+
+This model includes of the available features to create baseline needed in order to improve the fit or the R-squared. So, the "Everything Model" has a R-squared of 0.29
+
+### Positive and Significant Model
+
+```{r, echo=FALSE}
+# star model
+model_2 <- lm(Wins~ Hits_P + Triple_Hits_P + Homerun_P + Batter_Hit_P + Strike_Out_Pitcher_P, data = train_df)
+
+summary(model_2)
+```
+
+```{r, echo=FALSE}
+plot(model_2, 1:2)
+```
+
+This model based on the "Everything Model" by picking the coefficients that were the most significant and restricting the features effect to only positive in hopes it would create a better model from this data. Which we did not accomplish since it return a R-squared of 0.20, a decrease from out initial model.
+
+### Top 4 Importance Based Model
+
+```{r, echo=FALSE}
+# model based on the correlation plot and importance chart
+model_3 <- lm(Wins ~ Hits_P + Homeruns_Allowed_N + Strike_Out_Pitcher_P, Batter_Hit_P,
+              data = train_df)
+
+
+summary(model_3)
+```
+
+```{r, echo=FALSE}
+plot(model_3, 1:2)
+```
+
+Now, building a third model to based on the correlation plot and importance chart. We hope that this model would generate the best model out of all the prior model. In this model, we use the following features: Hits_P, Homeruns_Allowed_N, Strike_Out_Pitcher_P and Batter_Hit_P.
+
+The resulting R-squared was not the intended result with R-squared similar to the second model. 
+
+
+
+***
+
+## Model Selection
+
+Based on the R-squared of each model, the "Everything Model" has best fit on the data while the other two model had R-squared of approx 0.20. The initial thought was that the second and third model would be a better than the first model, but that wasnt the case. It seems that taking out less features in the model resulted in a lower than desired R-squared. Even the model with features based on  ranked important performed poorly. Moreover, the Everything Model with R-square 0.30 is still low where it only explained 30% of the variance in the target variable. We hoped that selecting the most important features would at least raise it to 0.50.
+
+
+Now using the first model, we will predict the number of wins in the eval dataset. We have the distributions of the predicted wins, with a median win of 80
+
+```{r,echo=FALSE}
+predictions <- predict(model_1, eval_df)
+eval_df <- eval_df |> 
+    mutate(predicted_wins = predictions)
+```
+
+
+```{r,echo=FALSE}
+summary(eval_df$predicted_wins)
+```
+
+
+```{r,echo=FALSE}
+head(eval_df$predicted_wins, 10)
+```
+
+
+***
+
+## Resources
+
+Feature Selection with Caret Package [LINK](https://machinelearningmastery.com/feature-selection-with-the-caret-r-package/)
+
+Faraway, J. J. (2005). Linear models with R. Chapman &amp; Hall/CRC. 
+
+Modern approach to regression with R. (n.d.). . Springer Nature. 
+
+
+***
+
+## Appendix 
+
+```{}
+library(tidyverse)
+library(zoo)
+library(kableExtra)
+library(knitr)
+library(broom)
+library(DT)
+library(faraway)
+library(caret)
+library(corrplot)
+library(mlbench)
+library(randomForest)
+
+setwd("C:/Users/Nick Climaco/Documents/DataScience/DATA_621_F23/Homework-1")
+set.seed(12041998)
+         
+eval_df <- read_csv("moneyball-evaluation-data.csv")
+train_df <- read_csv("moneyball-training-data.csv")        
+         
+dim(train_df)
+
+par(mfrow = c(4,4), mar = c(3,3,1,1))
+
+for (col_name in names(train_df)[-1]) {
+    hist(train_df[[col_name]], main = paste(col_name), xlab = "Value")
+}
+
+par(mfrow = c(1,1)
+    
+
+kable(tidy(train_df[-1]), "pipe")  
+
+colnames(train_df) <- c("Index", "Wins", "Hits_P","Double_Hits_P","Triple_Hits_P", "Homerun_P","Walks_P", "Batter_Hit_P", "Strike_Out_N",
+                        "Stolen_Base_P", "Caught_Stealing_N", "Errors_N","Double_Play_P", "Walks_Allowed_N", "Hits_Allowed_N", "Homeruns_Allowed_N",
+                        "Strike_Out_Pitcher_P")
+
+colnames(eval_df) <- c("Index", "Wins", "Hits_P","Double_Hits_P","Triple_Hits_P", "Homerun_P","Walks_P", "Batter_Hit_P", "Strike_Out_N",
+                       "Stolen_Base_P", "Caught_Stealing_N", "Errors_N","Double_Play_P", "Walks_Allowed_N", "Hits_Allowed_N",
+                       "Strike_Out_Pitcher_P")
+
+train_df <- as.data.frame(na.fill(train_df, fill = 0))
+train_df <- train_df[-1]
+
+eval_df <- as.data.frame(na.fill(eval_df, fill = 0))
+         
+colnames(train_df)
+
+correlation_Matrix <- cor(train_df[,2:16])
+
+corrplot(correlation_Matrix,method = "color", type = "full", order = "hclust")
+         
+control <- trainControl(method = "repeatedcv", number = 10, repeats =3)
+
+
+model <- train(Wins~., data=train_df, method="lm", preProcess="scale", trControl=control)
+
+importance <- varImp(model, scale=FALSE)
+
+plot(importance)
+
+model_1 <- lm(Wins ~ Hits_P + Double_Hits_P + Triple_Hits_P +  Walks_P + Strike_Out_N +
+                  Stolen_Base_P + Caught_Stealing_N + Errors_N + Double_Play_P + Walks_Allowed_N +  
+                  Homeruns_Allowed_N + Strike_Out_Pitcher_P, 
+              data = train_df)
+
+summary(model_1)
+
+plot(model_1, 1:2)
+
+model_2 <- lm(Wins~ Hits_P + Triple_Hits_P + Homerun_P + Batter_Hit_P + Strike_Out_Pitcher_P, data = train_df)
+
+summary(model_2)
+
+plot(model_2, 1:2)
+
+model_3 <- lm(Wins ~ Hits_P + Homeruns_Allowed_N + Strike_Out_Pitcher_P, Batter_Hit_P,
+              data = train_df)
+
+
+summary(model_3)
+
+plot(model_3, 1:2)
+
+
+```
+
+***

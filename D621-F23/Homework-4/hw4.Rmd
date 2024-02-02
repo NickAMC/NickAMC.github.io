@@ -1,0 +1,382 @@
+---
+title: 'Data 621: Homework 4'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+        code_folding: hide
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+# Overview 
+
+In this homework assignment, you will explore, analyze and model a data set containing approximately 8000 records representing a customer at an auto insurance company. 
+
+Each record has two response variables. The first response variable, TARGET_FLAG, is a 1 or a 0. A “1” means that the person was in a car crash. A zero means that the person was not in a car crash. The second response variable is TARGET_AMT.
+
+This value is zero if the person did not crash their car. But if they did crash their car, this number will be a value greater than zero.
+
+
+# Objective 
+
+Your objective is to build multiple linear regression and binary logistic regression models on the training data to predict the probability that a person will crash their car and also the amount of money it will cost if the person does crash their car. 
+
+You can only use the variables given to you (or variables that you derive from the variables provided). Below is a short description of the variables of interest in the data set:
+
+```{r,echo=FALSE,out.width = '100%'}
+knitr::include_graphics("C:/Users/Nick Climaco/Documents/DataScience/DATA_621_F23/table.png")
+```
+
+```{r,echo=FALSE}
+library(data.table)
+library(tidyverse)
+library(caret)
+library(leaps)
+library(car)
+library(bestglm)
+```
+
+```{r}
+train_df <- fread("C:/Users/Nick Climaco/Documents/DataScience/DATA_621_F23/Homework-4/insurance_training_data.csv")
+test_df <- fread("C:/Users/Nick Climaco/Documents/DataScience/DATA_621_F23/Homework-4/insurance-evaluation-data.csv")
+```
+
+# Data Cleaning
+
+This data set has 8161 rows with two response variables and 24 explanatory variables. We notice that there some missing entries in some of the columns where we will address to handle the missing data in a later section. 
+
+```{r}
+# removing "z_" and "$"
+train_df <- as.data.frame(lapply(train_df, function(x) gsub("^z_", "", x)))
+
+
+train_df$INCOME <- gsub("\\$", "", train_df$INCOME)
+train_df$HOME_VAL <- gsub("\\$", "", train_df$HOME_VAL)
+train_df$BLUEBOOK <- gsub("\\$", "", train_df$BLUEBOOK)
+train_df$OLDCLAIM <- gsub("\\$", "", train_df$OLDCLAIM)
+
+columns_to_convert = c("INCOME","HOME_VAL","BLUEBOOK","OLDCLAIM")
+convert_with_commas_to_numeric <- function(x) as.numeric(gsub(",", "", x))
+train_df[columns_to_convert] <- lapply(train_df[columns_to_convert], convert_with_commas_to_numeric)
+
+train_df <- type.convert(train_df, as.is = TRUE)
+
+train_df[train_df == ""] <- NA
+
+show_summary <- function(df) {
+  cat(rep("+", 50), "\n")
+  cat(paste("DIMENSIONS : (", nrow(df), ", ", ncol(df), ")\n", sep = ""), "\n")
+  cat(rep("+", 50), "\n")
+  cat("COLUMNS:\n", "\n")
+  col_names <- names(df)
+  cat(paste(col_names, ", "))
+  cat(rep("+", 50), "\n")
+  cat("DATA INFO:\n", "\n")
+  cat(sapply(df, class), "\n")
+  cat(rep("+", 50), "\n")
+  cat("MISSING VALUES:\n", "\n")
+  missing_values <- colSums(is.na(df))
+  cat(paste(col_names, ": ", missing_values, "\n"))
+}
+
+show_summary(train_df)
+```
+
+```{r}
+train_df <- na.omit(train_df)
+```
+
+# Data Exploration
+
+The following are some of the summary statistics of the numerical variables. 
+
+```{r}
+summary(train_df)
+```
+
+For the missing data, we decided to simply removing them since we believed that imputing them based on the non-missing data might have unwanted bias. For instance, trying to calculate a customer target variables with missing income based on other customer's data return a wide margin of error in calculating that customer actual income. 
+
+```{r}
+show_summary(train_df)
+```
+
+```{r}
+str(train_df)
+```
+
+Observe, that TARGET_FLAG has inbalance in the number of customer who crashed their cars  and the number of customer who didnt crash which could skew the models towards the customers who didnt crash. Also, for the rest of the skewed data, we employed boxcox, log and sqrt transformations in order for the distributions to resemble normal.  
+
+```{r}
+par(mfrow = c(4, 4), mar = c(3, 3, 1, 1))
+
+for (col_name in names(train_df)[-1]) {
+    if (is.numeric(train_df[[col_name]])) {
+        hist(train_df[[col_name]], main = paste(col_name), xlab = "Value")
+    }
+}
+
+par(mfrow = c(1, 1))
+
+```
+
+```{r}
+par(mfrow = c(4, 4), mar = c(3, 3, 1, 1))
+
+for (col_name in names(train_df)[-1]) {
+    if (is.numeric(train_df[[col_name]])) {
+        boxplot(train_df[[col_name]], main = paste(col_name), horizontal = TRUE,  ylab = "Value")
+    }
+}
+
+par(mfrow = c(1, 1))
+
+```
+
+Here, is the overwhelmingly skewed class imbalance in the data where a majority of the data are customer who have not crashed their cars. 
+
+```{r}
+train_df$TARGET_FLAG <- as.factor(train_df$TARGET_FLAG)
+count <- table(train_df$TARGET_FLAG)
+barplot(count, main = "Bar Plot of TARGET_FLAG", xlab = "Categories", ylab = "Count", names.arg = c("No Crash", "Crashed"))
+```
+
+# Data Preparation
+
+To the address the class imbalance, we used the upsampling method to have a more even number of customer who has reported a crash. 
+
+```{r}
+# up sample crashed count
+df_0 <- train_df[train_df$TARGET_FLAG == 0, ]
+df_1 <- train_df[train_df$TARGET_FLAG == 1, ]
+
+# Calculate the difference in the number of rows between the two classes
+diff_rows <- nrow(df_0) - nrow(df_1)
+
+# Randomly sample rows from the minority class to match the majority class
+df_1_upsampled <- df_1[sample(nrow(df_1), diff_rows + 1600, replace = TRUE), ]
+
+# Combine the upsampled minority class with the majority class
+upsampled_data <- rbind(df_0, df_1_upsampled)
+
+# Shuffle the rows to randomize the order
+set.seed(123)  # Set seed for reproducibility
+upsampled_data <- upsampled_data[sample(nrow(upsampled_data)), ]
+```
+
+```{r}
+count <- table(upsampled_data$TARGET_FLAG)
+barplot(count, main = "Bar Plot of TARGET_FLAG", xlab = "Categories", ylab = "Count", names.arg = c("No Crash", "Crashed"))
+```
+
+
+```{r}
+upsampled_data$TARGET_FLAG <- as.numeric(upsampled_data$TARGET_FLAG)
+```
+
+```{r}
+upsampled_data$TARGET_AMT<- ifelse(upsampled_data $TARGET_AMT > 0 ,log(upsampled_data$TARGET_AMT), 0)
+upsampled_data$INCOME <- sqrt(upsampled_data$INCOME)
+upsampled_data$HOME_VAL <- ifelse(upsampled_data $HOME_VAL > 0 ,log(upsampled_data$HOME_VAL), 0)
+upsampled_data$BLUEBOOK <- sqrt(upsampled_data$BLUEBOOK)
+upsampled_data$OLDCLAIM <- ifelse(upsampled_data $OLDCLAIM> 0 ,log(upsampled_data$OLDCLAIM), 0)
+```
+
+```{r}
+par(mfrow = c(4, 4), mar = c(3, 3, 1, 1))
+
+for (col_name in names(upsampled_data)[-1]) {
+    if (is.numeric(upsampled_data[[col_name]])) {
+        hist(upsampled_data[[col_name]], main = paste(col_name), xlab = "Value")
+    }
+}
+
+par(mfrow = c(1, 1))
+```
+
+TARGET_AMT, INCOME, BLUEBOOK and YOJ were transform to more closely a normal distribution in hopes to improve the performance of our models.
+
+# Model Building 
+
+## Linear Models  
+
+Our initial linear model with create a baseline for us where we will be able to build upon. 
+
+### LM 1
+
+```{r}
+lm_df <- upsampled_data |>  
+    dplyr::select(-INDEX, -TARGET_FLAG)
+lm_df2 <- train_df |> 
+    dplyr::select(-INDEX, -TARGET_FLAG)
+
+base_model <- lm(TARGET_AMT ~ ., data = lm_df2)
+summary(base_model)
+```
+```{r}
+par(mfrow = c(2, 2))
+plot(base_model)
+```
+
+This model, we expected to perform poorly with an adjR^2 0.07 where the model was only able to explain the 7% of the variability in the data. The data used for this model were not transformed and nor had a feature selection system that picked out the best features. 
+
+### LM 2 by Stepwise 
+
+```{r}
+models <- regsubsets(TARGET_AMT ~ . ,data = lm_df, nvmax = 5, method = "seqrep")
+summary(models)
+```
+
+```{r}
+model_2 <- lm(TARGET_AMT ~ PARENT1 + JOB + CAR_USE + OLDCLAIM + URBANICITY + INCOME, data = lm_df)
+summary(model_2)
+```
+```{r}
+par(mfrow = c(2, 2))
+plot(model_2)
+```
+
+Using best subsets function in feature selection of the transformed variables we were able to greatly improve the fit of this second model relative the first model wheret the adjusted Rsquared when from 0.07 to 0.225 which suggests that the transformation and removal of excess features were significant. 
+
+### LM 3 by 10-fold validation 
+
+```{r}
+train_control <- trainControl(method = "cv", number = 10)
+
+step_model2 <- train(TARGET_AMT ~ . ,data = lm_df,
+                     method = "leapBackward",
+                     tuneGrid = data.frame(nvmax = 1:5),
+                     trControl = train_control)
+step_model2$results
+```
+
+```{r}
+step_model2$bestTune
+```
+
+```{r}
+summary(step_model2$finalModel)
+```
+
+```{r}
+model_3 <- lm(TARGET_AMT ~ INCOME + JOB + CAR_USE + OLDCLAIM + URBANICITY, data = upsampled_data)
+summary(model_3)
+```
+```{r}
+par(mfrow = c(2, 2))
+plot(model_3)
+```
+
+For model 3, we used a 10-Fold Validation method to selecting the best features to use. This method was push our knowledge is feature selection away. And it returned the best 5 features to use in the model. Where model 3 yields an adjusted Rsquared of 
+0.20 which is worse than model 2. In addition, we observed multiple t-values over the suggested threshold which could account for the poor fit of the data.
+
+## Logistic Models 
+
+Next, we build our logistic models on w
+
+### Logit Model 1 
+
+```{r}
+logit_df <- upsampled_data |> 
+    select(-INDEX, -TARGET_AMT) |> 
+    mutate(TARGET_FLAG = if_else(TARGET_FLAG == 1, 0, 1))
+logit_1 <- glm(TARGET_FLAG ~ . ,data=logit_df, family = "binomial")
+summary(logit_1)
+```
+
+Our first logit model with all the features including the transformed variable yields an AIC of 9279. This model indicated multiple features that were not significant predictors. We can take those redundant features using stepwise regression in the next model. Reducing the number of features will help this model  to perform better.
+
+### Logit Model 2 Stepwise
+
+```{r}
+logit_2 <- step(logit_1, direction = "both", scope = formula(logit_1))
+summary(logit_2)
+```
+
+It seems even with using the step() function, we were able to improve that fit of the model minimally. This stepwise() method used the combination of forward selection and backwards elimination to reach a formula that would best fit the data. We hoped that this method would greatly improve our performance.
+
+
+### Manual Significant Selection Model 3
+```{r}
+logit_3 <- glm(data = logit_df, TARGET_FLAG ~ KIDSDRIV + INCOME + HOME_VAL + TRAVTIME + BLUEBOOK + CAR_TYPE + MVR_PTS + URBANICITY +TIF + AGE)
+summary(logit_3)
+```
+
+We wanted to see and test whether that manually selecting the features from the first model would improve or worsen the model's performance. In this case the AIC is higher thus making the performance of this model worse. The next model, we will be building will using teh rfeControl function to select the features.
+
+### Logit Model 4: rfeControl
+
+```{r}
+control <- rfeControl(functions = rfFuncs, # random forest
+                      method = "repeatedcv", # repeated cv
+                      repeats = 2, # number of repeats
+                      number = 5) # number of folds
+
+```
+
+```{r}
+x <- logit_df %>%
+  select(-TARGET_FLAG) %>%
+  as.data.frame()
+
+# Target variable
+y <- logit_df$TARGET_FLAG
+
+# Training: 80%; Test: 20%
+set.seed(2021)
+inTrain <- createDataPartition(y, p = .80, list = FALSE)[,1]
+
+x_train <- x[ inTrain, ]
+x_test  <- x[-inTrain, ]
+
+y_train <- y[ inTrain]
+y_test  <- y[-inTrain]
+```
+
+```{r}
+result_rfe1 <- rfe(x = x_train, 
+                   y = y_train, 
+                   sizes = c(1:4),
+                   rfeControl = control)
+
+# Print the results
+result_rfe1
+```
+
+```{r}
+result_rfe1
+```
+
+```{r}
+logit_4 <- glm(TARGET_FLAG ~ URBANICITY + TRAVTIME + BLUEBOOK + HOME_VAL + INCOME, data = logit_df, family = 'binomial')
+summary(logit_4)
+```
+
+The rfeControl returned that having 23 variables would have the best performing model however our hardware limited us from the running that function. Moreover, even using the best 5 features from the rfeControl function yielded a relatively high AIC. 
+
+# Model Selection 
+
+After building and testing multiple models and trying out new feature selection techniques. 
+For this assignment, we will be proposing the use of Linear Model 2 with a adj Rsquare of 0.22 53 and Logistic Model 2 with AIC 9396.9 our lowest amongst the models. There were many models that didnt make the cut for this report. 
+
+
+# Resources 
+
+http://www.sthda.com/english/articles/37-model-selection-essentials-in-r/155-best-subsets-regression-essentials-in-r/
+
+https://datascience.stackexchange.com/questions/103039/which-machine-learning-model-is-best-for-a-combination-of-numerical-and-categori
+
+https://search.r-project.org/CRAN/refmans/groupdata2/html/upsample.html
+
+https://rpubs.com/ohcsnad/feature_selection_methods
+
+https://towardsdatascience.com/effective-feature-selection-recursive-feature-elimination-using-r-148ff998e4f7

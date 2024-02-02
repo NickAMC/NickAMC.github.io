@@ -1,0 +1,141 @@
+---
+title: 'Project 4: Document Classifier'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output: 
+    html_document:
+        toc: true
+        theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+For this project, We will be working on building a document classifier to classify text messages as spam or ham. The dataset will contain text messages that have been labeled as either spam or ham.  In order to classify these messages, We will be using the Naive Bayes technique.
+
+Naive Bayes is a classification algorithm that is widely used in text classification. The Naive Bayes technique is optimal for text classification tasks because it is able to handle large datasets and it  also works well with small datasets. Additionally, it is a fast and simple algorithm, which makes it a popular choice for many text classification tasks.
+
+In order to build the document classifier using Naive Bayes, We will first need to preprocess the text data by cleaning and normalizing it. We will then need to create a document-term matrix (DTM) from the preprocessed text data, which will be used as input for the Naive Bayes algorithm. We will then split the data into a training set and a test set, and use the training set to train the Naive Bayes model. 
+
+
+This dataset is available on Kaggle.com:https://www.kaggle.com/datasets/team-ai/spam-text-message-classification
+
+## Loading Libraries
+```{r}
+library(caret)
+library(tm)
+library(e1071)
+library(pROC)
+```
+
+## Loading data and Setting Seed
+
+```{r}
+docs <- read.csv("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/SPAM%20text%20message%2020170820%20-%20Data.csv", stringsAsFactors = FALSE)
+set.seed(100)
+```
+
+## Creating a Corpus 
+
+Here, we are creating a corpus of text messages by converting the messages in the dataset to a vector format. Then, we are preprocessing the data by converting it to lowercase, removing numbers, removing stopwords and punctuations, and stemming the words to their base form. This helps in reducing the number of features and making the text more consistent for classification.
+
+```{r}
+# Create a corpus
+corpus <- VCorpus(VectorSource(docs$Message))
+
+# Clean and preprocess the data
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removeWords, stopwords("english"))
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, stemDocument)
+```
+
+
+## Converting Corpus to DTM
+
+The code below converts the cleaned corpus into a document-term matrix, which is a matrix that represents the frequency of each term (word) in each document (text message). The removeSparseTerms function removes terms that are too sparse (occur in very few documents), to reduce the size and noise in the matrix.
+
+```{r}
+# Convert the corpus to a document-term matrix
+dtm <- DocumentTermMatrix(corpus)
+dtm <- removeSparseTerms(dtm, 0.9)
+```
+
+## Converting DTM to a DataFrame
+
+Here, we are converting the dtm object, which is a sparse matrix, into a data frame using the as.matrix() and as.data.frame() functions. We are also adding a Category column to this data frame, which is a factor with two levels - "spam" and "ham". This column contains the labels indicating whether each message is a spam or ham message.
+
+```{r}
+dtm <- as.data.frame(as.matrix(dtm))
+dtm$Category <- factor(docs$Category, levels = c("spam", "ham"))
+```
+
+## Data Splitting
+
+In the first line, we are creating a random partition of the dataset into a training set and a test set using the createDataPartition() function. We pass the Category column of the dtm data frame as the outcome variable and set the ratio of the training set to the entire dataset to be 0.7. 
+
+In the second line, we are subsetting the dtm data frame using the indices from trainIndex to create the train_data data frame, which contains 70% of the original data for training the model.
+
+In the third line, we are creating the test_data data frame by subsetting the dtm data frame using the indices that were not included in the training set, which contains the remaining 30% of the original data for testing the model.
+
+```{r}
+# Create a training and test set
+
+# Split data into training and test sets
+# subset 70% of the data to train
+trainIndex <- createDataPartition(dtm$Category, p = 0.7, list = FALSE)
+
+train_data <- dtm[trainIndex, ]
+test_data <- dtm[-trainIndex, ]
+```
+
+## Training the Model
+
+Here, we are training a Naive Bayes model using the naiveBayes() function, which takes in the training data and the categories. The function learns the probability distributions of each word given the category: spam or ham; and computes the prior probabilities of each category. These probabilities are used to classify new messages.
+
+After training the model, we make predictions on the test set using the predict() function, which takes in the trained model and the test data as arguments. The function returns the predicted categories for each message in the test set based on the probabilities learned during training.
+```{r}
+# Train the model using Naive Bayes
+model <- naiveBayes(train_data, factor(train_data$Category))
+
+# Make predictions on the test set
+predictions <- predict(model, test_data)
+```
+
+## Confusion Matrix
+
+```{r}
+# Confusion matrix
+confusionMatrix(predictions, test_data$Category, positive = "spam", dnn = c("Prediction", "Actual"))
+```
+
+## Model Performance
+
+Next, we will plot the ROC (Receiver Operating Characteristic) curve. The AUC value of 0.998 indicates that the Naive Bayes model has performed well in classifying the spam and ham messages. This high AUC score suggests that the model has a high true positive rate and a low false positive rate, which is really good for a spam detection models.
+```{r}
+# creating a numeric set for predictions
+predicted_numeric <- ifelse(predictions == "spam", 1,0)
+
+# create a roc plot
+roc_plot <- roc(test_data$Category, predicted_numeric)
+plot(roc_plot, main="ROC Curve for Text Message Classifier", 
+     xlab = "False Positive Rate",
+     ylab = "True Positive Rate",col="red", print.auc =TRUE)
+```
+
+## Conclusion
+
+In conclusion, the document classifier model using Naive Bayes algorithm showed excellent performance with an accuracy of 0.9964 and an AUC of 0.998. These results indicate that the model was able to effectively label between spam and ham messages, making it a great tool for text classification tasks. Overall, the use of Naive Bayes algorithm proved to be a great choice for this document classification problem.
+
+
+## Resources:
+
+Naive Bayes Documentation. Website: https://www.rdocumentation.org/packages/e1071/versions/1.7-13/topics/naiveBayes
+
+ROC function, Website: https://www.rdocumentation.org/packages/pROC/versions/1.18.0/topics/roc
+
+Supervised Learning in R, DataCamp, Website: https://www.datacamp.com/courses/supervised-learning-in-r-classification

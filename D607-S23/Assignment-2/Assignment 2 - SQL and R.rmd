@@ -1,0 +1,138 @@
+---
+title: "Data 607 Assignment 2"
+author: "Nick Climaco"
+date: "2023-02-01"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, tidy = TRUE, tidy.width = 180)
+
+```
+# Loading packages
+```{r}
+# Loading packages
+library(dplyr)
+library(DBI)
+library(RMySQL)
+library(ggplot2)
+```
+
+## Intro: 
+Google Forms was used to collect the data from friends and family.
+There are six recent popular movies for analysis: 
+Puss in Boots: The Last Wish,
+Black Panther,
+Avatar: The Way of Water,
+M3GAN,
+INFINITY POOL,
+Everything Everywhere All At Once.
+
+The rating scale is from 1-5, where 1 is the least liked and 5 is the most liked. After collection time, data downloaded from Google Forms as a .csv file then uploaded that .csv file to MySQL Online Database.
+
+## Connecting to database and loading in the data
+```{r}
+# connecting to online sql database
+connect_db <- dbConnect(MySQL(), 
+                        user = "sql9594950", 
+                        password = rstudioapi::askForPassword("Database password"), 
+                        host = "sql9.freesqldatabase.com",
+                        port = 3306,
+                        dbname = "sql9594950")
+
+# Load the data from SQL database into R
+data <- dbGetQuery(connect_db, "SELECT * FROM movie_reviews;")
+head(data)
+```
+
+```{r}
+# remove the first row and rename the columns
+df <- data %>% 
+    slice(-1) %>%
+    rename(Timestamp = "COL 1",
+           Name = "COL 2",
+           Age = "COL 3",
+           Puss_in_Boots_The_Last_Wish = "COL 4",
+           Black_Panther = "COL 5",
+           Avatar_The_Way_of_Water = "COL 6",
+           M3GAN = "COL 7",
+           INFINITY_POOL = "COL 8",
+           Everything_Everywhere_All_At_Once = "COL 9",)
+head(df)
+```
+```{r}
+# checking to see the data type of these columns
+typeof(df$Age)
+typeof(df$Black_Panther)
+```
+
+```{r}
+# movies rating are character type, changing it to a numeric
+df <- df %>% mutate_at(vars(Age,
+                            Puss_in_Boots_The_Last_Wish, 
+                            Black_Panther, 
+                            Avatar_The_Way_of_Water, 
+                            M3GAN, 
+                            INFINITY_POOL, 
+                            Everything_Everywhere_All_At_Once), as.integer)
+
+head(df)
+typeof(df$Age)
+typeof(df$Black_Panther)
+```
+## Cleaning the data
+Replacing the NA values for the median of each column. Removing the timestamp column.
+```{r}
+# clean the data by changing NA to the median of each column
+df <- df %>% mutate_all(~ ifelse(is.na(.), median(., na.rm = TRUE), .)) %>% 
+    select(-Timestamp)
+head(df)
+```
+## Analysis 
+Which of the six movies in the survey was the highest rated?
+
+We are gonna use the sum of each movie rating and calculate the percentage out of the highest rating the movie could get based on the size of the survey. e.g. if there are n participants the max rating would be 5 * n.
+```{r}
+max_rating = as.numeric(5 * count(df))
+max_rating
+df_overall_rating <- df %>%
+    select(-Name, -Age) %>%
+    summarize_all(sum) 
+head(df_overall_rating)
+
+
+```
+
+```{r}
+ratings_list <- unname(slice(df_overall_rating, 1)) %>% as.numeric() 
+df_3 <- data.frame(Movies = c(colnames(df_overall_rating)), Ratings = ratings_list)
+
+df_3 <- df_3 %>%  mutate(Score = round(Ratings / max_rating, 2) * 100) %>%
+    arrange(desc(Ratings))
+df_3
+```
+
+## Visualization
+```{r}
+df_3 %>% ggplot(aes(x = Score, y = Movies, fill = Movies)) +
+    geom_bar(stat = "identity") +
+    ylab("Score") +
+    geom_text(aes(label = Score), hjust = 1.5) +
+    ggtitle("Movie Ratings") +
+    theme(legend.position = "none",
+          axis.title.y = element_blank(),
+          plot.title = element_text(hjust = 0.5))
+```
+
+
+
+
+## Conclusion
+The results of the survey conducted via Google Forms have indicated that the movie "Everything Everywhere All at Once" was the most favored among the movie choices presented. On the other hand, "M3GAN" was the least liked, with lowest number of favorable scale.
+
+```{r}
+# disconnect from the database
+dbDisconnect(connect_db)
+```
+

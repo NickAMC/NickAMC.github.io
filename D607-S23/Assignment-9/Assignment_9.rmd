@@ -1,0 +1,53 @@
+---
+title: "Assigment 9"
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+## Asssignment Task :
+    - Is to choose one of the New York Times APIs, construct an inferface in R to read in the JSON data,
+    transform it into an R DataFrame.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Import Packages
+```{r}
+library(httr)
+library(jsonlite)
+library(tidyverse)
+```
+
+## Load JSON Data from API
+
+We will be using the Books API for this assingment
+
+```{r}
+api_url <- "https://api.nytimes.com/svc/books/v3/lists/best-sellers/history.json?api-key=kFTFTG3izBIGadVV6JG6Nu72ti5CNuhj"
+```
+
+```{r}
+response <- GET(api_url)
+content <- content(response, "text")
+json_data <- fromJSON(content)
+```
+
+```{r}
+json_df <- json_data$results
+```
+
+```{r}
+glimpse(json_df)
+```
+```{r}
+class(json_df)
+```
+
+```{r}
+library(DT)
+datatable(json_df)
+```
+

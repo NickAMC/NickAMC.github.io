@@ -1,0 +1,351 @@
+,Title,Location,Pct_10,Pct_25,Median,Pct_75,PCt_90
+0,Data Scientist,Alabama,106956,118880,131977,145130,157104
+1,Data Scientist,Alaska,127015,141176,156729,172349,186569
+2,Data Scientist,Arizona,114023,126735,140697,154719,167485
+3,Data Scientist,Arkansas,106095,117923,130914,143961,155839
+4,Data Scientist,California,128412,142729,158453,174244,188621
+5,Data Scientist,Colorado,117620,130733,145136,159600,172769
+6,Data Scientist,Connecticut,125479,139468,154833,170263,184312
+7,Data Scientist,Delaware,118924,132183,146745,161369,174684
+8,Data Scientist,Florida,110600,122930,136474,150074,162457
+9,Data Scientist,Georgia,112967,125561,139394,153286,165934
+10,Data Scientist,Hawaii,122149,135767,150724,165745,179421
+11,Data Scientist,Idaho,108092,120143,133379,146672,158773
+12,Data Scientist,Illinois,119623,132959,147607,162317,175710
+13,Data Scientist,Indiana,113534,126191,140094,154055,166766
+14,Data Scientist,Iowa,111415,123836,137479,151180,163654
+15,Data Scientist,Kansas,110856,123215,136790,150422,162833
+16,Data Scientist,Kentucky,109552,121766,135181,148653,160918
+17,Data Scientist,Louisiana,110693,123034,136589,150201,162594
+18,Data Scientist,Maine,112230,124742,138485,152286,164851
+19,Data Scientist,Maryland,120037,133420,148119,162880,176319
+20,Data Scientist,Massachusetts,126701,140827,156341,171922,186107
+21,Data Scientist,Michigan,115464,128337,142476,156674,169602
+22,Data Scientist,Minnesota,119308,132610,147219,161891,175248
+23,Data Scientist,Mississippi,103824,115399,128113,140880,152504
+24,Data Scientist,Missouri,110932,123299,136883,150525,162944
+25,Data Scientist,Montana,106431,118297,131329,144417,156333
+26,Data Scientist,Nebraska,109238,121416,134793,148226,160456
+27,Data Scientist,Nevada,117678,130798,145208,159679,172854
+28,Data Scientist,New Hampshire,117958,131109,145553,160058,173265
+29,Data Scientist,New Jersey,128168,142457,158152,173912,188262
+30,Data Scientist,New Mexico,107387,119359,132509,145714,157737
+31,Data Scientist,New York,124233,138083,153296,168573,182482
+32,Data Scientist,North Carolina,111764,124224,137910,151654,164167
+33,Data Scientist,North Dakota,111788,124250,137939,151686,164201
+34,Data Scientist,Ohio,114182,126912,140894,154935,167719
+35,Data Scientist,Oklahoma,107644,119645,132826,146063,158115
+36,Data Scientist,Oregon,117050,130099,144432,158826,171931
+37,Data Scientist,Pennsylvania,116188,129142,143369,157657,170665
+38,Data Scientist,Rhode Island,122009,135612,150552,165556,179216
+39,Data Scientist,South Carolina,109914,122168,135628,149144,161450
+40,Data Scientist,South Dakota,102590,114028,126590,139206,150692
+41,Data Scientist,Tennessee,107026,118958,132063,145225,157207
+42,Data Scientist,Texas,114442,127201,141214,155287,168100
+43,Data Scientist,Utah,110159,122440,135929,149476,161809
+44,Data Scientist,Vermont,112114,124613,138341,152128,164680
+45,Data Scientist,Virginia,115723,128624,142795,157025,169981
+46,Data Scientist,Washington,124908,138834,154129,169489,183474
+47,Data Scientist,West Virginia,104835,116523,129360,142252,153989
+48,Data Scientist,Wisconsin,114675,127459,141502,155603,168442
+49,Data Scientist,Wyoming,107084,119023,132135,145304,157293
+0,Data Analyst,Alabama,61737,69115,77218,86393,94747
+1,Data Analyst,Alaska,73316,82077,91700,102596,112517
+2,Data Analyst,Arizona,65817,73681,82320,92101,101007
+3,Data Analyst,Arkansas,61240,68558,76596,85697,93984
+4,Data Analyst,California,74123,82980,92708,103725,113754
+5,Data Analyst,Colorado,67893,76006,84917,95007,104194
+6,Data Analyst,Connecticut,72429,81084,90590,101355,111155
+7,Data Analyst,Delaware,68646,76848,85858,96060,105349
+8,Data Analyst,Florida,63841,71469,79849,89337,97975
+9,Data Analyst,Georgia,65207,72999,81557,91249,100072
+10,Data Analyst,Hawaii,70507,78932,88186,98665,108206
+11,Data Analyst,Idaho,62393,69849,78038,87311,95754
+12,Data Analyst,Illinois,69049,77300,86362,96625,105968
+13,Data Analyst,Indiana,65534,73365,81967,91707,100574
+14,Data Analyst,Iowa,64311,71996,80437,89995,98697
+15,Data Analyst,Kansas,63989,71635,80033,89544,98202
+16,Data Analyst,Kentucky,63236,70792,79092,88490,97047
+17,Data Analyst,Louisiana,63895,71530,79916,89412,98058
+18,Data Analyst,Maine,64782,72523,81025,90653,99419
+19,Data Analyst,Maryland,69288,77568,86662,96960,106335
+20,Data Analyst,Massachusetts,73135,81874,91473,102342,112238
+21,Data Analyst,Michigan,66648,74613,83360,93266,102284
+22,Data Analyst,Minnesota,68867,77097,86136,96371,105690
+23,Data Analyst,Mississippi,59930,67091,74957,83864,91973
+24,Data Analyst,Missouri,64032,71684,80088,89605,98269
+25,Data Analyst,Montana,61434,68775,76839,85969,94282
+26,Data Analyst,Nebraska,63055,70589,78865,88236,96769
+27,Data Analyst,Nevada,67927,76044,84959,95054,104246
+28,Data Analyst,New Hampshire,68088,76224,85161,95280,104493
+29,Data Analyst,New Jersey,73981,82822,92532,103527,113538
+30,Data Analyst,New Mexico,61986,69393,77529,86741,95129
+31,Data Analyst,New York,71710,80279,89691,100349,110052
+32,Data Analyst,North Carolina,64513,72222,80689,90277,99007
+33,Data Analyst,North Dakota,64526,72237,80706,90296,99027
+34,Data Analyst,Ohio,65909,73784,82435,92230,101149
+35,Data Analyst,Oklahoma,62135,69559,77714,86949,95357
+36,Data Analyst,Oregon,67564,75637,84505,94546,103689
+37,Data Analyst,Pennsylvania,67066,75081,83883,93851,102926
+38,Data Analyst,Rhode Island,70426,78842,88086,98553,108082
+39,Data Analyst,South Carolina,63445,71026,79353,88783,97368
+40,Data Analyst,South Dakota,59217,66294,74066,82867,90880
+41,Data Analyst,Tennessee,61778,69160,77268,86450,94809
+42,Data Analyst,Texas,66058,73952,82622,92440,101379
+43,Data Analyst,Utah,63586,71184,79530,88980,97584
+44,Data Analyst,Vermont,64714,72447,80941,90559,99316
+45,Data Analyst,Virginia,66798,74780,83547,93474,102513
+46,Data Analyst,Washington,72100,80715,90178,100894,110650
+47,Data Analyst,West Virginia,60513,67744,75686,84680,92868
+48,Data Analyst,Wisconsin,66193,74103,82790,92628,101585
+49,Data Analyst,Wyoming,61811,69198,77310,86497,94861
+0,Data Engineer,Alabama,78898,92072,106542,122382,136803
+1,Data Engineer,Alaska,93695,109340,126524,145334,162460
+2,Data Engineer,Arizona,84111,98155,113581,130468,145842
+3,Data Engineer,Arkansas,78263,91330,105684,121396,135701
+4,Data Engineer,California,94726,110543,127915,146933,164247
+5,Data Engineer,Colorado,86765,101252,117165,134584,150443
+6,Data Engineer,Connecticut,92562,108017,124993,143576,160495
+7,Data Engineer,Delaware,87727,102375,118464,136076,152111
+8,Data Engineer,Florida,81586,95209,110172,126551,141464
+9,Data Engineer,Georgia,83332,97246,112529,129259,144491
+10,Data Engineer,Hawaii,90106,105151,121676,139766,156236
+11,Data Engineer,Idaho,79736,93050,107674,123682,138256
+12,Data Engineer,Illinois,88242,102976,119159,136875,153004
+13,Data Engineer,Indiana,83750,97735,113094,129908,145217
+14,Data Engineer,Iowa,82187,95911,110984,127484,142506
+15,Data Engineer,Kansas,81775,95429,110427,126844,141792
+16,Data Engineer,Kentucky,80813,94307,109128,125352,140124
+17,Data Engineer,Louisiana,81655,95289,110265,126658,141583
+18,Data Engineer,Maine,82789,96612,111795,128416,143549
+19,Data Engineer,Maryland,88548,103333,119572,137349,153535
+20,Data Engineer,Massachusetts,93463,109069,126210,144974,162058
+21,Data Engineer,Michigan,85174,99396,115017,132117,147685
+22,Data Engineer,Minnesota,88010,102705,118846,136516,152602
+23,Data Engineer,Mississippi,76588,89376,103422,118798,132797
+24,Data Engineer,Missouri,81831,95495,110502,126931,141888
+25,Data Engineer,Montana,78511,91620,106019,121781,136132
+26,Data Engineer,Nebraska,80581,94036,108815,124993,139722
+27,Data Engineer,Nevada,86808,101302,117223,134651,150518
+28,Data Engineer,New Hampshire,87014,101543,117501,134970,150875
+29,Data Engineer,New Jersey,94546,110332,127672,146653,163934
+30,Data Engineer,New Mexico,79216,92443,106971,122875,137354
+31,Data Engineer,New York,91643,106945,123752,142150,158901
+32,Data Engineer,North Carolina,82445,96211,111331,127883,142953
+33,Data Engineer,North Dakota,82462,96231,111355,127910,142983
+34,Data Engineer,Ohio,84229,98293,113740,130650,146046
+35,Data Engineer,Oklahoma,79406,92664,107227,123169,137683
+36,Data Engineer,Oregon,86344,100761,116596,133931,149714
+37,Data Engineer,Pennsylvania,85708,100020,115738,132945,148612
+38,Data Engineer,Rhode Island,90002,105031,121537,139606,156057
+39,Data Engineer,South Carolina,81080,94619,109489,125767,140587
+40,Data Engineer,South Dakota,75678,88314,102193,117386,131219
+41,Data Engineer,Tennessee,78950,92132,106611,122462,136892
+42,Data Engineer,Texas,84420,98516,113999,130947,146378
+43,Data Engineer,Utah,81261,94829,109732,126046,140900
+44,Data Engineer,Vermont,82703,96512,111679,128283,143400
+45,Data Engineer,Virginia,85365,99619,115274,132413,148016
+46,Data Engineer,Washington,92141,107526,124424,142923,159765
+47,Data Engineer,West Virginia,77333,90246,104429,119955,134090
+48,Data Engineer,Wisconsin,84592,98717,114231,131214,146676
+49,Data Engineer,Wyoming,78993,92182,106669,122528,136967
+0,Data Architect,Alabama,93478,105679,119080,133635,146886
+1,Data Architect,Alaska,111010,125499,141413,158698,174434
+2,Data Architect,Arizona,99655,112662,126948,142464,156591
+3,Data Architect,Arkansas,92725,104828,118121,132559,145703
+4,Data Architect,California,112231,126879,142969,160443,176353
+5,Data Architect,Colorado,102799,116216,130953,146959,161532
+6,Data Architect,Connecticut,109667,123981,139702,156778,172324
+7,Data Architect,Delaware,103938,117504,132405,148588,163322
+8,Data Architect,Florida,96663,109280,123137,138188,151891
+9,Data Architect,Georgia,98732,111618,125772,141145,155141
+10,Data Architect,Hawaii,106757,120691,135995,152618,167751
+11,Data Architect,Idaho,94471,106802,120345,135055,148447
+12,Data Architect,Illinois,104549,118195,133183,149461,164282
+13,Data Architect,Indiana,99227,112178,126404,141853,155920
+14,Data Architect,Iowa,97375,110085,124045,139206,153010
+15,Data Architect,Kansas,96887,109533,123422,138508,152242
+16,Data Architect,Kentucky,95747,108244,121971,136879,150452
+17,Data Architect,Louisiana,96744,109372,123241,138304,152019
+18,Data Architect,Maine,98088,110890,124952,140224,154129
+19,Data Architect,Maryland,104911,118604,133644,149979,164851
+20,Data Architect,Massachusetts,110735,125188,141063,158305,174003
+21,Data Architect,Michigan,100914,114086,128553,144265,158571
+22,Data Architect,Minnesota,104274,117884,132833,149068,163850
+23,Data Architect,Mississippi,90741,102585,115593,129722,142585
+24,Data Architect,Missouri,96953,109607,123507,138602,152346
+25,Data Architect,Montana,93019,105160,118496,132979,146165
+26,Data Architect,Nebraska,95473,107934,121621,136486,150020
+27,Data Architect,Nevada,102849,116274,131018,147032,161612
+28,Data Architect,New Hampshire,103094,116550,131329,147381,161995
+29,Data Architect,New Jersey,112017,126638,142697,160138,176017
+30,Data Architect,New Mexico,93855,106105,119560,134173,147478
+31,Data Architect,New York,108578,122750,138315,155221,170613
+32,Data Architect,North Carolina,97681,110430,124433,139642,153490
+33,Data Architect,North Dakota,97701,110453,124459,139672,153522
+34,Data Architect,Ohio,99794,112819,127126,142664,156810
+35,Data Architect,Oklahoma,94080,106359,119846,134495,147831
+36,Data Architect,Oregon,102300,115652,130318,146246,160748
+37,Data Architect,Pennsylvania,101547,114801,129359,145170,159565
+38,Data Architect,Rhode Island,106635,120553,135840,152443,167559
+39,Data Architect,South Carolina,96064,108602,122374,137331,150949
+40,Data Architect,South Dakota,89663,101366,114219,128180,140891
+41,Data Architect,Tennessee,93539,105748,119158,133722,146982
+42,Data Architect,Texas,100021,113076,127415,142988,157167
+43,Data Architect,Utah,96277,108844,122646,137637,151285
+44,Data Architect,Vermont,97986,110775,124822,140079,153969
+45,Data Architect,Virginia,101140,114341,128840,144588,158926
+46,Data Architect,Washington,109168,123417,139067,156065,171541
+47,Data Architect,West Virginia,91624,103583,116719,130985,143973
+48,Data Architect,Wisconsin,100224,113306,127674,143279,157487
+49,Data Architect,Wyoming,93590,105806,119223,133795,147062
+0,Machine Learning Research Scientist,Alabama,64045,76524,90231,108727,125566
+1,Machine Learning Research Scientist,Alaska,76056,90876,107154,129118,149116
+2,Machine Learning Research Scientist,Arizona,68276,81580,96193,115911,133863
+3,Machine Learning Research Scientist,Arkansas,63529,75908,89504,107851,124555
+4,Machine Learning Research Scientist,California,76893,91876,108333,130539,150756
+5,Machine Learning Research Scientist,Colorado,70430,84154,99228,119568,138086
+6,Machine Learning Research Scientist,Connecticut,75136,89777,105857,127556,147312
+7,Machine Learning Research Scientist,Delaware,71211,85087,100328,120893,139617
+8,Machine Learning Research Scientist,Florida,66227,79131,93305,112431,129844
+9,Machine Learning Research Scientist,Georgia,67644,80825,95302,114837,132623
+10,Machine Learning Research Scientist,Hawaii,73142,87394,103048,124171,143403
+11,Machine Learning Research Scientist,Idaho,64725,77337,91190,109882,126900
+12,Machine Learning Research Scientist,Illinois,71630,85587,100917,121603,140437
+13,Machine Learning Research Scientist,Indiana,67984,81231,95780,115414,133289
+14,Machine Learning Research Scientist,Iowa,66715,79715,93993,113260,130801
+15,Machine Learning Research Scientist,Kansas,66380,79315,93522,112692,130145
+16,Machine Learning Research Scientist,Kentucky,65599,78382,92421,111366,128614
+17,Machine Learning Research Scientist,Louisiana,66283,79198,93384,112526,129954
+18,Machine Learning Research Scientist,Maine,67203,80298,94680,114088,131758
+19,Machine Learning Research Scientist,Maryland,71878,85883,101267,122025,140923
+20,Machine Learning Research Scientist,Massachusetts,75868,90651,106889,128799,148747
+21,Machine Learning Research Scientist,Michigan,69139,82612,97409,117376,135555
+22,Machine Learning Research Scientist,Minnesota,71441,85362,100652,121284,140068
+23,Machine Learning Research Scientist,Mississippi,62170,74284,87589,105543,121890
+24,Machine Learning Research Scientist,Missouri,66426,79369,93585,112769,130234
+25,Machine Learning Research Scientist,Montana,63730,76149,89788,108193,124950
+26,Machine Learning Research Scientist,Nebraska,65411,78157,92156,111047,128245
+27,Machine Learning Research Scientist,Nevada,70465,84196,99277,119627,138154
+28,Machine Learning Research Scientist,New Hampshire,70633,84396,99513,119911,138482
+29,Machine Learning Research Scientist,New Jersey,76746,91701,108126,130290,150469
+30,Machine Learning Research Scientist,New Mexico,64303,76832,90595,109165,126072
+31,Machine Learning Research Scientist,New York,74390,88885,104807,126290,145849
+32,Machine Learning Research Scientist,North Carolina,66924,79964,94288,113615,131211
+33,Machine Learning Research Scientist,North Dakota,66938,79981,94307,113638,131238
+34,Machine Learning Research Scientist,Ohio,68372,81695,96328,116073,134050
+35,Machine Learning Research Scientist,Oklahoma,64457,77017,90812,109426,126374
+36,Machine Learning Research Scientist,Oregon,70089,83746,98747,118988,137416
+37,Machine Learning Research Scientist,Pennsylvania,69573,83130,98020,118112,136405
+38,Machine Learning Research Scientist,Rhode Island,73059,87295,102931,124029,143239
+39,Machine Learning Research Scientist,South Carolina,65816,78641,92727,111734,129039
+40,Machine Learning Research Scientist,South Dakota,61431,73401,86548,104289,120441
+41,Machine Learning Research Scientist,Tennessee,64087,76574,90290,108798,125648
+42,Machine Learning Research Scientist,Texas,68527,81880,96547,116337,134355
+43,Machine Learning Research Scientist,Utah,65963,78816,92933,111983,129326
+44,Machine Learning Research Scientist,Vermont,67133,80214,94582,113970,131621
+45,Machine Learning Research Scientist,Virginia,69294,82797,97627,117639,135858
+46,Machine Learning Research Scientist,Washington,74794,89369,105376,126976,146642
+47,Machine Learning Research Scientist,West Virginia,62775,75007,88442,106571,123076
+48,Machine Learning Research Scientist,Wisconsin,68667,82047,96743,116573,134628
+49,Machine Learning Research Scientist,Wyoming,64122,76616,90339,108857,125717
+0,"Analyst, Business Intelligence",Alabama,66484,74372,83036,93936,103859
+1,"Analyst, Business Intelligence",Alaska,78953,88321,98610,111553,123337
+2,"Analyst, Business Intelligence",Arizona,70877,79286,88523,100142,110721
+3,"Analyst, Business Intelligence",Arkansas,65949,73773,82368,93179,103022
+4,"Analyst, Business Intelligence",California,79822,89292,99694,112780,124694
+5,"Analyst, Business Intelligence",Colorado,73113,81788,91316,103302,114214
+6,"Analyst, Business Intelligence",Connecticut,77998,87252,97417,110203,121845
+7,"Analyst, Business Intelligence",Delaware,73924,82694,92328,104447,115480
+8,"Analyst, Business Intelligence",Florida,68749,76906,85865,97136,107397
+9,"Analyst, Business Intelligence",Georgia,70221,78552,87703,99215,109696
+10,"Analyst, Business Intelligence",Hawaii,75928,84937,94832,107279,118612
+11,"Analyst, Business Intelligence",Idaho,67191,75163,83919,94934,104962
+12,"Analyst, Business Intelligence",Illinois,74358,83180,92870,105060,116159
+13,"Analyst, Business Intelligence",Indiana,70573,78946,88143,99713,110246
+14,"Analyst, Business Intelligence",Iowa,69256,77473,86498,97852,108189
+15,"Analyst, Business Intelligence",Kansas,68909,77084,86064,97361,107646
+16,"Analyst, Business Intelligence",Kentucky,68098,76178,85052,96216,106380
+17,"Analyst, Business Intelligence",Louisiana,68807,76971,85938,97218,107488
+18,"Analyst, Business Intelligence",Maine,69762,78040,87131,98568,108980
+19,"Analyst, Business Intelligence",Maryland,74615,83468,93192,105424,116561
+20,"Analyst, Business Intelligence",Massachusetts,78758,88102,98366,111277,123032
+21,"Analyst, Business Intelligence",Michigan,71773,80289,89642,101408,112121
+22,"Analyst, Business Intelligence",Minnesota,74162,82962,92626,104784,115853
+23,"Analyst, Business Intelligence",Mississippi,64538,72195,80605,91185,100818
+24,"Analyst, Business Intelligence",Missouri,68956,77137,86123,97427,107720
+25,"Analyst, Business Intelligence",Montana,66158,74007,82629,93475,103349
+26,"Analyst, Business Intelligence",Nebraska,67903,75959,84808,95940,106075
+27,"Analyst, Business Intelligence",Nevada,73149,81828,91361,103353,114271
+28,"Analyst, Business Intelligence",New Hampshire,73323,82023,91578,103598,114542
+29,"Analyst, Business Intelligence",New Jersey,79670,89122,99505,112565,124457
+30,"Analyst, Business Intelligence",New Mexico,66752,74672,83371,94314,104277
+31,"Analyst, Business Intelligence",New York,77224,86386,96450,109109,120636
+32,"Analyst, Business Intelligence",North Carolina,69473,77716,86769,98159,108528
+33,"Analyst, Business Intelligence",North Dakota,69488,77732,86787,98179,108550
+34,"Analyst, Business Intelligence",Ohio,70976,79397,88647,100282,110876
+35,"Analyst, Business Intelligence",Oklahoma,66912,74851,83571,94540,104527
+36,"Analyst, Business Intelligence",Oregon,72759,81391,90873,102801,113660
+37,"Analyst, Business Intelligence",Pennsylvania,72223,80792,90204,102044,112824
+38,"Analyst, Business Intelligence",Rhode Island,75841,84840,94723,107156,118476
+39,"Analyst, Business Intelligence",South Carolina,68323,76429,85333,96534,106732
+40,"Analyst, Business Intelligence",South Dakota,63770,71337,79647,90101,99620
+41,"Analyst, Business Intelligence",Tennessee,66528,74421,83091,93997,103927
+42,"Analyst, Business Intelligence",Texas,71137,79578,88848,100510,111128
+43,"Analyst, Business Intelligence",Utah,68475,76599,85523,96749,106969
+44,"Analyst, Business Intelligence",Vermont,69690,77959,87040,98465,108867
+45,"Analyst, Business Intelligence",Virginia,71934,80468,89842,101635,112372
+46,"Analyst, Business Intelligence",Washington,77643,86856,96974,109702,121291
+47,"Analyst, Business Intelligence",West Virginia,65166,72897,81390,92073,101799
+48,"Analyst, Business Intelligence",Wisconsin,71282,79740,89029,100715,111354
+49,"Analyst, Business Intelligence",Wyoming,66564,74461,83136,94048,103983
+0,Quantitative Analyst,Alabama,90573,103002,116653,130773,143628
+1,Quantitative Analyst,Alaska,107560,122320,138531,155299,170566
+2,Quantitative Analyst,Arizona,96557,109807,124361,139413,153118
+3,Quantitative Analyst,Arkansas,89844,102172,115714,129720,142471
+4,Quantitative Analyst,California,108743,123665,140055,157007,172442
+5,Quantitative Analyst,Colorado,99604,113272,128284,143812,157949
+6,Quantitative Analyst,Connecticut,106259,120840,136855,153420,168502
+7,Quantitative Analyst,Delaware,100708,114528,129706,145406,159700
+8,Quantitative Analyst,Florida,93659,106511,120627,135228,148522
+9,Quantitative Analyst,Georgia,95663,108790,123209,138122,151700
+10,Quantitative Analyst,Hawaii,103439,117633,133224,149349,164031
+11,Quantitative Analyst,Idaho,91535,104096,117892,132162,145154
+12,Quantitative Analyst,Illinois,101300,115200,130468,146260,160638
+13,Quantitative Analyst,Indiana,96143,109336,123827,138816,152462
+14,Quantitative Analyst,Iowa,94349,107296,121516,136225,149616
+15,Quantitative Analyst,Kansas,93876,106758,120907,135542,148866
+16,Quantitative Analyst,Kentucky,92772,105502,119485,133947,147115
+17,Quantitative Analyst,Louisiana,93738,106601,120729,135342,148647
+18,Quantitative Analyst,Maine,95039,108081,122405,137221,150711
+19,Quantitative Analyst,Maryland,101651,115599,130920,146767,161195
+20,Quantitative Analyst,Massachusetts,107294,122017,138188,154915,170143
+21,Quantitative Analyst,Michigan,97778,111195,125933,141176,155054
+22,Quantitative Analyst,Minnesota,101033,114897,130125,145876,160216
+23,Quantitative Analyst,Mississippi,87921,99986,113237,126944,139423
+24,Quantitative Analyst,Missouri,93940,106831,120989,135634,148967
+25,Quantitative Analyst,Montana,90128,102496,116080,130131,142923
+26,Quantitative Analyst,Nebraska,92505,105199,119142,133563,146693
+27,Quantitative Analyst,Nevada,99653,113328,128348,143883,158027
+28,Quantitative Analyst,New Hampshire,99890,113597,128652,144225,158402
+29,Quantitative Analyst,New Jersey,108536,123430,139788,156708,172113
+30,Quantitative Analyst,New Mexico,90938,103417,117123,131300,144207
+31,Quantitative Analyst,New York,105204,119640,135496,151897,166829
+32,Quantitative Analyst,North Carolina,94645,107632,121897,136652,150085
+33,Quantitative Analyst,North Dakota,94665,107655,121923,136680,150116
+34,Quantitative Analyst,Ohio,96693,109961,124535,139608,153332
+35,Quantitative Analyst,Oklahoma,91156,103664,117404,131614,144552
+36,Quantitative Analyst,Oregon,99121,112722,127662,143114,157183
+37,Quantitative Analyst,Pennsylvania,98391,111893,126722,142061,156026
+38,Quantitative Analyst,Rhode Island,103321,117499,133071,149178,163843
+39,Quantitative Analyst,South Carolina,93078,105851,119880,134390,147601
+40,Quantitative Analyst,South Dakota,86876,98797,111892,125435,137766
+41,Quantitative Analyst,Tennessee,90632,103069,116729,130858,143722
+42,Quantitative Analyst,Texas,96912,110211,124818,139926,153681
+43,Quantitative Analyst,Utah,93285,106086,120146,134689,147929
+44,Quantitative Analyst,Vermont,94941,107969,122278,137079,150554
+45,Quantitative Analyst,Virginia,97997,111444,126214,141492,155401
+46,Quantitative Analyst,Washington,105775,120290,136233,152723,167736
+47,Quantitative Analyst,West Virginia,88777,100959,114340,128179,140780
+48,Quantitative Analyst,Wisconsin,97110,110435,125072,140211,153994
+49,Quantitative Analyst,Wyoming,90682,103125,116793,130930,143800

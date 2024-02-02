@@ -1,0 +1,94 @@
+---
+title: "data 605 hw 1"
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output: 
+    html_document:
+        toc: true
+        theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+```{r}
+library(animation)
+```
+
+## Create My Initials
+
+```{r}
+# Initials NC
+x <- c(rep(-1, 500), 
+       seq(-1, 0, length.out = 500), 
+       rep(0, 500),
+       rep(0.5, 500),
+       seq(1, 1.75,length.out=500),
+       seq(1, 1.75,length.out=500),
+       seq(0.5,1,length.out=500),
+       seq(0.5,1,length.out=500))
+
+y <- c(seq(-2,2,length.out=500), 
+       seq(2,-2,length.out=500), 
+       seq(-2,2,length.out=500),
+       seq(-1.5,1.5,length.out=500),
+       rep(2,500),
+       rep(-2,500),
+       seq(-1.5,-2,length.out=500),
+       seq(1.5,2,length.out=500))
+
+z <- rbind(x, y)
+z <-data.frame(z)
+plot(y~x, xlim=c(-5,5), ylim=c(-5,5))
+
+```
+
+## Shear
+```{r,animation.hook='gifski'}
+a <- diag(2) 
+ani.options(interval = 1/2000)
+for (i in seq(-3,3,length.out=100)){
+  
+  a[1,2] <- i
+  new_x <- apply(z,2,function(x) a%*%x)
+  plot(new_x[2,] ~ new_x[1,], xlim=c(-5,5), ylim=c(-5,5))
+}
+```
+
+## Scaling
+```{r,animation.hook='gifski'}
+a <- diag(2)
+ani.options(interval = 1/20)
+for (i in seq(-3,3, length.out=100)){
+    a[1,1] <- i
+    a[2,2] <- i
+    new_x <- apply(z,2,function(x) a%*%x)
+    plot(new_x[2,] ~ new_x[1,],  xlim=c(-5,5), ylim=c(-5,5))
+}
+```
+
+## Rotation
+```{r,animation.hook='gifski'}
+a <- diag(2)
+ani.options(interval = 1/20)
+for (i in seq(-3, 3, length.out = 100)) {
+    a[1, 1] = i
+    newmat = apply(z, 2, function(x) a %*% x)
+    plot(newmat[2, ] ~ newmat[1, ],  xlim=c(-5,5), ylim=c(-5,5))
+}
+```
+
+## Projection
+```{r,animation.hook='gifski'}
+myf = function(x) { matrix(c(cos(x), -sin(x), sin(x), cos(x)), byrow = TRUE, nrow = 2) }
+ani.options(interval = 1/20)
+for (i in seq(-3,3, length.out = 100)) {
+    a = myf(i)
+    a[1,1] <- i
+    newmat = apply(z, 2, function(x) a %*% x)
+    plot(newmat[2, ] ~ newmat[1, ],  xlim=c(-5,5), ylim=c(-5,5))
+}
+```
+

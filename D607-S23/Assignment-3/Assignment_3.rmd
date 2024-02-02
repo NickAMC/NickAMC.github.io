@@ -1,0 +1,125 @@
+---
+title: "Assignment 3"
+author: "Nick Climaco"
+date: "2023-02-08"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+### Exercise 1
+Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+
+#### Solution
+```{r}
+data <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/majors-list.csv")
+head(data)
+```
+
+```{r}
+# creating a subset of majors containing the desired key words
+subset_data <- data %>% 
+    filter(grepl("DATA", Major) | grepl("STATISTICS", Major))
+head(subset_data)
+```
+### Exercise 2
+
+Write code that transforms the data below:
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+[13] "olive"        "salal berry"
+Into a format like this:
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+#### Solution
+```{r}
+strStart <- '[1] "bell pepper" "bilberry"   "blackberry"  "blood orange"[5] "blueberry"  "cantaloupe"  "chili pepper" "cloudberry"[9] "elderberry"  "lime"     "lychee" "mulberry"[13] "olive"    "salal berry"'
+```
+
+```{r}
+create_fruits_vector <- function(string) {
+    # using stringr package to get words inside double quotes.
+    # reference regex from textbook 14.3.2
+    fruits <- str_extract_all(string, "\"[^\"]+\"") # matches sequence of characters that start and end with double quotes.  
+    # convert list to vector using unlist() 
+    fruits <- unlist(fruits)
+    # replace double quotes with empty string
+    fruits <- str_remove_all(fruits, "\"")
+    # create a character vector for fruits
+    fruit_vector <- c(fruits)
+    # str_flatten reduces the character vector to a single 
+    return(str_c("c('", str_flatten(fruit_vector, collapse = "', '"), "')"))
+}
+
+
+```
+
+```{r}
+# calling the function create_fruits_vector
+create_fruits_vector(strStart)
+
+```
+
+### Exercise 3
+Describe, in words, what these expressions will match:
+
+
+```{r}
+'(.)\1\1'
+```
+'(.)' captures the first of any character and stores it in a capturing group. 
+'\1' matches the first character in the capturing group.
+So, this expression will match a string that contains any sequence of the same character three times. So, suppose we have string 'ballooon'. It would match 'ooo',
+
+```{r}
+"(.)(.)\\2\\1"
+```
+Captures any the first two characters followed by the same two characters but in reversed order. So, a string 'abcddc' would match 'cddc'.
+
+```{r}
+"(..)\1"
+```
+Matches any string that contains a pair of characters that is repeated. So, suppose we have string 'coconut' it match 'coco'.
+
+```{r}
+"(.).\\1.\\1"
+```
+Matches any string that captures the first character followed by any character and repeats the same character captured and followed by any character and repeats the same character captured. So, some string 'apanads' would match 'apana'.
+```{r}
+"(.)(.)(.).*\\3\\2\\1"
+```
+Matches any string that captures three characters follow by zero or more characters then repeats the third character in the captured group, then the second and the first in the group. Suppose we have a string 'paragraph' it would match 'par..rap.'
+
+
+### Exercise 4
+Construct regular expressions to match words that:
+    -Start and end with the same character.
+    -Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+    -Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+
+
+#### Solution
+```{r}
+# Start and end with the same character.
+str_subset(words, '^(.).*\\1$')
+```
+Anchored the first capturing group then followed by zero or more characters and anchor $ to match the end of the string with the capturing group. 
+```{r}
+# Contain a repeated pair of letters (e.g. "church" contains "ch" repeated twice.)
+str_subset(words, '(..).*\\1')
+```
+```{r}
+# Contain one letter repeated in at least three places (e.g. "eleven" contains three "e"s.)
+str_subset(words, "(.).*\\1.*\\1")
+```
+
+

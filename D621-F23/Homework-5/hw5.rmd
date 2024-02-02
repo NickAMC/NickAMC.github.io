@@ -1,0 +1,361 @@
+---
+title: 'Count Regression'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+        code_folding: hide
+editor_options:
+    chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+# Overview
+
+In this homework assignment, you will explore, analyze and model a data set containing information on approximately 12,000 commercially available wines. The variables are mostly related to the chemical properties of the wine being sold. The response variable is the number of sample cases of wine that were purchased by wine distribution companies after sampling a wine. These cases would be used to provide tasting samples to restaurants and wine stores around the United States. The more sample cases purchased, the more likely is a wine to be sold at a high end restaurant. A large wine manufacturer is studying the data in order to predict the number of wine cases ordered based upon the wine characteristics. If the wine manufacturer can predict the number of cases, then that manufacturer will be able to adjust their wine offering to maximize sales.
+
+Your objective is to build a count regression model to predict the number of cases of wine that will be sold given certain properties of the wine. 
+
+HINT: Sometimes, the fact that a variable is missing is actually predictive of
+the target. 
+
+You can only use the variables given to you (or variables that you derive from the variables provided).
+
+Below is a short description of the variables of interest in the data set:
+
+```{r,echo=FALSE,out.width = '100%'}
+knitr::include_graphics("../table scnshot.png")
+```
+
+```{r,echo = FALSE}
+require(data.table)
+require(ResourceSelection)
+require(car)
+require(corrplot)
+require(mice)
+require(MASS)
+require(glmnet)
+require(caret)
+```
+
+```{r,echo=FALSE}
+train_df <- fread("wine-training-data.csv")
+test_df <- fread("wine-evaluation-data.csv")
+```
+
+# Data Exploration 
+
+```{r}
+dim(train_df)
+```
+
+The training dataframe has 12795 rows and 16 columns with 1 target variable and 15 features. 
+
+```{r}
+str(train_df)
+```
+
+```{r}
+show_summary <- function(df) {
+    cat(rep("+", 50), "\n")
+    cat(paste("DIMENSIONS : (", nrow(df), ", ", ncol(df), ")\n", sep = ""), "\n")
+    cat(rep("+", 50), "\n")
+    cat("COLUMNS:\n", "\n")
+    col_names <- names(df)
+    cat(paste(col_names, ", "))
+    cat(rep("+", 50), "\n")
+    cat("DATA INFO:\n", "\n")
+    cat(sapply(df, class), "\n")
+    cat(rep("+", 50), "\n")
+    cat("MISSING VALUES:\n", "\n")
+    missing_values <- colSums(is.na(df))
+    cat(paste(col_names, ": ", missing_values, "\n"))
+}
+
+show_summary(train_df)
+```
+
+There the different chemical components of wine and its STAR rating on 1-5 scale where 5 stars is the highest quality of wine.
+
+```{r}
+par(mfrow = c(4, 4), mar = c(3, 3, 1, 1))
+
+for (col_name in names(train_df)[-1]) {
+    if (is.numeric(train_df[[col_name]])) {
+        hist(train_df[[col_name]], main = paste(col_name), xlab = "Value")
+    }
+}
+
+par(mfrow = c(1, 1))
+```
+
+
+```{r}
+par(mfrow = c(4, 4), mar = c(3, 3, 1, 1))
+
+for (col_name in names(train_df)[-1]) {
+    if (is.numeric(train_df[[col_name]])) {
+        boxplot(train_df[[col_name]], main = paste(col_name), horizontal = TRUE,
+            ylab = "Value")
+    }
+}
+
+par(mfrow = c(1, 1))
+```
+
+All of the features distribution is center around the mean which is what we want. Further supported with boxplots that the distributions look normal.
+
+# Data Preparation 
+
+Firstly, we want to remove the INDEX column from both the training and testing dataframe.
+
+```{r}
+train_df <- train_df |> 
+    dplyr::select(-INDEX)
+test_df <- test_df |> 
+    dplyr::select(-IN)
+```
+
+We then split the training data in to train-test split since the evaluation data is unlabeled thus we can not use for test the models' performance. In addition, we chose to use MICE imputation method to fill out the missing values in the data.
+
+```{r}
+# Impute missing data using mice 
+set.seed(123123)
+imputed_data <- mice(train_df, m = 5, method = "pmm")
+complete_train_df <- complete(imputed_data,1)
+test_df <- test_df [,2:15]
+test_imputed <- mice(test_df, m =5, method = "pmm")
+complete_test_df <- complete(test_imputed, 1)
+
+```
+
+```{r}
+correlation_matrix <- cor(complete_train_df[,1:14])
+corrplot(correlation_matrix, method = "color", type = "upper", addCoef.col = "black",number.cex = 0.5)
+```
+
+The features are have little to no correlation with the target and with other predictor variables. 
+
+```{r}
+complete_train_df$AcidIndex <- log(complete_train_df$AcidIndex)
+```
+
+```{r}
+hist(complete_train_df$AcidIndex)
+```
+
+```{r}
+set.seed(123123)
+train_indices <- createDataPartition(complete_train_df$TARGET, p = 0.8, list = FALSE)
+train_model_df <- complete_train_df[train_indices, ]
+test_model_df <- complete_train_df[-train_indices, ]
+
+x_train <- train_model_df[, 2:15] |> as.matrix()
+y_train <- train_model_df$TARGET |> 
+    as.matrix() |> as.numeric()
+```
+
+# Model Building 
+
+## Poisson Models 
+
+### Poisson Model 1 with MICE Imputed Data
+
+```{r}
+performance_metrics <- function(model, true_values, predicted_values) {
+    deviance <- deviance(model)
+    aic <- AIC(model)
+    bic <- BIC(model)
+    mse_val <- mean((true_values - predicted_values)^2)
+    rmse_val <- sqrt(mse_val)
+    mae_val <- mean(abs(predicted_values - true_values))
+    
+    metrics_df <- data.frame(
+        Deviance = deviance,
+        AIC = aic,
+        BIC = bic,
+        MSE = mse_val,
+        RMSE = rmse_val,
+        MAE = mae_val
+    )
+    return(metrics_df)
+}
+```
+
+```{r}
+pm_1  <- glm(TARGET ~ ., data = train_model_df, family = poisson)
+summary(pm_1)
+```
+
+```{r}
+pm_1_predictions <- predict(pm_1, newdata = test_model_df)
+performance_metrics(pm_1,test_model_df$TARGET, pm_1_predictions)
+```
+
+
+### Poisson Model 2 Shrinkage Method Lasso Variable Selection 
+
+```{r}
+lasso_model_poisson <- cv.glmnet(x_train, y_train, family = "poisson", alpha = 1, nfolds = 5)
+
+best_lambda <- lasso_model_poisson$lambda.min
+
+selected_features_poisson <- which(coef(lasso_model_poisson, s = best_lambda) != 0)
+selected_features_lasso <- which(coef(lasso_model_poisson, s = best_lambda) != 0)
+print(paste("Selected features by LASSO:", selected_features_lasso))
+```
+
+Since lasso returns that all predictors should be in the model that would the same as model 1. Therefore, for this model we will manually keep the features that are the most significant based on model 1.
+
+```{r}
+pm_lasso <- glm(TARGET ~ VolatileAcidity + FreeSulfurDioxide + TotalSulfurDioxide + 
+                    LabelAppeal + AcidIndex + STARS, 
+                data = train_model_df, 
+                family = poisson)
+summary(pm_lasso)
+```
+
+```{r}
+m2_predictions <- predict(pm_lasso, test_model_df)
+performance_metrics(pm_lasso,test_model_df$TARGET, m2_predictions)
+```
+
+### Poisson Model 3 Tree Based Feature Selection
+
+```{r}
+require(randomForest)
+
+rf_model <- randomForest(x_train, y_train, ntree =100, importance = TRUE)
+print(rf_model)
+```
+
+```{r}
+feature_importance <- importance(rf_model)
+sorted_features <- sort(feature_importance[,1], decreasing = TRUE)
+
+top_features <- names(sorted_features)[1:5]
+
+print(top_features)
+```
+
+```{r}
+pm_3 <- glm(TARGET ~ STARS + LabelAppeal + AcidIndex + VolatileAcidity + Chlorides,
+            data = train_model_df, family = poisson)
+summary(pm_3)
+```
+
+```{r}
+pm3_predictions <- predict(pm_3, newdata = test_model_df)
+performance_metrics(pm_3,test_model_df$TARGET, pm3_predictions)
+```
+
+## Negative Binomial 
+
+### NB Model 1 without Imputed data
+
+```{r}
+nb_1 <- glm.nb(TARGET ~ ., data = train_df)
+summary(nb_1)
+```
+
+```{r}
+nb_1_predictions <- predict(nb_1, test_model_df)
+performance_metrics(nb_1, test_model_df$TARGET, nb_1_predictions)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(nb_1)
+```
+
+### NB Model 2 Stepwise Feature Selection
+
+```{r}
+full_model <- glm.nb(TARGET ~ .,data = train_model_df)
+
+nb_2 <- stepAIC(full_model, direction = "both")
+summary(nb_2)
+```
+
+```{r}
+nb_2_predictions <- predict(nb_2, test_model_df)
+performance_metrics(nb_2, test_model_df$TARGET, nb_2_predictions)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(nb_2)
+```
+### NB Model 3 Tree Based Feature Selection 
+
+```{r}
+nb_3 <- glm.nb(TARGET ~ STARS + LabelAppeal + AcidIndex + VolatileAcidity + Chlorides,
+            data = train_model_df)
+summary(nb_3)
+```
+
+```{r}
+nb_3_predictions <- predict(nb_3, test_model_df)
+performance_metrics(nb_3, test_model_df$TARGET, nb_3_predictions)
+```
+
+# Model Selection 
+
+```{r}
+
+model_names <- c("Poisson Model 1","Poisson Model 2", "Poisson Model 3",
+                 "NB Model 1", "NB Model 2", "NB Model 3")
+
+pm1_metrics <- performance_metrics(pm_1, test_model_df$TARGET, pm_1_predictions)
+
+pm2_metrics <- performance_metrics(pm_lasso, test_model_df$TARGET, m2_predictions)
+
+pm3_metrics <- performance_metrics(pm_3, test_model_df$TARGET, pm3_predictions)
+
+nb1_metrics <- performance_metrics(nb_1, test_model_df$TARGET, nb_1_predictions)
+
+nb2_metrics <- performance_metrics(nb_2, test_model_df$TARGET, nb_2_predictions)
+
+nb3_metrics <- performance_metrics(nb_3, test_model_df$TARGET, nb_3_predictions)
+
+all_models_metrics <- rbind(pm1_metrics,pm2_metrics,pm3_metrics,nb1_metrics,nb2_metrics,nb3_metrics)
+
+final_table <- cbind(Model = model_names, all_models_metrics)
+
+data.table(final_table)
+
+```
+
+All models performed almost identical for which we did not expect. We will Negative Binomial Model 1 which had the better performance metrics to predict the evaluation dataframe. 
+
+# Predictions 
+
+```{r}
+predictions_df <- predict(nb_1, newdata = complete_test_df, type = "response")
+predicted_test_df <- cbind(TARGET = round(predictions_df), test_df)
+data.table(predicted_test_df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,423 @@
+---
+title: 'Data 605: Assignment 5'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+editor_options:
+    chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+***
+
+## Question 1: Bayesian
+
+A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1 (HIV-1) variants was recently developed.  The test maintains 96% sensitivity, meaning that, for those with the disease, it will correctly report “positive” for 96% of them.  The test is also 98% specific, meaning that, for those without the disease, 98% will be correctly reported as “negative.”  MNR HIV-1 is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate.  Given the prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is reported as positive by the new test actually has the disease?  If the median cost (consider this the best point estimate) is about $100,000 per positive case total and the test itself costs $1000 per administration, what is the total first-year cost for treating 100,000 individuals? 
+
+#### Solution
+
+First, we need to defined the terms and pull the important information. 
+We denote D as having the disease.
+
+$$
+\begin{align}
+P(D) &= 0.001 \\
+P(D^c) = 1 - P(D) &= 0.999 \\
+P(Positive | D) &= 0.96 \\ 
+P(Negative | D^c) &= 0.98
+\end{align}
+$$
+The question wants to know P(D | Positive). We can use bayes theorem and the law of total probability formula to find P(Positive)
+
+$$
+\begin{align}
+P(Positive) &= P(Positive|D)P(D) + P(Positive|D^c)P(D^c) \\
+&= 0.96(0.001) + (1-P(Negative|D^c))(0.999) \\
+&= 0.96(0.001) + (0.02)(0.999) \\
+&= 0.02094
+\end{align}
+$$
+Now, we know the P(Positive)
+
+$$
+\begin{align}
+P(D | Positive) &= \frac{P(Positive | D)P(D)}{P(Positive)} \\ 
+&= \frac{0.96(0.01)}{0.02094} \\
+&= 0.04584 \approx 4.58\%
+\end{align}
+$$
+
+We need to calculate the first year cost for treating 100k individuals, 
+
+$$
+Total Individual Cost = 100,000(0.0458*100,000) = 458,000,000 \\
+Admin Cost for Treatment = 1,000(100,000) = 100,000,000
+$$
+We are using P(D|P) because they are the individuals who have the disease and have been tested positive. 
+
+So, the total first year cost of treating 100,000 individuals is $558,000,000.
+
+***
+
+## Question 2: Binomial
+
+The probability of your organization receiving a Joint Commission inspection in any given month is .05.
+
+#### a) What is the probability that, after 24 months, you received exactly 2 inspections?
+
+#### Solution
+
+$$
+P(X = 2) = \binom{24}{2}(0.05)^2(1-0.05)^{22}
+$$
+```{r}
+# p 0.05
+# We want to find P(X = 2) with n = 24
+five_C_2 <- choose(24,2)
+p_i <- 0.05 ^ 2
+q_n_i <- (1-0.05)^22
+
+result <- five_C_2 * p_i * q_n_i
+result
+```
+
+$$
+\begin{align}
+P(X = 2) = \binom{24}{2}(0.05)^2(1-0.05)^{22} 
+= 0.2223
+\end{align}
+$$
+
+#### b) What is the probability that, after 24 months, you received 2 or more inspections?
+
+#### Solution
+
+```{r}
+prob_geq_2 <- 1 - pbinom(1, 24, 0.05)
+prob_geq_2
+```
+
+$$
+\begin{align}
+P(X \geq 2) &= 1 - P(X <2) \\
+&= 1 - (P(X=0) + P(X=1)) \\ 
+&= 0.3392
+\end{align}
+$$
+
+#### c) What is the probability that your received fewer than 2 inspections?  
+
+#### Solution
+
+```{r}
+prob_less_2 <- pbinom(1,24,0.05)
+prob_less_2
+```
+
+$$
+\begin{align}
+P(X<2) &= P(X=0) + P(X=1) \\
+&= 0.292 + 0.369 \\
+&=0.661
+\end{align}
+$$
+
+#### d) What is the expected number of inspections you should have received? 
+
+#### Solution
+
+$$
+E[X] = np = 24(0.05) = 1.2
+$$
+
+
+#### e) What is the standard deviation? 
+
+#### Solution
+
+$$
+Var(X) = np(1-p) = 24(0.05)(0.95) = 1.14
+$$
+But we want the standard deviation. So
+
+$$
+\sigma = \sqrt{Var(X)} = \sqrt{1.14} = 1.0677
+$$
+
+***
+
+## Question 3: Poisson
+
+You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per hour.
+
+#### a) What is the probability that exactly 3 arrive in one hour?  
+
+#### Solution 
+
+$$
+\lambda = 10;\\
+P(X = 3)= \frac{e^{-10}10^3}{3!} = 0.008
+$$
+```{r}
+dpois(3,10)
+```
+
+#### b) What is the probability that more than 10 arrive in one hour?  
+
+#### Solution 
+
+$$
+\begin{align}
+P(X>10) &= 1 - P(X \leq 10 ) \\
+&= 1 - \sum_{i=0}^{10} \frac{e^{- \lambda}\lambda^i}{i!} \\
+&= 1 - 0.583 \\
+&= 0.417
+\end{align}
+$$
+
+```{r}
+ppois(10,10)
+```
+
+
+#### c) How many would you expect to arrive in 8 hours?  
+
+#### Solution
+
+The expected value is lambda = 10 per hour. So, after 8 hours we can expect have 80 arrivals.
+
+#### d) What is the standard deviation of the appropriate probability distribution?  
+
+#### Solution 
+
+$$
+\sigma = \sqrt{Var(X)} = \sqrt{\lambda} = \sqrt{10} \approx 3.162
+$$
+
+#### e) If there are three family practice providers that can see 24 templated patients each day, what is the percent utilization and what are your recommendations? 
+
+#### Response 
+
+Our given arrival rate of 10 per hour. Then we can say that for three family clinics we can expect 80 patients arriving in 8 hours per day. But, the three clinics can only see 24*3 = 72 patients a day.
+
+So, the utilization rate of 80/72 = 1.11 or 110% which indicates overbooking and thus may not have enough time to see all patients in their care. 
+
+Recommendations to combat this, is to either reduce their patient pool or to increase the number of clinics while all maintaining the same level of quality care.
+
+***
+
+## Question 4: Hypergeometric
+
+Your subordinate with 30 supervisors was recently accused of favoring nurses.  15 of the subordinate’s workers are nurses and 15 are other than nurses.  As evidence of malfeasance, the accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible.  The supervisor sent 5 nurses and 1 non-nurse.  
+
+#### a) If your subordinate acted innocently, what was the probability he/she would have selected five nurses for the trips?  
+
+#### Solution
+
+$$
+P(X =5) = \frac{\binom{15}{5} \binom{15}{1}}{\binom{30}{6}} = 0.07586 \approx 7.59 \%
+$$
+
+```{r}
+(choose(15,5) * choose(15,1)) / choose(30,6)
+```
+
+#### b) How many nurses would we have expected your subordinate to send?  
+
+#### Solution
+
+15 nurses out of 30 employees for 6 trips,
+
+$$
+E[X] = \frac{15(6)}{30} = 3
+$$
+
+#### c) How many non-nurses would we have expected your subordinate to send? 
+
+#### Solution
+
+15 non nurses out of 30 employees for 6 trips
+
+$$
+E[X] = \frac{15(6)}{30} = 3
+$$
+
+So, we could expect to have 3 nurses and 3 non nurses on the trips.
+
+***
+
+## Question 5: Geometric
+
+The probability of being seriously injured in a car crash in an unspecified location is about .1% per hour.  A driver is required to traverse this area for 1200 hours in the course of a year.  
+
+#### a) What is the probability that the driver will be seriously injured during the course of the year?  
+
+$$
+\begin{align}
+P(X \geq 1) &= 1 - P(X < 1) \\
+&=1 - P(X=0) \\
+&= 1- 0.699 \\
+&= 0.301
+\end{align}
+$$
+
+```{r}
+pgeom(1200, 0.001)
+```
+
+#### b) In the course of 15 months? 
+
+```{r}
+1 - pgeom(1500,0.001)
+```
+
+
+#### c) What is the expected number of hours that a driver will drive before being seriously injured?  
+
+$$
+E[X] = \frac{1}{p} = \frac{1}{0.001} = 1000
+$$
+
+In other words, for every 1000 hour, there could be at least 1 driver that will be seriously injured.
+
+#### d) Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the next 100 hours? 
+
+Using the cmf,
+
+$$
+P(X \leq 100 ) = 1- (1-0.001)^{100} = 0.09521 \approx 9.52 \%
+$$
+```{r}
+pgeom(100, 0.001)
+```
+
+***
+
+## Question 6: Poisson
+
+You are working in a hospital that is running off of a primary generator which fails about once in 1000 hours.  
+
+#### a) What is the probability that the generator will fail more than twice in 1000 hours?  
+
+#### Solution
+
+Based on the question, it sounds like a poisson distribution due to an existence of rate and a time window; in this case fails 1 in 1000 hours.
+
+So, we have $\lambda = 1$,
+
+$$
+\begin{align}
+P(X \geq 2) &= 1 - P(X < 2) \\
+& = 1 - \sum_{i=0} ^ 1 \frac{e^{- 0.001} 0.001^i}{i!} \\
+&= 0.0803 \approx 8.03 \%
+\end{align}
+$$
+
+
+```{r}
+1 - ppois(2, 1)
+```
+
+#### b) What is the expected value? 
+
+And the expected value of poisson is $E[X] = \lambda = 1$
+
+***
+
+## Question 7: Uniform
+
+A surgical patient arrives for surgery precisely at a given time.  Based on previous analysis (or a lack of knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes.  
+
+#### a) What is the probability that this patient will wait more than 10 minutes?  
+
+#### Solution 
+
+$$
+\begin{align}
+P(X>10) &= \int_{10}^{30} \frac{1}{30-0}dx \\
+&= \frac{x}{30} \Big| _{10}^{30} \\
+&= \frac{30-10}{30} = 0.6667
+\end{align}
+$$
+
+#### b) If the patient has already waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being seen?  
+
+#### Solution
+
+$$
+P(X \geq 15 | X > 10) = \frac{\int_{15}^{30} \frac{1}{30-0}dx}{\int_{10}^{30} \frac{1}{30-0}dx} = \frac{3}{4} = 0.75
+$$
+
+
+#### c) What is the expected waiting time? 
+
+#### Solution 
+
+$$
+E[X] = \frac{30}{2} = 15
+$$
+
+***
+
+## Question 8: Exponential
+
+Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value).  Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution.  
+
+#### a) What is the expected failure time?  What is the standard deviation?  
+
+#### Solution
+
+We have a $\lambda = 1/10$ given, 
+
+$$
+E[X] = \frac{1}{\lambda} = \frac{1}{\frac{1}{10}} = 10 \\
+\sigma = \sqrt{Var(X)} = \sqrt \frac{1}{\lambda^2} = 10
+$$
+
+#### b) What is the probability that your MRI will fail after 8 years?  
+
+#### Solution
+
+We were told that X~exp($\lambda$). Isnt this the hazard rate function. 
+
+$$
+P(X \geq 8) = 1 - P(X<8) = 1 - \int_0 ^ 8 0.1 e^{- 0.1 (x)} dx = 1-0.0.5507 = 0.4493
+$$
+
+```{r}
+1- pexp(8, 0.1)
+```
+
+#### c) Now assume that you have owned the machine for 8 years. Given that you already owned the machine 8 years, what is the probability that it will fail in the next two years?   
+
+#### Solution
+
+$$
+P(8<X \leq 10) = P(X \leq 10) - P(X \leq 8) = \int_8 ^{10} 0.1 e^{-0.1x}dx = 0.0814
+$$
+
+```{r}
+pexp(10, 0.1) - pexp(8,0.1)
+```
+
+```{r}
+lambda = 1/10
+integrate(function(x) lambda * exp(-lambda * x), lower = 8, upper = 10)$value
+```
+
+***
+
+## Resources
+
+* Ross, S. (2014) *A first course in probability*. Harlow:Pearson
+
+* [Probability distributions in R (Stat 5101, Geyer)](https://www.stat.umn.edu/geyer/old/5101/rlook.html#:~:text=R%20Functions%20for%20Probability%20Distributions,-Every%20distribution%20that&text=For%20the%20normal%20distribution%2C%20these,qbinom%20%2C%20dbinom%20%2C%20and%20rbinom%2)

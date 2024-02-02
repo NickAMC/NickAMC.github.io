@@ -1,0 +1,140 @@
+---
+title: "Project 1 Chess Rating"
+author: "Nick Climaco"
+date: "2023-02-15"
+class: "DATA 607"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE,tidy.opts=list(width.cutoff=90),tidy=TRUE)
+```
+
+# Project Description
+
+In this project, you’re given a text file with chess tournament results where the information has some structure. Your
+job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database)
+with the following information for all of the players:
+Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents
+For the first player, the information would be:
+Gary Hua, ON, 6.0, 1794, 1605
+
+# Import Required Packages
+```{r}
+library(tidyverse)
+library(knitr)
+```
+
+# Loading and Reading the Data
+```{r}
+tournament_data <- read.csv("https://raw.githubusercontent.com/Nick-Climaco/DATA-607-NC/main/tournament_info.txt", header = TRUE, skip = 3)
+tournament_data2 <- read_lines("https://raw.githubusercontent.com/Nick-Climaco/DATA-607-NC/main/tournament_info.txt")
+```
+
+# Extracting the Data from the txt file
+
+### Extraction and Cleaning
+
+```{r}
+# matches a string of characters for the first and last names or match first, middle and last names
+# simplify =TRUE returns a character matrix instead list of character vector
+player_names <- tournament_data %>% 
+    str_extract_all("\\w+\\s\\w+ | \\w+\\s\\w+\\s\\w+", simplify = TRUE) %>%
+    str_flatten(collapse = ",") %>% 
+    str_replace_all(",{2,}" , ",") %>%
+    str_remove_all("^$") %>%
+    str_split(",") 
+
+player_names <- player_names[[1]] %>%
+  str_trim()  # remove leading/trailing white space
+
+player_state <-  tournament_data %>% 
+    str_extract_all("\\s([A-Z][A-Z])\\s\\|", simplify =  TRUE) %>%
+    str_flatten(collapse = ",") %>%
+    str_replace_all(",{2,}" , ",") %>%
+    str_remove_all("\\|") %>%
+    str_split(",") 
+
+player_state <- player_state[[1]] %>%
+  str_trim()
+
+total_number_points <- tournament_data %>%
+    str_extract_all("\\d\\.\\d", simplify = TRUE) %>%
+    str_flatten(collapse = ",") %>%
+    str_replace_all(",{2,}" , ",") %>%
+    str_split(",")
+
+total_number_points <- total_number_points[[1]] %>% 
+    str_trim()
+
+player_pre_rating <- tournament_data %>%
+    # not all the pre rating are the same format
+    str_extract_all("R:\\s*(\\d\\d\\d\\d)|R:\\s*\\d\\d\\d", simplify = TRUE) %>%
+    str_flatten(collapse = ",") %>%
+    str_replace_all(",{2,}" , ",") %>%
+    str_remove_all("R: ") %>%
+    str_split(",") 
+
+player_pre_rating <- player_pre_rating[[1]] %>%
+    str_trim()
+```
+Adding the cleaned into a data frame...
+```{r}
+# checking if it worked
+df_tournament <- data.frame(Number = seq(1:64),
+                            Name = player_names, 
+                            State = player_state, 
+                            Total_Points = as.numeric(total_number_points), 
+                            Pre_Rating = as.numeric(player_pre_rating))
+
+
+head(df_tournament)
+```
+#### Create a List of opponents player numbers
+```{r}
+opponents_data <- tournament_data2[seq(5, 196, 3)]
+opponent_num <- str_extract_all(opponents_data, "(?<=\\|([A-Z])\\s{2,3})\\d{1,2}|(?<=\\|)(([A-Z])\\s{4}|\\s{5})") %>%
+  unlist() %>%
+  as.numeric()
+
+#KEEP TRACK OF REGEX MEANINGS:
+
+#(?<=\\|([A-Z])\\s{2,3}) :regex using a positive look behind token  "(?<=..)", match a capital letter A-Z; whitespace 2-3 times
+
+#\\d{1,2} : matches decimal digit 1-2 times 
+
+#"|" : alternate_match
+
+#(?<=\\|)(([A-Z])\\s{4}|\\s{5}): positive look behind \\|; alternate_match a single capital letter followed by 4 with space or no letter just 5 white spaces 
+
+```
+
+```{r}
+# Split the opponent numbers into groups of 7
+opponent_groups <- split(opponent_num, rep(1:(length(opponent_num) %/% 7), each = 7))
+
+# Create a matrix to store the total and average pre-ratings
+opponent_pre_rating <- matrix(0, ncol = 2, nrow = length(opponent_groups))
+colnames(opponent_pre_rating) <- c("Total", "Average")
+
+# Calculate the total and average pre-ratings for each group of opponents
+opponent_pre_rating[, 1] <- unlist(lapply(opponent_groups, function(opponents) {
+  total_pre_rating <- sum(df_tournament$Pre_Rating[df_tournament$Number %in% opponents], na.rm = TRUE)
+  return(total_pre_rating)
+}))
+
+opponent_pre_rating[, 2] <- unlist(lapply(opponent_groups, function(opponents) {
+  average_pre_rating <- mean(df_tournament$Pre_Rating[df_tournament$Number %in% opponents], na.rm = TRUE)
+  return(average_pre_rating)
+}))
+```
+```{r}
+df_tournament$Average_Opponents_Rating <- round(opponent_pre_rating[,2], digits = 0)
+
+kable(df_tournament, row.names = NA)
+```
+## Write csv file
+```{r}
+write.csv(df_tournament, "chess_tournament.csv", row.names = FALSE)
+```
+

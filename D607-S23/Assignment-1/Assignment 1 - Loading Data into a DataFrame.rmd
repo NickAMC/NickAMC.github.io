@@ -1,0 +1,43 @@
+---
+title: "Assignment 1 - Loading Data into a DataFrame"
+author: "Nick Climaco"
+date: "2023-01-28"
+output: 
+    html_document: default
+    pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Summary : 
+The article "Club Soccer Prediction" is a forecasting model of club soccer around the world. 
+This article uses a revised version of ESPN's SPI (Soccer Power Index) rating from seasons 2016 to 2022. 
+The article shows the probability of a team winning, losing, or drawing their respective games.
+
+Link to the articles: 
+
+https://projects.fivethirtyeight.com/soccer-predictions/
+
+https://fivethirtyeight.com/methodology/how-our-club-soccer-predictions-work/
+
+```{r}
+library(dplyr)
+# added csv file to my github
+data <- read.csv("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/spi_matches.csv")
+head(data)
+```
+```{r}
+# create a subset from data where the probability of a tie is greater than the probability of either team winning. 
+df <- data %>% 
+    select(season, league, team1, team2, spi1, spi2, prob1, prob2, probtie, xg1, xg2) %>% 
+    rename(expected_goal1 = "xg1", expected_goal2 = "xg2") %>%
+    filter(probtie > prob1 & probtie > prob2)
+head(df)
+```
+
+## Conclusion and Findings :
+A very interesting fact based on the data provided, we observe how low the chances are where a tie game is the most probable outcome. 
+For further analysis, we could analyze how SPI for each team can impact their likelihood of a match regardless if they are the home or away team. 
+It also be interesting to cross-examine the teams with the best SPI across different leagues and even different regions of the world.
+

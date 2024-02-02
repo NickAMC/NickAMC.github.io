@@ -1,0 +1,11 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/995982/746fc7d1fc464bbd854cf8e5c33a879f
+bundleId: https://api.rpubs.com/api/v1/document/995982/746fc7d1fc464bbd854cf8e5c33a879f
+url: http://rpubs.com/nick_clim04/995982
+when: 1674830880.42714
+lastSyncTime: 1674830880.42715

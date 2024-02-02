@@ -1,0 +1,121 @@
+---
+title: 'Lab 1: Intro to R'
+author: "Nick Climaco"
+date: "2/1/2023"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+```
+
+### Exercise 1
+
+What command would you use to extract just the counts of girls baptized? Try it!
+
+```{r view-girls-counts}
+arbuthnot$girls
+```
+
+
+### Exercise 2
+
+Is there an apparent trend in the number of girls baptized over the years? How would you describe it? (To ensure that your lab report is comprehensive, be sure to include the code needed to make the plot as well as your written interpretation.)
+
+```{r trend-girls}
+arbuthnot %>% ggplot(aes(year, girls)) +
+    geom_point() + 
+    geom_line() + 
+    geom_smooth(method = lm) +
+    labs(x = "Year",
+         y = "# of Girls Baptized") +
+    theme_bw()
+```
+Based on the graph, we observe that there is a generally upward trends in the number of girls being baptized. Though, we see a sudden drop in the 1640s; it could be due the London revolution and various civil wars that occurred during the time period. 
+
+### Exercise 3
+
+Now, generate a plot of the proportion of boys over time. What do you see?
+
+```{r plot-prop-boys-arbuthnot}
+arbuthnot %>% ggplot(aes(year, boys)) + 
+    geom_line() + 
+    geom_point() +
+    geom_smooth(method = lm) +
+    theme_classic()
+```
+
+Similar to what we observed in the girls plot, we see a mainly positive trend of boys being baptized over time and notice the same sudden drop during the 1640s. 
+```{r}
+arbuthnot %>% ggplot(aes(x = year)) +
+    geom_line(aes(y = girls, color = "Girls")) +
+    geom_line(aes(y = boys, color = "Boys")) +
+    scale_color_manual(values = c("Girls" = "Red", "Boys" = "Blue")) +
+    labs(x = "Year",
+         y = "# of Baptisms") +
+    ggtitle("The Number of Boys and Girls Baptized in the 17th Century")
+```
+
+
+```{r}
+data('present', package = 'openintro')
+# present is the data set for recorded births in the US
+```
+```{r}
+head(present)
+```
+
+### Exercise 4
+
+What years are included in this data set? What are the dimensions of the data frame? What are the variable (column) names?
+
+```{r dim-present}
+range(present$year)
+dim(present)
+colnames(present)
+```
+
+
+
+### Exercise 5
+
+How do these counts compare to Arbuthnot’s? Are they of a similar magnitude?
+
+```{r count-compare}
+count(arbuthnot)
+count(present)
+mean(arbuthnot$boys)
+mean(present$boys)
+mean(arbuthnot$girls)
+mean(present$girls)
+```
+In terms of number of observations, the arbuthnot data has 19 more entries than the present data set. As for the number of recorded births in either boys or girls, the magnitude of the present data set in 300 times larger than the magnitude of arbuthnot's data.
+
+### Exercise 6 
+
+Make a plot that displays the proportion of boys born over time. What do you see? Does Arbuthnot’s observation about boys being born in greater proportion than girls hold up in the U.S.? Include the plot in your response. Hint: You should be able to reuse your code from Exercise 3 above, just replace the dataframe name.
+
+```{r plot-prop-boys-present}
+present %>% ggplot(aes(x= year)) +
+    geom_line(aes(y = boys, color = "Boys")) + 
+    geom_line(aes(y = girls, color = "Girls")) +
+    scale_color_manual(values = c("Boys" = "Blue", "Girls" = "Red")) +
+    labs(y = "# of Births in the US")
+
+```
+From the graph, we observe that boy were born in a greater proportion than girls similar to what we saw in Arbuthnot's data set. In addition, we notice a sudden drop in birthrate due to the introduction of birth control in the US and the women's right movement where it provides women to follow their careers and enter the workforce.
+
+### Exercise 7
+
+In what year did we see the most total number of births in the U.S.? Hint: First calculate the totals and save it as a new variable. Then, sort your dataset in descending order based on the total column. You can do this interactively in the data viewer by clicking on the arrows next to the variable names. To include the sorted result in your report you will need to use two new functions: arrange (for sorting). We can arrange the data in a descending order with another function: desc (for descending order). The sample code is provided below.
+
+```{r find-max-total}
+present <- present %>% mutate(total = boys + girls) %>% 
+    arrange(desc(total))
+head(present)
+```
+In 1961, we observe from the data that it had the most total births recorded at 4,268,326.

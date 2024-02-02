@@ -1,0 +1,202 @@
+---
+title: 'Data 605: Assignment 2'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+        number_sections: true
+editor_options:
+    chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+## Pset 1 {-}
+
+### Question 1 {-}
+
+Show that $A^TA \neq AA^T$ in general. (Proof and Demonstration)
+
+#### Proof: {-}
+
+Suppose, we have 2x2 matrix A where a,b,c,d$\in$ **R** such that they are distinct
+
+$$A = \begin{bmatrix}
+a&b \\
+c&d \\
+\end{bmatrix} $$
+
+Then, matrix A transpose is 
+
+$$A^T = \begin{bmatrix}
+a&c \\
+b&d\\
+\end{bmatrix} $$
+
+Next, we have to compute $A^TA$ and $AA^T$
+
+$$\begin{align}A^TA = 
+\begin{bmatrix}
+a&c \\
+b&d\\
+\end{bmatrix} 
+\begin{bmatrix}
+a&b \\
+c&d\\
+\end{bmatrix} \\
+\Rightarrow 
+\begin{bmatrix} 
+a^2+c^2&ab+cd\\
+ba+dc&b^2+d^2
+\end{bmatrix}
+\end{align}$$
+and 
+
+$$\begin{align}AA^T = 
+\begin{bmatrix}
+a&b \\
+c&d\\
+\end{bmatrix} 
+\begin{bmatrix}
+a&c \\
+b&d\\
+\end{bmatrix} \\
+\Rightarrow 
+\begin{bmatrix} 
+a^2+b^2&ac+bd\\
+ca+db&c^2+d^2
+\end{bmatrix}
+\end{align}$$
+
+So,
+
+$$A^TA \neq AA^T \\
+\begin{bmatrix} 
+a^2+c^2&ab+cd\\
+ba+dc&b^2+d^2
+\end{bmatrix} \neq 
+\begin{bmatrix} 
+a^2+b^2&ac+bd\\
+ca+db&c^2+d^2
+\end{bmatrix} $$
+
+$\square$
+
+#### Demonstration: {-}
+
+Let a=1, b=2, c=3, and d=4
+
+$$A = \begin{bmatrix}
+1&2 \\
+3&4 \\
+\end{bmatrix} and \  A^T = \begin{bmatrix}
+1&3 \\
+2&4 \\
+\end{bmatrix} $$
+
+Then we have,
+
+$$A^TA \neq AA^T \\
+\begin{bmatrix} 
+10 & 14 \\
+14 & 20
+\end{bmatrix} \neq 
+\begin{bmatrix} 
+5 & 11 \\
+11 & 25
+\end{bmatrix}$$
+
+### Question 2 {-}
+
+For a special type of square matrix A, we get $A^TA = AA^T$. Under what conditions could this be true? 
+
+#### Response {-}
+
+By **Definiton SYM**(Symmetric Matrix) and **Theorem SMS**(Symmetric Matrices are Square), this statement is true if and only if the square matrix A is symmetric. 
+
+where,
+
+$$A = A^T$$
+
+Then,
+
+$$A^TA = AA^T \Leftrightarrow AA^T = A^TA$$
+
+Thus, this statement is true iff matrix A is symmetric.
+
+## Pset 2 {-}
+
+Write an R function to factorize a square matrix A into LU or LDU, whichever you prefer.
+
+```{r}
+
+lu_factor <- function(A) { # input is some nxn (square) matrix A, should work on any size matrix
+    n <- nrow(A) # get the size of matrix A
+    
+    lower <- diag(1, n) # SETUP the lower triangle
+    upper <- A # SETUP the upper triangle
+    
+    # start loop at row 2 through lower n rows
+    for(i in 2:n){ 
+        
+        # loop column 1 until i-1 column
+        for(j in 1:(i-1)){ 
+            
+            # find the multiplier needed to eliminate the element in A[i,j]
+            row_mupltiplier <- -(upper[i,j] / upper[j,j]) 
+            
+            # update the entire row with multiplier
+            upper[i, ] <- row_mupltiplier * upper[j, ] + upper[i, ] 
+            
+            # place the negative of the multiplier  to the element in lower[i,j]
+            lower[i,j] <- -row_mupltiplier 
+        }
+    }
+    
+    
+  return(list(Lower_Matrix = lower, Upper_Matrix = upper))
+}
+   # output is the lower and upper matrices
+```
+
+### Test and Check {-}
+
+```{r}
+library(matrixcalc)
+```
+
+```{r}
+B <- diag(1,4)
+C <- matrix(c(1,-2,-2,-3,3,-9,0,-9,-1,2,4,7,-3,-6,26,2), nrow=4,ncol=4)
+D <- matrix(c(1,2,3,4,5,6,7,8,9),nrow = 3, ncol =3)
+```
+
+#### Test B {-}
+```{r}
+lu_factor(B)
+lu.decomposition(B)
+```
+
+#### Test C {-}
+```{r}
+lu_factor(C)
+lu.decomposition(C)
+```
+
+#### Test D {-}
+```{r}
+lu_factor(D)
+lu.decomposition(D)
+```
+
+## Resources {-}
+* [RDocument: lu.decomposition() ](https://www.rdocumentation.org/packages/matrixcalc/versions/1.0-6/topics/lu.decomposition)
+
+* [Youtube: LU Decomposition - Shortcut Method](https://www.youtube.com/watch?v=UlWcofkUDDU)

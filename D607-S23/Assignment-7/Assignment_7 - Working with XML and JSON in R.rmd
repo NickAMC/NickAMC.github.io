@@ -1,0 +1,165 @@
+---
+title: "Assignment 7"
+author: "Nick Climaco"
+date: "2023-03-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Assignment – Working with XML and JSON in R
+
+Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more
+than one author. For each book, include the title, authors, and two or three other attributes that you find
+interesting.
+Take the information that you’ve selected about these three books, and separately create three files which
+store the book’s information in HTML (using an html table), XML, and JSON formats (e.g. “books.html”,
+“books.xml”, and “books.json”). To help you better understand the different file structures, I’d prefer that you
+create each of these files “by hand” unless you’re already very comfortable with the file formats.
+Write R code, using your packages of choice, to load the information from each of the three sources into
+separate R data frames. Are the three data frames identical?
+Your deliverable is the three source files and the R code. If you can, package your assignment solution up into
+an .Rmd file and publish to rpubs.com. [This will also require finding a way to make your three text files
+accessible from the web].
+
+# Load Libraries
+```{r}
+library(DT)
+library(jsonlite)
+library(xml2)
+library(rvest)
+library(tibble)
+```
+
+# HTML 
+```{r}
+html_books <- read_html("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/books.html")
+html_df <- html_table(html_books)[[1]]
+names(html_df) <- c("title", "author", "year")
+datatable(html_df)
+```
+## HTML Source Code
+```{html}
+<html>
+<head>
+<title>Books</title>
+</head>
+
+<body>
+
+<table>
+  <tr>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Publication Year</th>
+  </tr>
+  <tr>
+    <td>An Introduction to Mathematical Statistics and its Applications</td>
+    <td>Richard L. Larsen, Morris L. Marx</td>
+    <td>2018</td>
+  </tr>
+  <tr>
+    <td>Time Series and Methods</td>
+    <td>Peter J. Brockwell, Richard A. Davis</td>
+    <td>1991</td>
+  </tr>
+  <tr>
+    <td>Meditations </td>
+    <td>Marcus Aurelius, Gregory Hayes(Translator)</td>
+    <td>2002</td>
+  </tr>
+</table>
+
+</body>
+</html>
+
+```    
+# XML
+
+```{r}
+xml_books <- read_xml("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/books.xml")
+xml_title <- xml_text(xml_find_all(xml_books, xpath = "//title"))
+xml_author <- xml_text(xml_find_all(xml_books, xpath = "//author"))
+xml_year <- xml_text(xml_find_all(xml_books, xpath = "//year"))
+
+xml_df <- tibble(title = xml_title, author = xml_author, year = xml_year)
+
+datatable(xml_df)
+```
+# XML Source Code
+```{XML}
+<?xml version="1.0" encoding="UTF-8"?>
+  <books>
+  <book>
+    <title>
+      An Introduction to Mathematical Statistics and its Applications
+    </title>
+    <author>
+      Richard L. Larsen, Morris L. Marx
+    </author>
+    <year>
+      2018
+    </year>
+  </book>
+  <book>
+    <title>
+      Time Series and Methods
+    </title>
+    <author>
+      Peter J. Brockwell, Richard A. Davis
+    </author>
+    <year>
+      1991
+    </year>
+  </book>
+  <book>
+    <title>
+      Meditations
+    </title>
+    <author>
+      Marcus Aurelius, Gregory Hayes(Translator)
+    </author>
+    <year>
+      2002
+    </year>
+  </book>
+  </books>
+```
+
+# JSON
+
+```{r}
+json_books <- fromJSON("https://raw.githubusercontent.com/Nick-Climaco/Rdataset/main/books.json") |>
+    as.data.frame() 
+names(json_books) <- c("title", "author", "year")
+datatable(json_books)
+```
+## JSON Source Code
+```{JSON}
+{
+  "books": [
+    {
+      "title": "An Introduction to Mathematical Statistics and its Applicatons",
+      "author": "Richard L. Larsen, Morris L. Marx",
+      "publication_year": "2018"
+    },
+    {
+      "title": "Time Series and Methods",
+      "author": "Peter J. Brockwell, Richard A. Davis",
+      "publication_year": "1991"
+    },
+    {
+      "title": "Meditations",
+      "author": "Marcus Aurelius, Gregory Hayes(Translator)",
+      "publication_year": "2002"
+    }
+  ]
+}
+```
+
+# Conclusion
+
+All three data tables are identical.
+

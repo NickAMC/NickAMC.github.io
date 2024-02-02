@@ -1,0 +1,210 @@
+---
+title: 'Data 605: Homework 6'
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+    html_document:
+        highlight: pygments
+        theme: cerulean
+        toc: true
+        toc_float: true
+editor_options:
+    chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+## Question 1 
+
+> A bag contains 5 green and 7 red jellybeans. How many ways can 5 jellybeans be withdrawn from the bag so that the number of green ones withdrawn will be less than 2?
+
+### Solution
+
+```{r}
+# Case G = 0 
+case_1 <- choose (7,5)
+
+# Case G = 1 
+case_2 <- choose(7,4) * choose(5,1)
+
+total <- case_1 + case_2 
+
+paste0("There are ", total," ways to draw 5 jellybeans with the green ones less than 2")
+```
+
+
+## Question 2
+
+> A certain congressional committee consists of 14 senators and 13 representatives. How many ways can a subcommittee of 5 be formed if at least 4 of the members must be representatives?
+
+### Solution
+
+```{r}
+# case reps = 4 
+reps_4 <- choose(13,4) * choose(14,1) 
+
+# case reps = 5 
+reps_5 <- choose(13,5)
+
+paste0("There are ", reps_4 + reps_5, " ways of creating subcommittee of 5 with at least 4 representatives.")
+```
+
+## Question 3
+
+> If a coin is tossed 5 times, and then a standard six-sided die is rolled 2 times, and finally a group of three cards are drawn from a standard deck of 52 cards without replacement, how many different outcomes are possible?
+
+### Solution
+
+```{r}
+coin <- 2*2*2*2*2
+
+die <- 6 * 6
+
+cards <- factorial(52) / factorial(52-3)
+
+q_3_total <- round(coin*die*cards)
+
+paste0("There are ", q_3_total, " outcomes")
+```
+
+## Question 4
+
+> 3 cards are drawn from a standard deck without replacement. What is the probability that at least one of the cards drawn is a 3? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+### Solution 
+
+```{r}
+# Let X be the event that one of the cards drawn is 3
+
+x_c <- (48/52) * (47/51) * (46/50)
+
+prob_x <- round(1 - x_c,4)
+
+paste0("The probability of having one of the cards to be 3 is ", prob_x)
+```
+
+## Question 5 
+
+> Lorenzo is picking out some movies to rent, and he is primarily interested in documentaries and mysteries. He has narrowed down his selections to 17 documentaries and 14 mysteries.
+
+>> Step 1. How many different combinations of 5 movies can he rent?
+
+### Solution 
+
+```{r}
+paste0("There are ", choose(31,5), " combinations of 5 movies he can rent")
+```
+
+>> Step 2. How many different combinations of 5 movies can he rent if he wants at least one mystery?
+
+### Solution
+
+```{r}
+paste0("There are ", choose(31,5)-choose(17,5), " combinations of 5 movies he can rent with at least 1 mystery movie")
+```
+
+## Question 6
+
+> In choosing what music to play at a charity fund raising event, Cory needs to have an equal number of symphonies from Brahms, Haydn, and Mendelssohn. If he is setting up a schedule of the 9 symphonies to be played, and he has 4 Brahms, 104 Haydn, and 17 Mendelssohn symphonies from which to choose, how many different schedules are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+### Solution
+
+```{r}
+q_6 <- choose(4,3) * choose(104,3) * choose(17,3)
+
+paste0("There are ", format(q_6, scientific = TRUE, digits = 3), " different schedules possible")
+```
+
+## Question 7
+
+> An English teacher needs to pick 13 books to put on his reading list for the next school year, and he needs to plan the order in which they should be read. He has narrowed down his choices to 6 novels, 6 plays, 7 poetry books, and 5 nonfiction books.
+
+>> Step 1. If he wants to include no more than 4 nonfiction books, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place.
+
+### Solution 
+
+```{r}
+# case nonfiction = 0
+a <- choose(5,0) * choose(19,13)
+# case nonfiction = 1
+b <- choose(5,1) * choose(19,12)
+# case nonfiction = 2
+c <- choose(5,2) * choose(19,11)
+# case nonfiction = 3
+d <- choose(5,3) * choose(19,10)
+# case nonfiction = 4
+e <- choose(5,4) * choose(19,9)
+
+all <- a+b+c+d+e
+format(all, scientific = TRUE, digits = 3)
+```
+
+>> Step 2. If he wants to include all 6 plays, how many different reading schedules are possible? Express your answer in scientific notation rounding to the hundredths place
+
+### Solution
+
+```{r}
+all_plays <- choose(6,6) * choose(18, 7)
+format(all_plays, scientific = TRUE, digits = 3)
+```
+
+## Question 8 
+
+> Zane is planting trees along his driveway, and he has 5 sycamores and 5 cypress trees to plant in one row. What is the probability that he randomly plants the trees so that all 5 sycamores are next to each other and all 5 cypress trees are next to each other? Express your answer as a fraction or a decimal number rounded to four decimal places
+
+### Solution 
+
+```{r}
+x <- 2 * (factorial(5) * factorial(5) / factorial(10))
+round(x, 4)
+```
+
+## Question 9
+
+> If you draw a queen or lower from a standard deck of cards, I will pay you $4. If not, you pay me $16. (Aces are considered the highest card in the deck.)
+
+>> Step 1. Find the expected value of the proposition. Round your answer to two decimal places. Losses must be expressed as negative values.
+
+### Solution 
+
+```{r}
+# 52 deck
+queen_low <- (44/52) * 4
+king_high <- (8/52) * -16
+
+expected_val <- round(queen_low + king_high,2)
+
+paste0("The expected value of this proposition is $", expected_val)
+```
+
+>> Step 2. If you played this game 833 times how much would you expect to win or lose? Round your answer to two decimal places. Losses must be expressed as negative values.
+
+### Solution 
+
+```{r}
+# simulate this scenario
+set.seed(123)
+n_games <- 833 
+win_amount <- 4
+lose_amout <- -16
+
+result <- replicate(n_games, { 
+    drawn_card <- sample(1:52,1) # create 52 deck and choose 1 card
+    if (drawn_card %% 13 <= 11) { # mod 13 cuz a set of each suit is 13 cards, multiples of 13 are the Aces
+        win_amount
+    } else {
+        lose_amout
+    }
+})
+
+sum_winning_losses <- (sum(result))
+
+expected_value <- round(sum_winning_losses / n_games,2)
+
+paste0("After ", n_games, " games, we expect to win/loss $", expected_value)
+```
+
+

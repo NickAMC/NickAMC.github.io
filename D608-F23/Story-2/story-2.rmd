@@ -1,0 +1,226 @@
+---
+title: "Story-2: Can the FED Control Inflation and Maintain Full Employment"
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE,
+                      tidy.opts = list(width.cutoff = 80), tidy = TRUE)
+```
+
+## Overview
+
+The Federal Reserve, also known as the FED, works towards a dual mandate established by the U.S. Congress. This mandate requires the FED to maintain two primary objectives which are controlling inflation and maintain full employment. We derive the inflation rate from the Consumer Price Index, by calculating the percentage change in the general price level of goods and services in a lag(1) function. The question in this document is whether the FED is able to effectively achieve both of these objectives at the same time. 
+
+```{r,echo=FALSE}
+# Load Libraries
+library(tidyverse)
+```
+
+```{r, echo=FALSE}
+# Loading the Data
+
+cpi_df <- read_csv("datasets/CPI.csv", skip = 10)
+
+funds_rate_df <- read_csv("datasets/FEDFUNDS.csv")
+
+unemployment_rate_df <- read_csv("datasets/UnemploymentRate.csv", skip = 10)
+```
+
+```{r, echo = FALSE}
+#Data Wrangling and Cleaning
+# clean funds_rate_df
+cleaned_funds_rate_df <- funds_rate_df |> 
+    mutate(Year = format(as.Date(DATE), "%Y"),
+           Month = format(as.Date(DATE), "%b")) |> 
+    pivot_wider(names_from = Month, values_from = FEDFUNDS) |> 
+    select(Year, Jan,Feb,Mar,Apr,May,Jun,Jul,Sep,Aug,Sep,Oct,Nov,Dec)
+
+# Replace missing values (NA) with 0
+cleaned_funds_rate_df[is.na(cleaned_funds_rate_df)] <- 0
+
+# Group and summarize
+final_funds_rate_df <- cleaned_funds_rate_df |> 
+    group_by(Year) |> 
+    summarise_all(~ sum(.x)) |> 
+    filter(Year > 1997)
+
+# set row 1 as columns names and remove row 1
+colnames(cpi_df) <- cpi_df[1, ]
+cpi_df <- cpi_df[-1, ]
+
+# calculate the avg values for each year
+year_avg_funds_rate <- final_funds_rate_df %>%
+  mutate(Avg_Fed_Rate = round(rowMeans(select(., -Year), na.rm = TRUE),2)) |> 
+    select(Year, Avg_Fed_Rate)
+
+cpi_df <- lapply(cpi_df, as.numeric)
+cpi_df <- as.data.frame(cpi_df)
+
+year_avg_cpi <- cpi_df %>%
+  mutate(Avg_Cpi = round(rowMeans(select(., -c(Year,HALF1, HALF2)), na.rm = TRUE), 2)) %>%
+  select(Year, Avg_Cpi)
+
+colnames(unemployment_rate_df) <- unemployment_rate_df[1, ] 
+unemployment_rate_df <- unemployment_rate_df |> 
+    slice(-1, )
+
+unemployment_rate_df <- lapply(unemployment_rate_df, as.numeric)
+unemployment_rate_df <- as.data.frame(unemployment_rate_df)
+
+year_avg_unemployment <- unemployment_rate_df %>%
+  mutate(Avg_Unemployment = round(rowMeans(select(., -Year), na.rm = TRUE),2)) |> 
+    select(Year, Avg_Unemployment)
+
+# merge cpi, fed funds, and unemployment based on the Year column
+merged_df <- merge(year_avg_cpi, year_avg_funds_rate, by = "Year", all = TRUE)
+merged_df <- merge(merged_df, year_avg_unemployment, by = "Year", all = TRUE)
+
+merged_df <- merged_df |> 
+    mutate(Inflation_Rate = round((Avg_Cpi - lag(Avg_Cpi)) / lag(Avg_Cpi) * 100,2))
+```
+
+```{r, echo = FALSE}
+merged_long <- merged_df |> select(-Avg_Cpi) |> 
+    pivot_longer(cols = -Year,
+                 names_to = "Metric", 
+                 values_to = "Value") 
+fed_long <- merged_df |> 
+    select(Year, Avg_Fed_Rate)
+```
+
+## Question
+
+> Has the FED  been able to fulfill the mandate given to it by Congress?
+
+The series of plots below provides a visual representation of key economic indications over the last 25 years. These indicators include the unemployment rate, inflation rate, and the federal funds rate. This visual analysis offers a quick and simple overview of their respective trendlines spanning the 25-year period. The goal of these visualization are to determine the Federal Reserve's effectiveness in managing their mandate: controlling inflation and maintaining full employment. The Federal Reserve employs the federal funds rate as a economic tool in its monetary policy to mitigate rising inflation and unemployment rates. 
+
+## Visual Analysis
+
+```{r, echo=FALSE}
+unemployment_plot <- ggplot(merged_df, aes(x=Year, y=Avg_Unemployment)) + 
+    geom_line() +
+    labs(
+    x = "Year",
+    y = "Unemployment Rate",
+    title = "Unemployment Rate Over Time (1998-2023)"
+  ) +
+    ylim(-1, 10) + 
+   theme_minimal()
+```
+
+```{r, echo=FALSE}
+inflation_plot <- ggplot(merged_df, aes(x=Year, y=Inflation_Rate)) +
+    geom_line() +
+    labs(
+    x = "Year",
+    y = "Inflation Rate",
+    title = "Inflation Rate Over Time (1998-2023)"
+  ) + 
+    ylim(-1, 10) + 
+    theme_minimal()
+```
+
+```{r,echo=FALSE}
+fed_funds_rate_plot <- ggplot(merged_df, aes(x=Year, y=Avg_Fed_Rate)) +
+    geom_line() + 
+    labs(
+    x = "Year",
+    y = "Federal Funds Rate",
+    title = "Federal Funds Rate Over Time (1998-2023)"
+  ) +
+    ylim(-1, 10) + 
+  theme_minimal()
+    
+```
+
+```{r, echo=FALSE}
+library(gridExtra)
+grid.arrange(unemployment_plot, inflation_plot, fed_funds_rate_plot, ncol = 1)
+```
+
+The Consumer Price Index is an economic indicator that measure the average cost of goods and services. The yearly percentage change in the CPI is an important metric, as it reflects the inflation rate which measure the rate at which the average prices of goods and services are rising or falling over time. In the plot below, we observe a gradual increase in the CPI from 1998. This upward trend is evident of the general rise in the cost of living and is considered as a key indicator of the how inflation affects the economy. Moreover, the CPI can be influenced by various economic events and factors, for instance a global pandemic which caused major global turmoil. In the years during the pandemic, we can observe a sharp rise in the inflation rate where it peaked at 8% in 2021-2022. 
+
+```{r,echo=FALSE}
+ggplot(merged_df, aes(x=Year, y=Avg_Cpi, color = "blue", width = 0.7)) +
+    geom_line() +
+    geom_point() +
+    labs(
+    x = "Year",
+    y = "Avg CPI",
+    title = "Consumer Price Index (1998-2023)"
+  ) +
+    guides(color = FALSE) +
+    scale_x_continuous(breaks = seq(1998, 2023, by = 3)) +
+    annotate("text", x = 2019.7, y = 290, label = paste("Inflation Rate: 8%"), size = 5, color = "red") +
+    theme_minimal()
+```
+
+The follow couple of plots will demonstrate how the FED is using the Fed Funds Rate to counteract inflation and unemployment rates. 
+
+In the first plot, having a negative correlation of -0.61 between the unemployment rate and fed funds rate. This inverse relationship highlights how changes in monetary policy especially the fed funds rate affects employment. For instance, when unemployment was at its peak around 2010-2011, the FED kept the federal funds rate very low until unemployment drops to a desired level. If we were to draw a horizontal line at around 3 on the y-axis then the two steplines would have a symmetrical appearance. 
+
+```{r,echo=FALSE}
+ggplot(merged_df, aes(x=Year)) +
+    geom_step(aes(y = Avg_Fed_Rate, color = "Fed Funds Rate"), size = 1) +
+    geom_step(aes(y = Avg_Unemployment, color = "Unemployment Rate"), size = 1) +
+    labs(
+        x = "Year",
+        y = "",
+        color = "Legend",
+        title = "Unemployment and Fed Funds Rate over the Last 25 years (1998-2023)"
+    ) +
+    scale_color_manual(
+        values = c("Fed Funds Rate" = "blue", "Unemployment Rate" = "red"),
+        labels = c("Fed Funds Rate", "Unemployment Rate")
+    ) +
+    scale_x_continuous(breaks = seq(1998, 2023, by = 3)) +
+    annotate("text", x = 2001, y = 8.8, label = paste("Correlation: -0.61"), size = 4, color = "black") +
+    theme_minimal()
+```
+
+In the second plot, we can observe that the inflation rate and fed funds rate has a  positive correlation of 0.30. The FED uses the fed funds rate as a tool when inflation rate increase, often due to increased demand fo goods and services, the FED may choice to increase the Federal Funds Rate. This choice is to press the metaphorical brake on economic activity by increasing borrowing costs, which in turn discourages spending and investment. In an effort that it can help mitigate inflation. However, it is important to note that the impact of changes in policy and rates is not immediate and can have lag effects. Thus, the FED must maintain a delicate balance of controlling inflation and full employment.
+
+```{r,echo=FALSE}
+ggplot(merged_df, aes(x=Year)) +
+    geom_step(aes(y = Inflation_Rate, color = "Inflation Rate"), size = 1) +
+    geom_step(aes(y=Avg_Fed_Rate, color = "Fed Funds Rate"), size = 1) +
+    labs(
+        x = "Year",
+        y = "",
+        color = "Legend",
+        title = "Inflation Rate and Fed Funds Rate over the Last 25 years (1998-2023)" 
+    ) +
+    scale_color_manual(
+        values = c("Inflation Rate" = "red",
+                   "Fed Funds Rate" = "blue"),
+        labels = c("Fed Funds Rate","Inflation Rate") 
+    ) +
+    scale_x_continuous(breaks = seq(1998, 2023, by = 3)) + 
+    annotate("text", x = 2001, y = 7.8, label = paste("Correlation: 0.304"), size = 4, color = "black") +
+    ylim(-0.5, 10) +
+    theme_minimal()
+```
+
+## Conclusion
+
+Based on the visualization, the Federal Reserve has a difficult mandate given by the US congress. Using the Federal Funds Rate as the sole economic tool for this assignment, we can say that the Federal Reserve is moderately effectively in controlling inflation and maintaining the unemployment rate. We know that there are many other economic and non-economic factors that can influence inflation and unemployment, and counteracting them requires more economic tools other than the fed funds rate. 
+
+## Resources
+
+[FED Funds Rate](https://fred.stlouisfed.org/series/FEDFUNDS#)
+
+[Consumer Price Index](https://data.bls.gov)
+
+[Unemployment Rate](https://data.bls.gov)
+
+[Federal Reserve Monetary Policy](https://www.federalreserve.gov/monetarypolicy/monetary-policy-what-are-its-goals-how-does-it-work.htm)
