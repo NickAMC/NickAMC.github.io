@@ -1,5 +1,9 @@
 # MSDS Coursework
 
+[qmd file](https://github.com/NickAMC/NickAMC.github.io/blob/main/authoring.qmd)
+
+[html file](https://github.com/NickAMC/NickAMC.github.io/blob/main/authoring.html)
+
 ## Introduction 
 
 In my Data Science Master's program at CUNY, I've progressed through a comprehensive curriculum that covered exploratory data analysis, the foundational math including linear algebra, probability, statistics, and calculus, and practical skills in data collection and wrangling. I've developed proficiency in feature engineering and selection, and gained hands-on experience in building and selecting models, focusing on regression and classification techniques. This journey has given me a well-rounded skill set in data science, preparing me for real-world challenges.
