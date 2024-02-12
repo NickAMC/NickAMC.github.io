@@ -1,0 +1,32 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-02-12"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(fpp3)
+library(seasonal)
+```
+
+```{r}
+retailing_aus <- aus_retail[grepl("retail", aus_retail$Industry), ]
+```
+
+```{r}
+x11_decomp <- retailing_aus %>%
+  model(x11 = X_13ARIMA_SEATS(Turnover ~ x11())) %>%
+  components() 
+
+```
+
+```{r}
+autoplot(x11_decomp) + labs(title = "Decomposition of total Australian retail turnover using X-11.")
+```
+

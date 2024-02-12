@@ -1,0 +1,1 @@
+"0","retailing_aus <- aus_retail[grepl(""retail"", aus_retail$Industry), ]"

@@ -1,0 +1,23 @@
+"0","x11_decomp <- retailing_aus %>%"
+"0","  model(x11 = X_13ARIMA_SEATS(Turnover ~ x11())) %>%"
+"0","  components() "
+"2","Warning: 2 errors (1 unique) encountered for x11
+[2] X-13 run failed
+
+Errors:
+- Series to be modelled and/or seasonally adjusted must have at least 3 complete years of data. No seasonal adjustment this run
+
+Notes:
+- Correct input errors in the order they are detected since the first one or two may be responsible for the others (especially if there are errors in the SERIES or COMPOSITE spec).
+"
+"1","[1m[33mError[39m in `transmute()`:[22m
+[38;5;255m[36mℹ[38;5;255m In argument: `cmp = map(.fit, components)`.[39m
+[1mCaused by error in `UseMethod()`:[22m
+[33m![39m no applicable method for 'components' applied to an object of class ""null_mdl""
+Backtrace:
+[90m  1. [39m... %>% components()
+[90m 11. [39m[1mfabletools[22m:::map(.fit, components)
+[90m 12. [39m[1mbase[22m::lapply(.x, .f, ...)
+[90m 14. [39m[1mfabletools[22m:::components.mdl_ts(X[[i]], ...)
+[90m 15. [39m[1mgenerics[22m::components(object$fit, ...)
+"
