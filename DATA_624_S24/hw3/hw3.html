@@ -59,7 +59,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </style>
 
 
-<script src="hw3_files/libs/clipboard/clipboard.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="hw3_files/libs/clipboard/clipboard.min.js"></script>
 <script src="hw3_files/libs/quarto-html/quarto.js"></script>
 <script src="hw3_files/libs/quarto-html/popper.min.js"></script>
 <script src="hw3_files/libs/quarto-html/tippy.umd.min.js"></script>
@@ -69,6 +69,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="hw3_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="hw3_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="hw3_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
 
 </head>
@@ -81,9 +84,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#chapter-5-the-forecasters-toolbox" id="toc-chapter-5-the-forecasters-toolbox" class="nav-link active" data-scroll-target="#chapter-5-the-forecasters-toolbox">Chapter 5: The Forecaster’s Toolbox</a></li>
+  <li><a href="#chapter-5-the-forecasters-toolbox" id="toc-chapter-5-the-forecasters-toolbox" class="nav-link active" data-scroll-target="#chapter-5-the-forecasters-toolbox">Chapter 5: The Forecaster’s Toolbox</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
+  <li><a href="#exercise-7" id="toc-exercise-7" class="nav-link" data-scroll-target="#exercise-7">Exercise 7</a></li>
+  </ul></li>
   </ul>
-</nav>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="hw3.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content">
 
@@ -120,21 +130,204 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="chapter-5-the-forecasters-toolbox" class="level1">
 <h1>Chapter 5: The Forecaster’s Toolbox</h1>
-<div id="cell-2" class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="exercise-1" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
+<p>Produce forecasts for the following series using whichever of NAIVE(y), SNAIVE(y) or RW(y ~ drift()) is more appropriate in each case:</p>
+<ul>
+<li><p>Australian Population (global_economy)</p></li>
+<li><p>Bricks (aus_production)</p></li>
+<li><p>NSW Lambs (aus_livestock)</p></li>
+<li><p>Household wealth (hh_budget).</p></li>
+<li><p>Australian takeaway food turnover (aus_retail).</p></li>
+</ul>
+<div id="cell-4" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df_aus_prod <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/global_economy.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">"Year"</span>], index_col<span class="op">=</span>[<span class="st">'Year'</span>])</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df_aus_prod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Unnamed: 0</th>
+<th data-quarto-table-cell-role="th">Country</th>
+<th data-quarto-table-cell-role="th">Code</th>
+<th data-quarto-table-cell-role="th">GDP</th>
+<th data-quarto-table-cell-role="th">Growth</th>
+<th data-quarto-table-cell-role="th">CPI</th>
+<th data-quarto-table-cell-role="th">Imports</th>
+<th data-quarto-table-cell-role="th">Exports</th>
+<th data-quarto-table-cell-role="th">Population</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1960-01-01</td>
+<td>1</td>
+<td>Afghanistan</td>
+<td>AFG</td>
+<td>5.377778e+08</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>7.024793</td>
+<td>4.132233</td>
+<td>8996351.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1961-01-01</td>
+<td>2</td>
+<td>Afghanistan</td>
+<td>AFG</td>
+<td>5.488889e+08</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>8.097166</td>
+<td>4.453443</td>
+<td>9166764.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1962-01-01</td>
+<td>3</td>
+<td>Afghanistan</td>
+<td>AFG</td>
+<td>5.466667e+08</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>9.349593</td>
+<td>4.878051</td>
+<td>9345868.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1963-01-01</td>
+<td>4</td>
+<td>Afghanistan</td>
+<td>AFG</td>
+<td>7.511112e+08</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>16.863910</td>
+<td>9.171601</td>
+<td>9533954.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1964-01-01</td>
+<td>5</td>
+<td>Afghanistan</td>
+<td>AFG</td>
+<td>8.000000e+08</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>18.055555</td>
+<td>8.888893</td>
+<td>9731361.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2013-01-01</td>
+<td>15146</td>
+<td>Zimbabwe</td>
+<td>ZWE</td>
+<td>1.909102e+10</td>
+<td>1.989493</td>
+<td>109.079488</td>
+<td>36.668735</td>
+<td>21.987759</td>
+<td>15054506.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-01-01</td>
+<td>15147</td>
+<td>Zimbabwe</td>
+<td>ZWE</td>
+<td>1.949552e+10</td>
+<td>2.376929</td>
+<td>108.847215</td>
+<td>33.741470</td>
+<td>20.930146</td>
+<td>15411675.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2015-01-01</td>
+<td>15148</td>
+<td>Zimbabwe</td>
+<td>ZWE</td>
+<td>1.996312e+10</td>
+<td>1.779873</td>
+<td>106.224541</td>
+<td>37.588635</td>
+<td>19.160176</td>
+<td>15777451.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2016-01-01</td>
+<td>15149</td>
+<td>Zimbabwe</td>
+<td>ZWE</td>
+<td>2.054868e+10</td>
+<td>0.755869</td>
+<td>104.560626</td>
+<td>31.275493</td>
+<td>19.943532</td>
+<td>16150362.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2017-01-01</td>
+<td>15150</td>
+<td>Zimbabwe</td>
+<td>ZWE</td>
+<td>2.204090e+10</td>
+<td>4.704035</td>
+<td>105.511849</td>
+<td>30.370273</td>
+<td>19.658023</td>
+<td>16529904.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>15150 rows × 9 columns</p>
 </div>
-<section id="produce-forecasts-for-the-following-series-using-whichever-of-naivey-snaivey-or-rwy-drift-is-more-appropriate-in-each-case" class="level4">
-<h4 class="anchored" data-anchor-id="produce-forecasts-for-the-following-series-using-whichever-of-naivey-snaivey-or-rwy-drift-is-more-appropriate-in-each-case">1) Produce forecasts for the following series using whichever of NAIVE(y), SNAIVE(y) or RW(y ~ drift()) is more appropriate in each case:</h4>
-<p>Australian Population (global_economy) Bricks (aus_production) NSW Lambs (aus_livestock) Household wealth (hh_budget). Australian takeaway food turnover (aus_retail).</p>
+</div>
+</div>
 </section>
-<section id="use-the-facebook-stock-price-data-set-gafa_stock-to-do-the-following" class="level4">
-<h4 class="anchored" data-anchor-id="use-the-facebook-stock-price-data-set-gafa_stock-to-do-the-following">2) Use the Facebook stock price (data set gafa_stock) to do the following:</h4>
-<p>Produce a time plot of the series. Produce forecasts using the drift method and plot them. Show that the forecasts are identical to extending the line drawn between the first and last observations. Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?</p>
-<section id="apply-a-seasonal-naïve-method-to-the-quarterly-australian-beer-production-data-from-1992.-check-if-the-residuals-look-like-white-noise-and-plot-the-forecasts.-the-following-code-will-help." class="level5">
-<h5 class="anchored" data-anchor-id="apply-a-seasonal-naïve-method-to-the-quarterly-australian-beer-production-data-from-1992.-check-if-the-residuals-look-like-white-noise-and-plot-the-forecasts.-the-following-code-will-help.">3) Apply a seasonal naïve method to the quarterly Australian beer production data from 1992. Check if the residuals look like white noise, and plot the forecasts. The following code will help.</h5>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<p>Use the Facebook stock price (data set gafa_stock) to do the following:</p>
+<ul>
+<li><p>Produce a time plot of the series.</p></li>
+<li><p>Produce forecasts using the drift method and plot them.</p></li>
+<li><p>Show that the forecasts are identical to extending the line drawn between the first and last observations.</p></li>
+<li><p>Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?</p></li>
+</ul>
+</section>
+<section id="exercise-3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<p>Apply a seasonal naïve method to the quarterly Australian beer production data from 1992. Check if the residuals look like white noise, and plot the forecasts. The following code will help.</p>
 <pre class="{r}"><code># Extract data of interest
 recent_production &lt;- aus_production |&gt;
   filter(year(Quarter) &gt;= 1992)
@@ -147,16 +340,15 @@ fit |&gt; gg_tsresiduals()
 
 # Look a some forecasts
 fit |&gt; forecast() |&gt; autoplot(recent_production)</code></pre>
+<p>What do you conclude?</p>
 </section>
+<section id="exercise-4" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
+<p>Repeat the previous exercise using the Australian Exports series from global_economy and the Bricks series from aus_production. Use whichever of NAIVE() or SNAIVE() is more appropriate in each case</p>
 </section>
-<section id="what-do-you-conclude" class="level4">
-<h4 class="anchored" data-anchor-id="what-do-you-conclude">What do you conclude?</h4>
-</section>
-<section id="repeat-the-previous-exercise-using-the-australian-exports-series-from-global_economy-and-the-bricks-series-from-aus_production.-use-whichever-of-naive-or-snaive-is-more-appropriate-in-each-case." class="level4">
-<h4 class="anchored" data-anchor-id="repeat-the-previous-exercise-using-the-australian-exports-series-from-global_economy-and-the-bricks-series-from-aus_production.-use-whichever-of-naive-or-snaive-is-more-appropriate-in-each-case.">4) Repeat the previous exercise using the Australian Exports series from <code>global_economy</code> and the Bricks series from <code>aus_production</code>. Use whichever of NAIVE() or SNAIVE() is more appropriate in each case.</h4>
-</section>
-<section id="for-your-retail-time-series-from-exercise-7-in-section-2.10" class="level4">
-<h4 class="anchored" data-anchor-id="for-your-retail-time-series-from-exercise-7-in-section-2.10">7) For your retail time series (from Exercise 7 in Section 2.10):</h4>
+<section id="exercise-7" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
+<p>For your retail time series (from Exercise 7 in Section 2.10):</p>
 <ol type="a">
 <li>Create a training dataset consisting of observations before 2011 using</li>
 </ol>

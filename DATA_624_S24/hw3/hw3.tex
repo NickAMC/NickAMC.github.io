@@ -1,0 +1,409 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  11pt,
+]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{241,243,245}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.40,0.45,0.13}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\BuiltInTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\ExtensionTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.28,0.35,0.67}{#1}}
+\newcommand{\ImportTok}[1]{\textcolor[rgb]{0.00,0.46,0.62}{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\NormalTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.68,0.00,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{\textcolor[rgb]{0.00,0.23,0.31}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.07,0.07,0.07}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.13,0.47,0.30}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.37,0.37,0.37}{\textit{#1}}}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{OutputCode}{Verbatim}{breaklines,commandchars=\\\{\}}
+\fvset{breaksymbolleft={}, breakindent=1em}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table of contents}
+\else
+  \newcommand\contentsname{Table of contents}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{List of Figures}
+\else
+  \newcommand\listfigurename{List of Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{List of Tables}
+\else
+  \newcommand\listtablename{List of Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{List of Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Homework 3},
+  pdfauthor={Nick Climaco},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Homework 3}
+\author{Nick Climaco}
+\date{February 12, 2024}
+
+\begin{document}
+\maketitle
+
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+  showspaces = false,
+  showtabs = false,
+  breaksymbolleft={},
+  breaklines
+}
+
+\renewcommand*\contentsname{Table of contents}
+{
+\hypersetup{linkcolor=}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\newpage
+
+\section{Chapter 5: The Forecaster's
+Toolbox}\label{chapter-5-the-forecasters-toolbox}
+
+\subsection{Exercise 1}\label{exercise-1}
+
+Produce forecasts for the following series using whichever of NAIVE(y),
+SNAIVE(y) or RW(y \textasciitilde{} drift()) is more appropriate in each
+case:
+
+\begin{itemize}
+\item
+  Australian Population (global\_economy)
+\item
+  Bricks (aus\_production)
+\item
+  NSW Lambs (aus\_livestock)
+\item
+  Household wealth (hh\_budget).
+\item
+  Australian takeaway food turnover (aus\_retail).
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_aus\_prod }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/global\_economy.csv"}\NormalTok{, parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{"Year"}\NormalTok{], index\_col}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{])}
+\NormalTok{df\_aus\_prod}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llllllll@{}}
+\toprule\noalign{}
+& Unnamed: 0 & Country & Code & ... & Imports & Exports & Population \\
+Year & & & & & & & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1960-01-01 & 1 & Afghanistan & AFG & ... & 7.024793 & 4.132233 &
+8996351.0 \\
+1961-01-01 & 2 & Afghanistan & AFG & ... & 8.097166 & 4.453443 &
+9166764.0 \\
+1962-01-01 & 3 & Afghanistan & AFG & ... & 9.349593 & 4.878051 &
+9345868.0 \\
+1963-01-01 & 4 & Afghanistan & AFG & ... & 16.863910 & 9.171601 &
+9533954.0 \\
+1964-01-01 & 5 & Afghanistan & AFG & ... & 18.055555 & 8.888893 &
+9731361.0 \\
+... & ... & ... & ... & ... & ... & ... & ... \\
+2013-01-01 & 15146 & Zimbabwe & ZWE & ... & 36.668735 & 21.987759 &
+15054506.0 \\
+2014-01-01 & 15147 & Zimbabwe & ZWE & ... & 33.741470 & 20.930146 &
+15411675.0 \\
+2015-01-01 & 15148 & Zimbabwe & ZWE & ... & 37.588635 & 19.160176 &
+15777451.0 \\
+2016-01-01 & 15149 & Zimbabwe & ZWE & ... & 31.275493 & 19.943532 &
+16150362.0 \\
+2017-01-01 & 15150 & Zimbabwe & ZWE & ... & 30.370273 & 19.658023 &
+16529904.0 \\
+\end{longtable}
+
+\subsection{Exercise 2}\label{exercise-2}
+
+Use the Facebook stock price (data set gafa\_stock) to do the following:
+
+\begin{itemize}
+\item
+  Produce a time plot of the series.
+\item
+  Produce forecasts using the drift method and plot them.
+\item
+  Show that the forecasts are identical to extending the line drawn
+  between the first and last observations.
+\item
+  Try using some of the other benchmark functions to forecast the same
+  data set. Which do you think is best? Why?
+\end{itemize}
+
+\subsection{Exercise 3}\label{exercise-3}
+
+Apply a seasonal naïve method to the quarterly Australian beer
+production data from 1992. Check if the residuals look like white noise,
+and plot the forecasts. The following code will help.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{\# Extract data of interest}
+\NormalTok{recent\_production \textless{}{-} aus\_production |\textgreater{}}
+\NormalTok{  filter(year(Quarter) \textgreater{}= 1992)}
+
+\NormalTok{\# Define and estimate a model}
+\NormalTok{fit \textless{}{-} recent\_production |\textgreater{} model(SNAIVE(Beer))}
+\NormalTok{\#Look at the residuals}
+
+\NormalTok{fit |\textgreater{} gg\_tsresiduals()}
+
+\NormalTok{\# Look a some forecasts}
+\NormalTok{fit |\textgreater{} forecast() |\textgreater{} autoplot(recent\_production)}
+\end{Highlighting}
+\end{Shaded}
+
+What do you conclude?
+
+\subsection{Exercise 4}\label{exercise-4}
+
+Repeat the previous exercise using the Australian Exports series from
+global\_economy and the Bricks series from aus\_production. Use
+whichever of NAIVE() or SNAIVE() is more appropriate in each case
+
+\subsection{Exercise 7}\label{exercise-7}
+
+For your retail time series (from Exercise 7 in Section 2.10):
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  Create a training dataset consisting of observations before 2011 using
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myseries\_train \textless{}{-} myseries |\textgreater{}}
+\NormalTok{  filter(year(Month) \textless{} 2011)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Check that your data have been split appropriately by producing the
+  following plot.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{autoplot(myseries, Turnover) +}
+\NormalTok{  autolayer(myseries\_train, Turnover, colour = "red")}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Fit a seasonal naïve model using SNAIVE() applied to your training
+  data (myseries\_train).
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit \textless{}{-} myseries\_train |\textgreater{}}
+\NormalTok{  model(SNAIVE())}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Check the residuals.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit |\textgreater{} gg\_tsresiduals()}
+\end{Highlighting}
+\end{Shaded}
+
+Do the residuals appear to be uncorrelated and normally distributed?
+
+e.Produce forecasts for the test data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fc \textless{}{-} fit |\textgreater{}}
+\NormalTok{  forecast(new\_data = anti\_join(myseries, myseries\_train))}
+\NormalTok{fc |\textgreater{} autoplot(myseries)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  Compare the accuracy of your forecasts against the actual values.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit |\textgreater{} accuracy()}
+\NormalTok{fc |\textgreater{} accuracy(myseries)}
+\end{Highlighting}
+\end{Shaded}
+
+g.How sensitive are the accuracy measures to the amount of training data
+used?
+
+
+
+\end{document}
