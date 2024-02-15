@@ -182,7 +182,7 @@
 
 \title{Homework 3}
 \author{Nick Climaco}
-\date{February 14, 2024}
+\date{February 15, 2024}
 
 \begin{document}
 \maketitle
@@ -220,6 +220,12 @@ Toolbox}\label{chapter-5-the-forecasters-toolbox}
 
 \CommentTok{\# ts decomposition}
 \ImportTok{from}\NormalTok{ statsmodels.tsa.seasonal }\ImportTok{import}\NormalTok{ STL}
+\ImportTok{from}\NormalTok{ statsmodels.tsa.seasonal }\ImportTok{import}\NormalTok{ seasonal\_decompose}
+
+\CommentTok{\# forecasting method}
+\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveMean}
+\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveSeasonal }\CommentTok{\# K=1 for last value, K=4 for quarterly data}
+\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveDrift}
 \end{Highlighting}
 \end{Shaded}
 
@@ -249,7 +255,7 @@ case:
 \NormalTok{df\_production}\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/aus\_production.csv"}\NormalTok{, parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{])}
 \NormalTok{df\_livestock }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/aus\_livestock.csv"}\NormalTok{, parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{])}
 \NormalTok{df\_budget }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/hh\_budget.csv"}\NormalTok{, parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{])}
-\NormalTok{df\_retail }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/hh\_budget.csv"}\NormalTok{,parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{])}
+\NormalTok{df\_retail }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/aus\_retail.csv"}\NormalTok{,parse\_dates}\OperatorTok{=}\NormalTok{[}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{])}
 \end{Highlighting}
 \end{Shaded}
 
@@ -281,8 +287,6 @@ my initial observation of no seasonality is correct.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ statsmodels.tsa.seasonal }\ImportTok{import}\NormalTok{ seasonal\_decompose}
-
 \CommentTok{\# decompose this ts }
 \NormalTok{decomposition }\OperatorTok{=}\NormalTok{ seasonal\_decompose(df\_aus\_pop.Population, period }\OperatorTok{=} \DecValTok{1}\NormalTok{, model}\OperatorTok{=}\StringTok{"multiplicative"}\NormalTok{)}
 
@@ -322,8 +326,6 @@ forecast cast would be the average change seen in the data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveDrift}
-
 \NormalTok{drift }\OperatorTok{=}\NormalTok{ NaiveDrift()}
 
 \NormalTok{drift.fit(series)}
@@ -335,7 +337,12 @@ forecast cast would be the average change seen in the data.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-9-output-1.png}
+\begin{verbatim}
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from tqdm.autonotebook import tqdm
+\end{verbatim}
+
+\includegraphics{hw3_files/figure-pdf/cell-9-output-2.png}
 
 From the eye test, we observe that the Drift forecast is in-line with
 the data. It reasonable to agree with the forecast since the timeseries
@@ -371,11 +378,13 @@ demonstrates an linear growth in population.
 
 \includegraphics{hw3_files/figure-pdf/cell-12-output-1.png}
 
-Since the data
+We see a high frequency of the seasonality component while it is unclear
+whether the trend line is increasing or decreasing. Thus, we believe
+that using the seasonal naive would be best for forecasting this
+particular time series.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-
 \NormalTok{df\_bricks }\OperatorTok{=}\NormalTok{ df\_bricks.dropna() }\CommentTok{\# missing a data at the tail() }
 
 \CommentTok{\# format datetime to accomodate the input for darts library}
@@ -385,10 +394,29 @@ Since the data
 \end{Highlighting}
 \end{Shaded}
 
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& Bricks \\
+Quarter & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1956-01-01 & 189.0 \\
+1956-02-01 & 204.0 \\
+1956-03-01 & 208.0 \\
+1956-04-01 & 197.0 \\
+1957-01-01 & 187.0 \\
+... & ... \\
+2004-02-01 & 423.0 \\
+2004-03-01 & 428.0 \\
+2004-04-01 & 397.0 \\
+2005-01-01 & 355.0 \\
+2005-02-01 & 435.0 \\
+\end{longtable}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveSeasonal}
-
 \CommentTok{\# remove time col since it is set as the index}
 \NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(df\_bricks, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{, fill\_missing\_dates}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
 
@@ -483,8 +511,6 @@ seasonality component which suggest that we use the Mean Naive method.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveMean}
-
 \NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(df\_sheep, }\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Count\textquotesingle{}}\NormalTok{)}
 
 \NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveMean() }
@@ -502,58 +528,144 @@ seasonality component which suggest that we use the Mean Naive method.
 \subsubsection{\texorpdfstring{Household Wealth from
 \texttt{hh\_budget}}{Household Wealth from hh\_budget}}\label{household-wealth-from-hh_budget}
 
+Let us see which columns and constrains we need to filter. We will need
+the \texttt{Year}, \texttt{Country} and \texttt{Wealth} columns.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{df\_wealth }\OperatorTok{=}\NormalTok{ df\_budget[[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Wealth\textquotesingle{}}\NormalTok{]]}
+\NormalTok{df\_wealth }\OperatorTok{=}\NormalTok{ df\_budget[[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Country\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Wealth\textquotesingle{}}\NormalTok{]]}
 \NormalTok{df\_wealth}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}lll@{}}
+\begin{longtable}[]{@{}llll@{}}
 \toprule\noalign{}
-& Year & Wealth \\
+& Year & Country & Wealth \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-0 & 1995-01-01 & 314.9344 \\
-1 & 1996-01-01 & 314.5559 \\
-2 & 1997-01-01 & 323.2357 \\
-3 & 1998-01-01 & 339.3139 \\
-4 & 1999-01-01 & 354.4382 \\
-... & ... & ... \\
-83 & 2012-01-01 & 514.4276 \\
-84 & 2013-01-01 & 592.3568 \\
-85 & 2014-01-01 & 596.4713 \\
-86 & 2015-01-01 & 588.1454 \\
-87 & 2016-01-01 & 609.2657 \\
+0 & 1995-01-01 & Australia & 314.9344 \\
+1 & 1996-01-01 & Australia & 314.5559 \\
+2 & 1997-01-01 & Australia & 323.2357 \\
+3 & 1998-01-01 & Australia & 339.3139 \\
+4 & 1999-01-01 & Australia & 354.4382 \\
+... & ... & ... & ... \\
+83 & 2012-01-01 & USA & 514.4276 \\
+84 & 2013-01-01 & USA & 592.3568 \\
+85 & 2014-01-01 & USA & 596.4713 \\
+86 & 2015-01-01 & USA & 588.1454 \\
+87 & 2016-01-01 & USA & 609.2657 \\
 \end{longtable}
+
+So, we have annual data for wealth of four different countries. Based on
+the prior exercise, we can assume that we want the Australian data.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{wealth }\OperatorTok{=}\NormalTok{ df\_wealth}
 \NormalTok{wealth }\OperatorTok{=}\NormalTok{ wealth.set\_index([}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{])}
 
-\NormalTok{wealth.plot()}
+\NormalTok{wealth.groupby(}\StringTok{\textquotesingle{}Country\textquotesingle{}}\NormalTok{)[}\StringTok{\textquotesingle{}Wealth\textquotesingle{}}\NormalTok{].plot()}
+\NormalTok{plt.legend()}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{hw3_files/figure-pdf/cell-21-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aus\_wealth }\OperatorTok{=}\NormalTok{ wealth.query(}\StringTok{\textquotesingle{}Country == "Australia"\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{decomposition}\OperatorTok{=}\NormalTok{seasonal\_decompose(aus\_wealth.Wealth, period}\OperatorTok{=}\DecValTok{1}\NormalTok{,model}\OperatorTok{=}\StringTok{"multiplicative"}\NormalTok{)}
+
+\NormalTok{fig, (ax1, ax2, ax3, ax4) }\OperatorTok{=}\NormalTok{ plt.subplots(}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, figsize}\OperatorTok{=}\NormalTok{(}\DecValTok{10}\NormalTok{, }\DecValTok{8}\NormalTok{))}
+
+\NormalTok{ax1.plot(decomposition.observed)}
+\NormalTok{ax1.set\_title(}\StringTok{\textquotesingle{}Observed\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{ax2.plot(decomposition.trend)}
+\NormalTok{ax2.set\_title(}\StringTok{\textquotesingle{}Trend\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{ax3.plot(decomposition.seasonal)}
+\NormalTok{ax3.set\_title(}\StringTok{\textquotesingle{}Seasonal\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{ax4.plot(decomposition.resid, linestyle }\OperatorTok{=} \StringTok{"dotted"}\NormalTok{, markersize }\OperatorTok{=} \DecValTok{10}\NormalTok{)}
+\NormalTok{ax4.set\_title(}\StringTok{\textquotesingle{}Residual\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{plt.tight\_layout()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-23-output-1.png}
+
+From the decomposition, it clear that there is minimal seasonality and
+the trend line is unclear without further analysis. Thus, we believe
+using Naive Mean forecast would be the best for this time series.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_wealth, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Wealth\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveMean()}
+
+\NormalTok{model.fit(series)}
+
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ model.predict(}\DecValTok{10}\NormalTok{)}
+
+\NormalTok{series.plot()}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}NaiveMean Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-24-output-1.png}
 
 \subsubsection{\texorpdfstring{Australian takeaway food turnover from
 \texttt{aus\_retail}}{Australian takeaway food turnover from aus\_retail}}\label{australian-takeaway-food-turnover-from-aus_retail}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-
+\NormalTok{df\_takeaway }\OperatorTok{=}\NormalTok{ df\_retail.query(}\StringTok{\textquotesingle{}Industry == "Takeaway food services"\textquotesingle{}}\NormalTok{)}
+\NormalTok{df\_takeaway }\OperatorTok{=}\NormalTok{ df\_takeaway[[}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{]]}
+\NormalTok{df\_takeaway.set\_index(}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{, inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{df\_takeaway}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-Index(['Unnamed: 0', 'Country', 'Year', 'Debt', 'DI', 'Expenditure', 'Savings',
-       'Wealth', 'Unemployment'],
-      dtype='object')
-\end{verbatim}
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& Turnover \\
+Month & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1982-04-01 & 3.2 \\
+1982-05-01 & 3.3 \\
+1982-06-01 & 3.5 \\
+1982-07-01 & 3.5 \\
+1982-08-01 & 3.7 \\
+... & ... \\
+2018-08-01 & 178.5 \\
+2018-09-01 & 179.8 \\
+2018-10-01 & 183.2 \\
+2018-11-01 & 183.7 \\
+2018-12-01 & 195.1 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_takeaway.plot()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-26-output-1.png}
 
 \subsection{Exercise 2}\label{exercise-2}
 
