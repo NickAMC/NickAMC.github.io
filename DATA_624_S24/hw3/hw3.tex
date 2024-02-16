@@ -182,7 +182,7 @@
 
 \title{Homework 3}
 \author{Nick Climaco}
-\date{February 15, 2024}
+\date{February 16, 2024}
 
 \begin{document}
 \maketitle
@@ -228,6 +228,20 @@ Toolbox}\label{chapter-5-the-forecasters-toolbox}
 \ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveDrift}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from tqdm.autonotebook import tqdm
+\end{verbatim}
+
+Resource:
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://unit8co.github.io/darts/quickstart/00-quickstart.html}{Darts
+  Documentation}
+\end{itemize}
 
 \subsection{Exercise 1}\label{exercise-1}
 
@@ -337,12 +351,7 @@ forecast cast would be the average change seen in the data.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from tqdm.autonotebook import tqdm
-\end{verbatim}
-
-\includegraphics{hw3_files/figure-pdf/cell-9-output-2.png}
+\includegraphics{hw3_files/figure-pdf/cell-9-output-1.png}
 
 From the eye test, we observe that the Drift forecast is in-line with
 the data. It reasonable to agree with the forecast since the timeseries
@@ -370,7 +379,7 @@ demonstrates an linear growth in population.
 \NormalTok{bricks\_plot }\OperatorTok{=}\NormalTok{ df\_bricks.set\_index(}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{)}
 \NormalTok{bricks\_plot[}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{] }\OperatorTok{=}\NormalTok{ bricks\_plot[}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{].ffill()}
 
-\NormalTok{decom }\OperatorTok{=}\NormalTok{ STL(bricks\_plot[}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{], period }\OperatorTok{=} \DecValTok{4}\NormalTok{).fit()}
+\NormalTok{decom }\OperatorTok{=}\NormalTok{ STL(bricks\_plot[}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{].values, period }\OperatorTok{=} \DecValTok{4}\NormalTok{).fit()}
 \NormalTok{decom.plot()}
 \NormalTok{plt.show()}
 \end{Highlighting}
@@ -629,60 +638,170 @@ using Naive Mean forecast would be the best for this time series.
 \subsubsection{\texorpdfstring{Australian takeaway food turnover from
 \texttt{aus\_retail}}{Australian takeaway food turnover from aus\_retail}}\label{australian-takeaway-food-turnover-from-aus_retail}
 
+We are going to filter take away food services in the Australian Capital
+Territory because we tried plotting all of the territories in one plot
+which leds to a overcrowded plot. Therefore, we will focus on the
+Australian Capital Regions.
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{df\_takeaway }\OperatorTok{=}\NormalTok{ df\_retail.query(}\StringTok{\textquotesingle{}Industry == "Takeaway food services"\textquotesingle{}}\NormalTok{)}
+\NormalTok{df\_takeaway }\OperatorTok{=}\NormalTok{ df\_retail.query(}\StringTok{\textquotesingle{}Industry == "Takeaway food services" \& State == "Australian Capital Territory"\textquotesingle{}}\NormalTok{)}
 \NormalTok{df\_takeaway }\OperatorTok{=}\NormalTok{ df\_takeaway[[}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{]]}
 \NormalTok{df\_takeaway.set\_index(}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{, inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
-\NormalTok{df\_takeaway}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{longtable}[]{@{}ll@{}}
-\toprule\noalign{}
-& Turnover \\
-Month & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-1982-04-01 & 3.2 \\
-1982-05-01 & 3.3 \\
-1982-06-01 & 3.5 \\
-1982-07-01 & 3.5 \\
-1982-08-01 & 3.7 \\
-... & ... \\
-2018-08-01 & 178.5 \\
-2018-09-01 & 179.8 \\
-2018-10-01 & 183.2 \\
-2018-11-01 & 183.7 \\
-2018-12-01 & 195.1 \\
-\end{longtable}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{df\_takeaway.plot()}
+\NormalTok{plt.xlabel(}\StringTok{"Daily[1D]"}\NormalTok{)}
+\NormalTok{plt.show()}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{hw3_files/figure-pdf/cell-26-output-1.png}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{decomp }\OperatorTok{=}\NormalTok{ STL(df\_takeaway[}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{].values, period}\OperatorTok{=}\DecValTok{365}\NormalTok{).fit()}
+\NormalTok{decomp.plot()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-27-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(df\_takeaway)}
+
+\NormalTok{season\_model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{10}\NormalTok{) }\CommentTok{\# captures the pattern for 14 days (bi{-}weekly pattern)}
+\NormalTok{drift\_model }\OperatorTok{=}\NormalTok{ NaiveDrift()}
+
+\NormalTok{season\_model.fit(series)}
+\NormalTok{drift\_model.fit(series)}
+
+\NormalTok{seasonal\_forecast }\OperatorTok{=}\NormalTok{ season\_model.predict(}\DecValTok{60}\NormalTok{)}
+\NormalTok{drift\_forecast }\OperatorTok{=}\NormalTok{ drift\_model.predict(}\DecValTok{60}\NormalTok{)}
+
+\NormalTok{combined\_forecast }\OperatorTok{=}\NormalTok{ seasonal\_forecast }\OperatorTok{+}\NormalTok{ drift\_forecast }\OperatorTok{{-}}\NormalTok{ series.last\_value()}
+
+\NormalTok{series.plot()}
+\NormalTok{combined\_forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Combined (Drift and Seasonal Naive)\textquotesingle{}}\NormalTok{)}
+\NormalTok{drift\_forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Drift\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-28-output-1.png}
+
+After decomposing the timeseries and observing that its overall trend is
+increasing, we wanted to imploy a combination of the simple forecasting
+methods. There is some seasonality but it was unclear the whether the
+pattern was weeky or monthly. So, we decide to use bi-weekly to forcast
+this timeseries.
+
 \subsection{Exercise 2}\label{exercise-2}
 
 Use the Facebook stock price (data set gafa\_stock) to do the following:
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df\_gafa\_stock }\OperatorTok{=}\NormalTok{ pd.read\_csv(}\StringTok{"../rdata/gafa\_stock.csv"}\NormalTok{, parse\_dates }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}Date\textquotesingle{}}\NormalTok{], index\_col }\OperatorTok{=}\NormalTok{ [}\StringTok{\textquotesingle{}Date\textquotesingle{}}\NormalTok{])}
+
+\NormalTok{fb\_stock }\OperatorTok{=}\NormalTok{ df\_gafa\_stock.query(}\StringTok{\textquotesingle{}Symbol == "FB"\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{fb\_stock\_close }\OperatorTok{=}\NormalTok{ fb\_stock[}\StringTok{\textquotesingle{}Close\textquotesingle{}}\NormalTok{]}
+
+\NormalTok{fb\_stock\_close }\OperatorTok{=}\NormalTok{ fb\_stock\_close.rename\_axis(}\StringTok{\textquotesingle{}Date\textquotesingle{}}\NormalTok{).reset\_index()}
+\end{Highlighting}
+\end{Shaded}
+
 \begin{itemize}
+\tightlist
 \item
   Produce a time plot of the series.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fb\_stock\_close[}\StringTok{\textquotesingle{}Close\textquotesingle{}}\NormalTok{].plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Facebook Daily Closing Price\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-30-output-1.png}
+
+\begin{itemize}
 \item
   Produce forecasts using the drift method and plot them.
 \item
   Show that the forecasts are identical to extending the line drawn
   between the first and last observations.
+\end{itemize}
+
+For the next two bullet points, we will create a drift forecast of the
+fb closing price data and then draw a dash line between the first and
+last values to determine whether the drift forecast is identical to the
+dash line.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(fb\_stock\_close, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Close\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{drift }\OperatorTok{=}\NormalTok{ NaiveDrift()}
+\NormalTok{drift.fit(series)}
+
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ drift.predict(}\DecValTok{100}\NormalTok{) }\CommentTok{\# predict the next 100 days since it is daily data}
+
+\NormalTok{series.plot()}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Drift Forecast\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{first\_value }\OperatorTok{=}\NormalTok{ series.first\_value()}
+\NormalTok{last\_value }\OperatorTok{=}\NormalTok{ series.last\_value()}
+
+\CommentTok{\# superimpose dash line on plot}
+\NormalTok{plt.plot([series.time\_index[}\DecValTok{0}\NormalTok{], series.time\_index[}\OperatorTok{{-}}\DecValTok{1}\NormalTok{]], [first\_value, last\_value], }\StringTok{\textquotesingle{}{-}{-}\textquotesingle{}}\NormalTok{, color }\OperatorTok{=} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-31-output-1.png}
+
+The drift forecast is identical to the superimposed dashed line on the
+plot.
+
+\begin{itemize}
+\tightlist
 \item
   Try using some of the other benchmark functions to forecast the same
   data set. Which do you think is best? Why?
 \end{itemize}
+
+We can observe that the drift method does not capture the seasonal
+component of the data. So, we propose that a combination of NaiveSeaonal
+and the drift method might be a better bencamrk function to forecast.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{seasonal }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{30}\NormalTok{)}
+\NormalTok{seasonal.fit(series)}
+\NormalTok{seasonal\_forecast }\OperatorTok{=}\NormalTok{ seasonal.predict(}\DecValTok{100}\NormalTok{)}
+\NormalTok{combination }\OperatorTok{=}\NormalTok{ seasonal\_forecast }\OperatorTok{+}\NormalTok{ forecast }\OperatorTok{{-}}\NormalTok{ series.last\_value()}
+
+\NormalTok{series.plot()}
+\NormalTok{combination.plot(label}\OperatorTok{=}\StringTok{"Combined Drift and Naive Seasonal Forecast"}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-32-output-1.png}
 
 \subsection{Exercise 3}\label{exercise-3}
 
@@ -708,6 +827,103 @@ and plot the forecasts. The following code will help.
 \end{Shaded}
 
 What do you conclude?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aus\_beer }\OperatorTok{=}\NormalTok{ df\_production[[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{]]}
+\NormalTok{aus\_beer }\OperatorTok{=}\NormalTok{ aus\_beer.query(}\StringTok{\textquotesingle{}Quarter \textgreater{}= "1992 Q1"\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{aus\_beer[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{] }\OperatorTok{=}\NormalTok{ pd.to\_datetime(aus\_beer[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{].astype(}\BuiltInTok{str}\NormalTok{), }\BuiltInTok{format} \OperatorTok{=} \StringTok{"\%Y Q\%m"}\NormalTok{)}
+\NormalTok{aus\_beer}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& Quarter & Beer \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+144 & 1992-01-01 & 443 \\
+145 & 1992-02-01 & 410 \\
+146 & 1992-03-01 & 420 \\
+147 & 1992-04-01 & 532 \\
+148 & 1993-01-01 & 433 \\
+... & ... & ... \\
+213 & 2009-02-01 & 398 \\
+214 & 2009-03-01 & 419 \\
+215 & 2009-04-01 & 488 \\
+216 & 2010-01-01 & 414 \\
+217 & 2010-02-01 & 374 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aus\_beer.set\_index(}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+KeyError: "None of ['Quarter'] are in the columns"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{aus\_beer}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& Beer \\
+Quarter & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1992Q1 & 443 \\
+1992Q1 & 410 \\
+1992Q1 & 420 \\
+1992Q2 & 532 \\
+1993Q1 & 433 \\
+... & ... \\
+2009Q1 & 398 \\
+2009Q1 & 419 \\
+2009Q2 & 488 \\
+2010Q1 & 414 \\
+2010Q1 & 374 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aus\_beer.reset\_index(inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_beer, }\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{4}\NormalTok{)}
+
+\NormalTok{model.fit(series)}
+
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ model.predict(}\DecValTok{4}\NormalTok{)}
+
+\NormalTok{series.plot()}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Seasonal Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+
+
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+TypeError: Cannot interpret 'period[Q-DEC]' as a data type
+\end{verbatim}
 
 \subsection{Exercise 4}\label{exercise-4}
 
