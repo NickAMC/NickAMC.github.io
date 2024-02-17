@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-02-12">
+<meta name="dcterms.date" content="2024-02-17">
 
 <title>Homework 3</title>
 <style>
@@ -86,7 +86,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#chapter-5-the-forecasters-toolbox" id="toc-chapter-5-the-forecasters-toolbox" class="nav-link active" data-scroll-target="#chapter-5-the-forecasters-toolbox">Chapter 5: The Forecaster’s Toolbox</a>
   <ul class="collapse">
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a>
+  <ul class="collapse">
+  <li><a href="#australian-population-from-global_economy" id="toc-australian-population-from-global_economy" class="nav-link" data-scroll-target="#australian-population-from-global_economy">Australian Population from <code>global_economy</code></a></li>
+  <li><a href="#bricks-from-aus_production" id="toc-bricks-from-aus_production" class="nav-link" data-scroll-target="#bricks-from-aus_production">Bricks from <code>aus_production</code></a></li>
+  <li><a href="#nsw-lambs-from-aus_livestock" id="toc-nsw-lambs-from-aus_livestock" class="nav-link" data-scroll-target="#nsw-lambs-from-aus_livestock">NSW Lambs from <code>aus_livestock</code></a></li>
+  <li><a href="#household-wealth-from-hh_budget" id="toc-household-wealth-from-hh_budget" class="nav-link" data-scroll-target="#household-wealth-from-hh_budget">Household Wealth from <code>hh_budget</code></a></li>
+  <li><a href="#australian-takeaway-food-turnover-from-aus_retail" id="toc-australian-takeaway-food-turnover-from-aus_retail" class="nav-link" data-scroll-target="#australian-takeaway-food-turnover-from-aus_retail">Australian takeaway food turnover from <code>aus_retail</code></a></li>
+  </ul></li>
   <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
   <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
   <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
@@ -96,6 +103,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="hw3.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
 </div>
 <main class="content" id="quarto-document-content">
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{
+  showspaces = false,
+  showtabs = false,
+  breaksymbolleft={},
+  breaklines
+}
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
@@ -116,7 +129,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 12, 2024</p>
+      <p class="date">February 17, 2024</p>
     </div>
   </div>
   
@@ -130,6 +143,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="chapter-5-the-forecasters-toolbox" class="level1">
 <h1>Chapter 5: The Forecaster’s Toolbox</h1>
+<div id="cell-3" class="cell" data-execution_count="63">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data wrangling </span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># data visuals</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># timeseries analysis</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts <span class="im">import</span> TimeSeries</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ts decomposition</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> STL</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> seasonal_decompose</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># forecasting method</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts.models <span class="im">import</span> NaiveMean</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts.models <span class="im">import</span> NaiveSeasonal <span class="co"># K=1 for last value, K=4 for quarterly data</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts.models <span class="im">import</span> NaiveDrift</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Resource:</p>
+<ul>
+<li><a href="https://unit8co.github.io/darts/quickstart/00-quickstart.html">Darts Documentation</a></li>
+</ul>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
 <p>Produce forecasts for the following series using whichever of NAIVE(y), SNAIVE(y) or RW(y ~ drift()) is more appropriate in each case:</p>
@@ -140,10 +178,233 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Household wealth (hh_budget).</p></li>
 <li><p>Australian takeaway food turnover (aus_retail).</p></li>
 </ul>
-<div id="cell-4" class="cell" data-execution_count="14">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df_aus_prod <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/global_economy.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">"Year"</span>], index_col<span class="op">=</span>[<span class="st">'Year'</span>])</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>df_aus_prod</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="14">
+<div id="cell-7" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># reading in the data</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>df_global_economy <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/global_economy.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">'Year'</span>])</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_production<span class="op">=</span> pd.read_csv(<span class="st">"../rdata/aus_production.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">'Quarter'</span>])</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df_livestock <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/aus_livestock.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">'Month'</span>])</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>df_budget <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/hh_budget.csv"</span>, parse_dates<span class="op">=</span>[<span class="st">'Year'</span>])</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>df_retail <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/aus_retail.csv"</span>,parse_dates<span class="op">=</span>[<span class="st">'Month'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="australian-population-from-global_economy" class="level3">
+<h3 class="anchored" data-anchor-id="australian-population-from-global_economy">Australian Population from <code>global_economy</code></h3>
+<div id="cell-9" class="cell" data-execution_count="66">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter australia</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_aus <span class="op">=</span> df_global_economy.query(<span class="st">'Country == "Australia"'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-10" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot australian timeseries pop</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df_aus_pop <span class="op">=</span> df_aus[[<span class="st">'Year'</span>, <span class="st">'Population'</span>]]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df_aus_pop.set_index(<span class="st">'Year'</span>, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df_aus_pop.plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The Australian Populatiion has near perfect linear growth from the 1960 to 2020. Before, choosing which forecasting method to go with. I would like to see the decomposition of this time series just to make sure that my initial observation of no seasonality is correct.</p>
+<div id="cell-12" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># decompose this ts </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>decomposition <span class="op">=</span> seasonal_decompose(df_aus_pop.Population, period <span class="op">=</span> <span class="dv">1</span>, model<span class="op">=</span><span class="st">"multiplicative"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2, ax3, ax4) <span class="op">=</span> plt.subplots(<span class="dv">4</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ax1.plot(decomposition.observed)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">'Observed'</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>ax2.plot(decomposition.trend)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">'Trend'</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ax3.plot(decomposition.seasonal)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>ax3.set_title(<span class="st">'Seasonal'</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>ax4.plot(decomposition.resid, linestyle <span class="op">=</span> <span class="st">"dotted"</span>, markersize <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>ax4.set_title(<span class="st">'Residual'</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The trend line captures almost all of the observed data indicated that the seasonal component is constant at a value of 1. Thus, I believe that using the Drift method would be the most appropriate for this timeseries since it exhibits no seasonality and a overal upward trend. Wherein our forecast cast would be the average change seen in the data.</p>
+<div id="cell-14" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># convert df to ts </span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(df_aus,<span class="st">'Year'</span>, <span class="st">'Population'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-15" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>drift <span class="op">=</span> NaiveDrift()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>drift.fit(series)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> drift.predict(<span class="dv">10</span>) <span class="co"># 10 timesteps</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Drift Forecast'</span>, low_quantile <span class="op">=</span> <span class="fl">0.05</span>, high_quantile<span class="op">=</span><span class="fl">0.95</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the eye test, we observe that the Drift forecast is in-line with the data. It reasonable to agree with the forecast since the timeseries demonstrates an linear growth in population.</p>
+</section>
+<section id="bricks-from-aus_production" class="level3">
+<h3 class="anchored" data-anchor-id="bricks-from-aus_production">Bricks from <code>aus_production</code></h3>
+<div id="cell-18" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>df_bricks <span class="op">=</span> df_production[[<span class="st">'Quarter'</span>, <span class="st">'Bricks'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-19" class="cell" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>df_bricks.set_index(<span class="st">'Quarter'</span>).plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>bricks_plot <span class="op">=</span> df_bricks.set_index(<span class="st">'Quarter'</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bricks_plot[<span class="st">'Bricks'</span>] <span class="op">=</span> bricks_plot[<span class="st">'Bricks'</span>].ffill()</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>decom <span class="op">=</span> STL(bricks_plot[<span class="st">'Bricks'</span>].values, period <span class="op">=</span> <span class="dv">4</span>).fit()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>decom.plot()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see a high frequency of the seasonality component while it is unclear whether the trend line is increasing or decreasing. Thus, we believe that using the seasonal naive would be best for forecasting this particular time series.</p>
+<div id="cell-22" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_bricks <span class="op">=</span> df_bricks.dropna() <span class="co"># missing a data at the tail() </span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># format datetime to accomodate the input for darts library</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df_bricks[<span class="st">'Quarter'</span>] <span class="op">=</span> pd.to_datetime(df_bricks[<span class="st">'Quarter'</span>].astype(<span class="bu">str</span>), <span class="bu">format</span><span class="op">=</span><span class="st">'%Y Q%m'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df_bricks.set_index(<span class="st">'Quarter'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="74">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Bricks</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Quarter</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1956-01-01</td>
+<td>189.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1956-02-01</td>
+<td>204.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1956-03-01</td>
+<td>208.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1956-04-01</td>
+<td>197.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1957-01-01</td>
+<td>187.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2004-02-01</td>
+<td>423.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2004-03-01</td>
+<td>428.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2004-04-01</td>
+<td>397.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2005-01-01</td>
+<td>355.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2005-02-01</td>
+<td>435.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>198 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># remove time col since it is set as the index</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(df_bricks, value_cols<span class="op">=</span><span class="st">'Bricks'</span>, fill_missing_dates<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>seasonal <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">4</span>) <span class="co"># K=4 for quarterly data</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>seasonal.fit(series)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> seasonal.predict(<span class="dv">16</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Naive Seasonal Forecast'</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="nsw-lambs-from-aus_livestock" class="level3">
+<h3 class="anchored" data-anchor-id="nsw-lambs-from-aus_livestock">NSW Lambs from <code>aus_livestock</code></h3>
+<div id="cell-25" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>display(df_livestock.State.unique())</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>display(df_livestock.Animal.unique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<pre><code>array(['Australian Capital Territory', 'New South Wales',
+       'Northern Territory', 'Queensland', 'South Australia', 'Tasmania',
+       'Victoria', 'Western Australia'], dtype=object)</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>array(['Bulls, bullocks and steers', 'Calves', 'Cattle (excl. calves)',
+       'Cows and heifers', 'Lambs', 'Pigs', 'Sheep'], dtype=object)</code></pre>
+</div>
+</div>
+<p>Assuming NSW means New South Wales. So, we need to filter <code>df_livestock</code> of sheep from New South Wales.</p>
+<div id="cell-27" class="cell" data-execution_count="77">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>df_sheep <span class="op">=</span> df_livestock.query(<span class="st">'Animal == "Sheep" &amp; State == "New South Wales"'</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>df_sheep</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="77">
 <div>
 
 
@@ -152,88 +413,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">Unnamed: 0</th>
-<th data-quarto-table-cell-role="th">Country</th>
-<th data-quarto-table-cell-role="th">Code</th>
-<th data-quarto-table-cell-role="th">GDP</th>
-<th data-quarto-table-cell-role="th">Growth</th>
-<th data-quarto-table-cell-role="th">CPI</th>
-<th data-quarto-table-cell-role="th">Imports</th>
-<th data-quarto-table-cell-role="th">Exports</th>
-<th data-quarto-table-cell-role="th">Population</th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">Year</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Month</th>
+<th data-quarto-table-cell-role="th">Animal</th>
+<th data-quarto-table-cell-role="th">State</th>
+<th data-quarto-table-cell-role="th">Count</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1960-01-01</td>
-<td>1</td>
-<td>Afghanistan</td>
-<td>AFG</td>
-<td>5.377778e+08</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>7.024793</td>
-<td>4.132233</td>
-<td>8996351.0</td>
+<td data-quarto-table-cell-role="th">25458</td>
+<td>25459</td>
+<td>1972-07-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>669400.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1961-01-01</td>
-<td>2</td>
-<td>Afghanistan</td>
-<td>AFG</td>
-<td>5.488889e+08</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>8.097166</td>
-<td>4.453443</td>
-<td>9166764.0</td>
+<td data-quarto-table-cell-role="th">25459</td>
+<td>25460</td>
+<td>1972-08-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>581100.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1962-01-01</td>
-<td>3</td>
-<td>Afghanistan</td>
-<td>AFG</td>
-<td>5.466667e+08</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>9.349593</td>
-<td>4.878051</td>
-<td>9345868.0</td>
+<td data-quarto-table-cell-role="th">25460</td>
+<td>25461</td>
+<td>1972-09-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>468100.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">1963-01-01</td>
-<td>4</td>
-<td>Afghanistan</td>
-<td>AFG</td>
-<td>7.511112e+08</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>16.863910</td>
-<td>9.171601</td>
-<td>9533954.0</td>
+<td data-quarto-table-cell-role="th">25461</td>
+<td>25462</td>
+<td>1972-10-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>515300.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">1964-01-01</td>
-<td>5</td>
-<td>Afghanistan</td>
-<td>AFG</td>
-<td>8.000000e+08</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>18.055555</td>
-<td>8.888893</td>
-<td>9731361.0</td>
+<td data-quarto-table-cell-role="th">25462</td>
+<td>25463</td>
+<td>1972-11-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>564500.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">...</td>
@@ -242,88 +467,403 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>...</td>
 <td>...</td>
 <td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
-<td>...</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2013-01-01</td>
-<td>15146</td>
-<td>Zimbabwe</td>
-<td>ZWE</td>
-<td>1.909102e+10</td>
-<td>1.989493</td>
-<td>109.079488</td>
-<td>36.668735</td>
-<td>21.987759</td>
-<td>15054506.0</td>
+<td data-quarto-table-cell-role="th">26011</td>
+<td>26012</td>
+<td>2018-08-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>245900.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2014-01-01</td>
-<td>15147</td>
-<td>Zimbabwe</td>
-<td>ZWE</td>
-<td>1.949552e+10</td>
-<td>2.376929</td>
-<td>108.847215</td>
-<td>33.741470</td>
-<td>20.930146</td>
-<td>15411675.0</td>
+<td data-quarto-table-cell-role="th">26012</td>
+<td>26013</td>
+<td>2018-09-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>236800.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2015-01-01</td>
-<td>15148</td>
-<td>Zimbabwe</td>
-<td>ZWE</td>
-<td>1.996312e+10</td>
-<td>1.779873</td>
-<td>106.224541</td>
-<td>37.588635</td>
-<td>19.160176</td>
-<td>15777451.0</td>
+<td data-quarto-table-cell-role="th">26013</td>
+<td>26014</td>
+<td>2018-10-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>277200.0</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">2016-01-01</td>
-<td>15149</td>
-<td>Zimbabwe</td>
-<td>ZWE</td>
-<td>2.054868e+10</td>
-<td>0.755869</td>
-<td>104.560626</td>
-<td>31.275493</td>
-<td>19.943532</td>
-<td>16150362.0</td>
+<td data-quarto-table-cell-role="th">26014</td>
+<td>26015</td>
+<td>2018-11-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>263600.0</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">2017-01-01</td>
-<td>15150</td>
-<td>Zimbabwe</td>
-<td>ZWE</td>
-<td>2.204090e+10</td>
-<td>4.704035</td>
-<td>105.511849</td>
-<td>30.370273</td>
-<td>19.658023</td>
-<td>16529904.0</td>
+<td data-quarto-table-cell-role="th">26015</td>
+<td>26016</td>
+<td>2018-12-01</td>
+<td>Sheep</td>
+<td>New South Wales</td>
+<td>212300.0</td>
 </tr>
 </tbody>
 </table>
 
-<p>15150 rows × 9 columns</p>
+<p>558 rows × 5 columns</p>
+</div>
+</div>
+</div>
+<p>Next, we want to see the timeseries.</p>
+<div id="cell-29" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>df_sheep[[<span class="st">'Month'</span>, <span class="st">'Count'</span>]].set_index([<span class="st">'Month'</span>]).plot()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sheep <span class="op">=</span> df_sheep.set_index(<span class="st">'Month'</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>decomposition <span class="op">=</span> STL(sheep[<span class="st">'Count'</span>]).fit()</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>decomposition.plot()</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We see that this time seres has no clear trend and inconsistent seasonality component which suggest that we use the Mean Naive method.</p>
+<div id="cell-32" class="cell" data-execution_count="80">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(df_sheep, <span class="st">'Month'</span>, <span class="st">'Count'</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> NaiveMean() </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>model.fit(series)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(<span class="dv">30</span>) <span class="co"># 30 timesteps in the future in this case 30 months</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>forecast.plot(label <span class="op">=</span> <span class="st">'Naive Mean Forecast'</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
 </div>
 </div>
 </section>
+<section id="household-wealth-from-hh_budget" class="level3">
+<h3 class="anchored" data-anchor-id="household-wealth-from-hh_budget">Household Wealth from <code>hh_budget</code></h3>
+<p>Let us see which columns and constrains we need to filter. We will need the <code>Year</code>, <code>Country</code> and <code>Wealth</code> columns.</p>
+<div id="cell-35" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>df_wealth <span class="op">=</span> df_budget[[<span class="st">'Year'</span>, <span class="st">'Country'</span>, <span class="st">'Wealth'</span>]]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>df_wealth</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="81">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Year</th>
+<th data-quarto-table-cell-role="th">Country</th>
+<th data-quarto-table-cell-role="th">Wealth</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1995-01-01</td>
+<td>Australia</td>
+<td>314.9344</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1996-01-01</td>
+<td>Australia</td>
+<td>314.5559</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1997-01-01</td>
+<td>Australia</td>
+<td>323.2357</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1998-01-01</td>
+<td>Australia</td>
+<td>339.3139</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1999-01-01</td>
+<td>Australia</td>
+<td>354.4382</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">83</td>
+<td>2012-01-01</td>
+<td>USA</td>
+<td>514.4276</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">84</td>
+<td>2013-01-01</td>
+<td>USA</td>
+<td>592.3568</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">85</td>
+<td>2014-01-01</td>
+<td>USA</td>
+<td>596.4713</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">86</td>
+<td>2015-01-01</td>
+<td>USA</td>
+<td>588.1454</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">87</td>
+<td>2016-01-01</td>
+<td>USA</td>
+<td>609.2657</td>
+</tr>
+</tbody>
+</table>
+
+<p>88 rows × 3 columns</p>
+</div>
+</div>
+</div>
+<p>So, we have annual data for wealth of four different countries. Based on the prior exercise, we can assume that we want the Australian data.</p>
+<div id="cell-37" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>wealth <span class="op">=</span> df_wealth</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>wealth <span class="op">=</span> wealth.set_index([<span class="st">'Year'</span>])</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>wealth.groupby(<span class="st">'Country'</span>)[<span class="st">'Wealth'</span>].plot()</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-38" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>aus_wealth <span class="op">=</span> wealth.query(<span class="st">'Country == "Australia"'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-39" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>decomposition<span class="op">=</span>seasonal_decompose(aus_wealth.Wealth, period<span class="op">=</span><span class="dv">1</span>,model<span class="op">=</span><span class="st">"multiplicative"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2, ax3, ax4) <span class="op">=</span> plt.subplots(<span class="dv">4</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>ax1.plot(decomposition.observed)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">'Observed'</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>ax2.plot(decomposition.trend)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">'Trend'</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>ax3.plot(decomposition.seasonal)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>ax3.set_title(<span class="st">'Seasonal'</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>ax4.plot(decomposition.resid, linestyle <span class="op">=</span> <span class="st">"dotted"</span>, markersize <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>ax4.set_title(<span class="st">'Residual'</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the decomposition, it clear that there is minimal seasonality and the trend line is unclear without further analysis. Thus, we believe using Naive Mean forecast would be the best for this time series.</p>
+<div id="cell-41" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(aus_wealth, value_cols<span class="op">=</span><span class="st">'Wealth'</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> NaiveMean()</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>model.fit(series)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(<span class="dv">10</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'NaiveMean Forecast'</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-24-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="australian-takeaway-food-turnover-from-aus_retail" class="level3">
+<h3 class="anchored" data-anchor-id="australian-takeaway-food-turnover-from-aus_retail">Australian takeaway food turnover from <code>aus_retail</code></h3>
+<p>We are going to filter take away food services in the Australian Capital Territory because we tried plotting all of the territories in one plot which leds to a overcrowded plot. Therefore, we will focus on the Australian Capital Regions.</p>
+<div id="cell-44" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_takeaway <span class="op">=</span> df_retail.query(<span class="st">'Industry == "Takeaway food services" &amp; State == "Australian Capital Territory"'</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>df_takeaway <span class="op">=</span> df_takeaway[[<span class="st">'Month'</span>, <span class="st">'Turnover'</span>]]</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>df_takeaway.set_index(<span class="st">'Month'</span>, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-45" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df_takeaway.plot()</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Daily[1D]"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-26-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-46" class="cell" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>decomp <span class="op">=</span> STL(df_takeaway[<span class="st">'Turnover'</span>].values, period<span class="op">=</span><span class="dv">365</span>).fit()</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>decomp.plot()</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-47" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(df_takeaway)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>season_model <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">30</span>) </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>drift_model <span class="op">=</span> NaiveDrift()</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>season_model.fit(series)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>drift_model.fit(series)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>seasonal_forecast <span class="op">=</span> season_model.predict(<span class="dv">60</span>)</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>drift_forecast <span class="op">=</span> drift_model.predict(<span class="dv">60</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>combined_forecast <span class="op">=</span> seasonal_forecast <span class="op">+</span> drift_forecast <span class="op">-</span> series.last_value()</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>combined_forecast.plot(label<span class="op">=</span><span class="st">'Combined (Drift and Seasonal Naive)'</span>)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>drift_forecast.plot(label<span class="op">=</span><span class="st">'Drift'</span>)</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>After decomposing the timeseries and observing that its overall trend is increasing, we wanted to imploy a combination of the simple forecasting methods. There is some seasonality but it was unclear the whether the pattern was weeky or monthly. So, we decide to use bi-weekly to forcast this timeseries.</p>
+</section>
+</section>
 <section id="exercise-2" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
 <p>Use the Facebook stock price (data set gafa_stock) to do the following:</p>
+<div id="cell-50" class="cell" data-execution_count="90">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>df_gafa_stock <span class="op">=</span> pd.read_csv(<span class="st">"../rdata/gafa_stock.csv"</span>, parse_dates <span class="op">=</span> [<span class="st">'Date'</span>], index_col <span class="op">=</span> [<span class="st">'Date'</span>])</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>fb_stock <span class="op">=</span> df_gafa_stock.query(<span class="st">'Symbol == "FB"'</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>fb_stock_close <span class="op">=</span> fb_stock[<span class="st">'Close'</span>]</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>fb_stock_close <span class="op">=</span> fb_stock_close.rename_axis(<span class="st">'Date'</span>).reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <ul>
-<li><p>Produce a time plot of the series.</p></li>
+<li>Produce a time plot of the series.</li>
+</ul>
+<div id="cell-52" class="cell" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>fb_stock_close[<span class="st">'Close'</span>].plot(label<span class="op">=</span><span class="st">'Facebook Daily Closing Price'</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
 <li><p>Produce forecasts using the drift method and plot them.</p></li>
 <li><p>Show that the forecasts are identical to extending the line drawn between the first and last observations.</p></li>
-<li><p>Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?</p></li>
 </ul>
+<p>For the next two bullet points, we will create a drift forecast of the fb closing price data and then draw a dash line between the first and last values to determine whether the drift forecast is identical to the dash line.</p>
+<div id="cell-56" class="cell" data-execution_count="92">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(fb_stock_close, value_cols<span class="op">=</span><span class="st">'Close'</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>drift <span class="op">=</span> NaiveDrift()</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>drift.fit(series)</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> drift.predict(<span class="dv">100</span>) <span class="co"># predict the next 100 days since it is daily data</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Drift Forecast'</span>)</span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>first_value <span class="op">=</span> series.first_value()</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>last_value <span class="op">=</span> series.last_value()</span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co"># superimpose dash line on plot</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>plt.plot([series.time_index[<span class="dv">0</span>], series.time_index[<span class="op">-</span><span class="dv">1</span>]], [first_value, last_value], <span class="st">'--'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The drift forecast is identical to the superimposed dashed line on the plot.</p>
+<ul>
+<li>Try using some of the other benchmark functions to forecast the same data set. Which do you think is best? Why?</li>
+</ul>
+<p>We can observe that the drift method does not capture the seasonal component of the data. So, we propose that a combination of NaiveSeaonal and the drift method might be a better bencamrk function to forecast.</p>
+<div id="cell-60" class="cell" data-execution_count="93">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>seasonal <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>seasonal.fit(series)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>seasonal_forecast <span class="op">=</span> seasonal.predict(<span class="dv">100</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>combination <span class="op">=</span> seasonal_forecast <span class="op">+</span> forecast <span class="op">-</span> series.last_value()</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>combination.plot(label<span class="op">=</span><span class="st">"Combined Drift and Naive Seasonal Forecast"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 <section id="exercise-3" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
@@ -341,10 +881,287 @@ fit |&gt; gg_tsresiduals()
 # Look a some forecasts
 fit |&gt; forecast() |&gt; autoplot(recent_production)</code></pre>
 <p>What do you conclude?</p>
+<div id="cell-62" class="cell" data-execution_count="94">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>aus_beer <span class="op">=</span> df_production[[<span class="st">'Quarter'</span>, <span class="st">'Beer'</span>]]</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>aus_beer <span class="op">=</span> aus_beer.query(<span class="st">'Quarter &gt;= "1992 Q1"'</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>aus_beer[<span class="st">'Quarter'</span>] <span class="op">=</span> pd.to_datetime(aus_beer[<span class="st">'Quarter'</span>].astype(<span class="bu">str</span>), <span class="bu">format</span> <span class="op">=</span> <span class="st">"%Y Q%m"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-63" class="cell" data-execution_count="95">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>aus_beer</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="95">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Quarter</th>
+<th data-quarto-table-cell-role="th">Beer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">144</td>
+<td>1992-01-01</td>
+<td>443</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">145</td>
+<td>1992-02-01</td>
+<td>410</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">146</td>
+<td>1992-03-01</td>
+<td>420</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">147</td>
+<td>1992-04-01</td>
+<td>532</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">148</td>
+<td>1993-01-01</td>
+<td>433</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">213</td>
+<td>2009-02-01</td>
+<td>398</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">214</td>
+<td>2009-03-01</td>
+<td>419</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">215</td>
+<td>2009-04-01</td>
+<td>488</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">216</td>
+<td>2010-01-01</td>
+<td>414</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">217</td>
+<td>2010-02-01</td>
+<td>374</td>
+</tr>
+</tbody>
+</table>
+
+<p>74 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-64" class="cell" data-execution_count="96">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(aus_beer, value_cols<span class="op">=</span><span class="st">'Beer'</span>, freq<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-65" class="cell" data-execution_count="97">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>train_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(series) <span class="op">*</span> <span class="fl">0.8</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>train_series<span class="op">=</span> series[:train_size]</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>test_series <span class="op">=</span> series[train_size:]</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>model.fit(train_series)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(<span class="bu">len</span>(test_series))</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Naive Seasonal Forecast'</span>)</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-36-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-66" class="cell" data-execution_count="98">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.pyplot <span class="im">import</span> hlines</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>resid <span class="op">=</span> test_series <span class="op">-</span> forecast</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>resid.plot()</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>plt.axhline(y<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The residuals indicate that our current model isn’t performing well for this data. Specifically, the mean of the residuals being far from zero suggests a some bias in our predictions. This suggests we should either significantly adjust the existing model’s parameters or explore a fundamentally different forecasting approach altogether</p>
+<div id="cell-68" class="cell" data-execution_count="99">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts.utils.statistics <span class="im">import</span> plot_acf, plot_pacf</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>plot_acf(train_series, alpha <span class="op">=</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-38-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-69" class="cell" data-execution_count="100">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>plot_pacf(train_series, alpha <span class="op">=</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-39-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The majority of correlations falling outside the blue region signals a problem with our model. This pattern indicates there’s a strong correlation within the residuals themselves, violating the assumption of independent errors. We’ll need to address this issue, as it suggests our model isn’t capturing all the important patterns within the data.</p>
 </section>
 <section id="exercise-4" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
 <p>Repeat the previous exercise using the Australian Exports series from global_economy and the Bricks series from aus_production. Use whichever of NAIVE() or SNAIVE() is more appropriate in each case</p>
+<section id="australian-exports" class="level4">
+<h4 class="anchored" data-anchor-id="australian-exports">Australian Exports</h4>
+<div id="cell-73" class="cell" data-execution_count="101">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>aus_exports <span class="op">=</span> df_aus[[<span class="st">'Year'</span>, <span class="st">'Exports'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-74" class="cell" data-execution_count="102">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(aus_exports, value_cols<span class="op">=</span><span class="st">'Exports'</span>, fill_missing_dates<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-75" class="cell" data-execution_count="103">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>train_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(series) <span class="op">*</span> <span class="fl">0.8</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>train_series<span class="op">=</span> series[:train_size]</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>test_series <span class="op">=</span> series[train_size:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-76" class="cell" data-execution_count="104">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>train_size</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="104">
+<pre><code>46</code></pre>
+</div>
+</div>
+<div id="cell-77" class="cell" data-execution_count="105">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> darts.utils.statistics <span class="im">import</span> check_seasonality</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> m <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>, <span class="dv">25</span>):</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    is_seasonal, period <span class="op">=</span> check_seasonality(train_series, m<span class="op">=</span>m, alpha<span class="op">=</span><span class="fl">0.05</span>)</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> is_seasonal:</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"There is seasonality of order </span><span class="sc">{}</span><span class="st">."</span>.<span class="bu">format</span>(period))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since this timeseries has no seasonality, we believe that using the Naive Method would be the better forecasting tool.</p>
+<div id="cell-79" class="cell" data-execution_count="106">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>seasonal <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">1</span>) </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>seasonal.fit(train_series)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> seasonal.predict(<span class="bu">len</span>(test_series))</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Naive Forecast'</span>)</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-80" class="cell" data-execution_count="107">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>plot_acf(train_series, alpha<span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-46-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-81" class="cell" data-execution_count="108">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>residuals <span class="op">=</span> forecast <span class="op">-</span> test_series</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>residuals.plot()</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>plt.axhline(y<span class="op">=</span><span class="dv">0</span>, color<span class="op">=</span><span class="st">'black'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-47-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="australian-bricks" class="level4">
+<h4 class="anchored" data-anchor-id="australian-bricks">Australian Bricks</h4>
+<div id="cell-83" class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>series <span class="op">=</span> TimeSeries.from_dataframe(df_bricks, value_cols<span class="op">=</span><span class="st">'Bricks'</span>, freq<span class="op">=</span><span class="va">None</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-84" class="cell" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>train_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(series) <span class="op">*</span> <span class="fl">0.8</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>train_series<span class="op">=</span> series[:train_size]</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>test_series <span class="op">=</span> series[train_size:]</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> NaiveSeasonal(K<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>model.fit(train_series)</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> model.predict(<span class="bu">len</span>(test_series))</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>series.plot()</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>forecast.plot(label<span class="op">=</span><span class="st">'Naive Seasonal Forecast'</span>)</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-49-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-85" class="cell" data-execution_count="111">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>plot_acf(train_series, alpha <span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-50-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-86" class="cell" data-execution_count="112">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>plot_pacf(train_series, alpha <span class="op">=</span><span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw3_files/figure-html/cell-51-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
 </section>
 <section id="exercise-7" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
@@ -357,26 +1174,26 @@ fit |&gt; forecast() |&gt; autoplot(recent_production)</code></pre>
 <ol start="2" type="a">
 <li>Check that your data have been split appropriately by producing the following plot.</li>
 </ol>
-<pre><code>autoplot(myseries, Turnover) +
+<pre class="{r}"><code>autoplot(myseries, Turnover) +
   autolayer(myseries_train, Turnover, colour = "red")</code></pre>
 <ol start="3" type="a">
 <li>Fit a seasonal naïve model using SNAIVE() applied to your training data (myseries_train).</li>
 </ol>
-<pre><code>fit &lt;- myseries_train |&gt;
+<pre class="{r}"><code>fit &lt;- myseries_train |&gt;
   model(SNAIVE())</code></pre>
 <ol start="4" type="a">
 <li>Check the residuals.</li>
 </ol>
-<pre><code>fit |&gt; gg_tsresiduals()</code></pre>
+<pre class="{r}"><code>fit |&gt; gg_tsresiduals()</code></pre>
 <p>Do the residuals appear to be uncorrelated and normally distributed?</p>
 <p>e.Produce forecasts for the test data</p>
-<pre><code>fc &lt;- fit |&gt;
+<pre class="{r}"><code>fc &lt;- fit |&gt;
   forecast(new_data = anti_join(myseries, myseries_train))
 fc |&gt; autoplot(myseries)</code></pre>
 <ol start="6" type="a">
 <li>Compare the accuracy of your forecasts against the actual values.</li>
 </ol>
-<pre><code>fit |&gt; accuracy()
+<pre class="{r}"><code>fit |&gt; accuracy()
 fc |&gt; accuracy(myseries)</code></pre>
 <p>g.How sensitive are the accuracy measures to the amount of training data used?</p>
 </section>
