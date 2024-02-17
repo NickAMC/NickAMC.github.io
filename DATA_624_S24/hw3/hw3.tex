@@ -182,7 +182,7 @@
 
 \title{Homework 3}
 \author{Nick Climaco}
-\date{February 16, 2024}
+\date{February 17, 2024}
 
 \begin{document}
 \maketitle
@@ -228,6 +228,11 @@ Toolbox}\label{chapter-5-the-forecasters-toolbox}
 \ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveDrift}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from tqdm.autonotebook import tqdm
+\end{verbatim}
 
 Resource:
 
@@ -835,6 +840,32 @@ What do you conclude?
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{aus\_beer}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& Quarter & Beer \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+144 & 1992-01-01 & 443 \\
+145 & 1992-02-01 & 410 \\
+146 & 1992-03-01 & 420 \\
+147 & 1992-04-01 & 532 \\
+148 & 1993-01-01 & 433 \\
+... & ... & ... \\
+213 & 2009-02-01 & 398 \\
+214 & 2009-03-01 & 419 \\
+215 & 2009-04-01 & 488 \\
+216 & 2010-01-01 & 414 \\
+217 & 2010-02-01 & 374 \\
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 
 \NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_beer, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{, freq}\OperatorTok{=}\VariableTok{None}\NormalTok{)}
 \end{Highlighting}
@@ -861,21 +892,27 @@ What do you conclude?
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-35-output-1.png}
+\includegraphics{hw3_files/figure-pdf/cell-36-output-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ matplotlib.pyplot }\ImportTok{import}\NormalTok{ hlines}
+
+
 \NormalTok{resid }\OperatorTok{=}\NormalTok{ test\_series }\OperatorTok{{-}}\NormalTok{ forecast}
 \NormalTok{resid.plot()}
+\NormalTok{plt.axhline(y}\OperatorTok{=}\DecValTok{0}\NormalTok{, color}\OperatorTok{=}\StringTok{\textquotesingle{}black\textquotesingle{}}\NormalTok{, linestyle}\OperatorTok{=}\StringTok{\textquotesingle{}{-}{-}\textquotesingle{}}\NormalTok{)}
 \NormalTok{plt.show()}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-36-output-1.png}
+\includegraphics{hw3_files/figure-pdf/cell-37-output-1.png}
 
-The residuals indicate that the model we made is not a good model for
-this data which require more tunings or completely try a different
-forecasting method.
+The residuals indicate that our current model isn't performing well for
+this data. Specifically, the mean of the residuals being far from zero
+suggests a some bias in our predictions. This suggests we should either
+significantly adjust the existing model's parameters or explore a
+fundamentally different forecasting approach altogether
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -885,7 +922,7 @@ forecasting method.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-37-output-1.png}
+\includegraphics{hw3_files/figure-pdf/cell-38-output-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -893,16 +930,105 @@ forecasting method.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-38-output-1.png}
+\includegraphics{hw3_files/figure-pdf/cell-39-output-1.png}
 
-Most of the correlations are outside the non-statistically significant
-blue region which indicates that the residuals are correlated.
+The majority of correlations falling outside the blue region signals a
+problem with our model. This pattern indicates there's a strong
+correlation within the residuals themselves, violating the assumption of
+independent errors. We'll need to address this issue, as it suggests our
+model isn't capturing all the important patterns within the data.
 
 \subsection{Exercise 4}\label{exercise-4}
 
 Repeat the previous exercise using the Australian Exports series from
 global\_economy and the Bricks series from aus\_production. Use
 whichever of NAIVE() or SNAIVE() is more appropriate in each case
+
+\paragraph{Australian Exports}\label{australian-exports}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{aus\_exports }\OperatorTok{=}\NormalTok{ df\_aus[[}\StringTok{\textquotesingle{}Year\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Exports\textquotesingle{}}\NormalTok{]]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_exports, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Exports\textquotesingle{}}\NormalTok{, fill\_missing\_dates}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{train\_size }\OperatorTok{=} \BuiltInTok{int}\NormalTok{(}\BuiltInTok{len}\NormalTok{(series) }\OperatorTok{*} \FloatTok{0.8}\NormalTok{)}
+
+\NormalTok{train\_series}\OperatorTok{=}\NormalTok{ series[:train\_size]}
+\NormalTok{test\_series }\OperatorTok{=}\NormalTok{ series[train\_size:]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{train\_size}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+46
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ darts.utils.statistics }\ImportTok{import}\NormalTok{ check\_seasonality}
+\ControlFlowTok{for}\NormalTok{ m }\KeywordTok{in} \BuiltInTok{range}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{25}\NormalTok{):}
+\NormalTok{    is\_seasonal, period }\OperatorTok{=}\NormalTok{ check\_seasonality(train\_series, m}\OperatorTok{=}\NormalTok{m, alpha}\OperatorTok{=}\FloatTok{0.05}\NormalTok{)}
+    \ControlFlowTok{if}\NormalTok{ is\_seasonal:}
+        \BuiltInTok{print}\NormalTok{(}\StringTok{"There is seasonality of order }\SpecialCharTok{\{\}}\StringTok{."}\NormalTok{.}\BuiltInTok{format}\NormalTok{(period))}
+\end{Highlighting}
+\end{Shaded}
+
+Since this timeseries has no seasonality, we believe that using the
+Naive Method would be the better forecasting tool.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{seasonal }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{1}\NormalTok{) }
+
+\NormalTok{seasonal.fit(train\_series)}
+
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ seasonal.predict(}\BuiltInTok{len}\NormalTok{(test\_series))}
+
+\NormalTok{series.plot()}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Seasonal Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-45-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot\_acf(train\_series, alpha}\OperatorTok{=}\FloatTok{0.05}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-46-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{residuals }\OperatorTok{=}\NormalTok{ forecast }\OperatorTok{{-}}\NormalTok{ test\_series}
+\NormalTok{residuals.plot()}
+\NormalTok{plt.axhline(y}\OperatorTok{=}\DecValTok{0}\NormalTok{, color}\OperatorTok{=}\StringTok{\textquotesingle{}black\textquotesingle{}}\NormalTok{, linestyle}\OperatorTok{=}\StringTok{\textquotesingle{}{-}{-}\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-47-output-1.png}
+
+\paragraph{Australian Bricks}\label{australian-bricks}
 
 \subsection{Exercise 7}\label{exercise-7}
 
