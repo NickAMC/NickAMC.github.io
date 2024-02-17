@@ -229,11 +229,6 @@ Toolbox}\label{chapter-5-the-forecasters-toolbox}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from tqdm.autonotebook import tqdm
-\end{verbatim}
-
 Resource:
 
 \begin{itemize}
@@ -675,7 +670,7 @@ Australian Capital Regions.
 \begin{Highlighting}[]
 \NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(df\_takeaway)}
 
-\NormalTok{season\_model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{10}\NormalTok{) }\CommentTok{\# captures the pattern for 14 days (bi{-}weekly pattern)}
+\NormalTok{season\_model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{30}\NormalTok{) }
 \NormalTok{drift\_model }\OperatorTok{=}\NormalTok{ NaiveDrift()}
 
 \NormalTok{season\_model.fit(series)}
@@ -832,98 +827,76 @@ What do you conclude?
 \begin{Highlighting}[]
 \NormalTok{aus\_beer }\OperatorTok{=}\NormalTok{ df\_production[[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{]]}
 \NormalTok{aus\_beer }\OperatorTok{=}\NormalTok{ aus\_beer.query(}\StringTok{\textquotesingle{}Quarter \textgreater{}= "1992 Q1"\textquotesingle{}}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{Shaded}
-\begin{Highlighting}[]
 
 \NormalTok{aus\_beer[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{] }\OperatorTok{=}\NormalTok{ pd.to\_datetime(aus\_beer[}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{].astype(}\BuiltInTok{str}\NormalTok{), }\BuiltInTok{format} \OperatorTok{=} \StringTok{"\%Y Q\%m"}\NormalTok{)}
-\NormalTok{aus\_beer}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{longtable}[]{@{}lll@{}}
-\toprule\noalign{}
-& Quarter & Beer \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-144 & 1992-01-01 & 443 \\
-145 & 1992-02-01 & 410 \\
-146 & 1992-03-01 & 420 \\
-147 & 1992-04-01 & 532 \\
-148 & 1993-01-01 & 433 \\
-... & ... & ... \\
-213 & 2009-02-01 & 398 \\
-214 & 2009-03-01 & 419 \\
-215 & 2009-04-01 & 488 \\
-216 & 2010-01-01 & 414 \\
-217 & 2010-02-01 & 374 \\
-\end{longtable}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{aus\_beer.set\_index(}\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-KeyError: "None of ['Quarter'] are in the columns"
-\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 
-\NormalTok{aus\_beer}
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_beer, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{, freq}\OperatorTok{=}\VariableTok{None}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{longtable}[]{@{}ll@{}}
-\toprule\noalign{}
-& Beer \\
-Quarter & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-1992Q1 & 443 \\
-1992Q1 & 410 \\
-1992Q1 & 420 \\
-1992Q2 & 532 \\
-1993Q1 & 433 \\
-... & ... \\
-2009Q1 & 398 \\
-2009Q1 & 419 \\
-2009Q2 & 488 \\
-2010Q1 & 414 \\
-2010Q1 & 374 \\
-\end{longtable}
-
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{aus\_beer.reset\_index(inplace}\OperatorTok{=}\VariableTok{True}\NormalTok{)}
-\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(aus\_beer, }\StringTok{\textquotesingle{}Quarter\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}Beer\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{train\_size }\OperatorTok{=} \BuiltInTok{int}\NormalTok{(}\BuiltInTok{len}\NormalTok{(series) }\OperatorTok{*} \FloatTok{0.8}\NormalTok{)}
+
+\NormalTok{train\_series}\OperatorTok{=}\NormalTok{ series[:train\_size]}
+\NormalTok{test\_series }\OperatorTok{=}\NormalTok{ series[train\_size:]}
 
 \NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{4}\NormalTok{)}
 
-\NormalTok{model.fit(series)}
+\NormalTok{model.fit(train\_series)}
 
-\NormalTok{forecast }\OperatorTok{=}\NormalTok{ model.predict(}\DecValTok{4}\NormalTok{)}
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ model.predict(}\BuiltInTok{len}\NormalTok{(test\_series))}
 
 \NormalTok{series.plot()}
 \NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Seasonal Forecast\textquotesingle{}}\NormalTok{)}
 \NormalTok{plt.legend()}
 \NormalTok{plt.show()}
-
-
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-TypeError: Cannot interpret 'period[Q-DEC]' as a data type
-\end{verbatim}
+\includegraphics{hw3_files/figure-pdf/cell-35-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{resid }\OperatorTok{=}\NormalTok{ test\_series }\OperatorTok{{-}}\NormalTok{ forecast}
+\NormalTok{resid.plot()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-36-output-1.png}
+
+The residuals indicate that the model we made is not a good model for
+this data which require more tunings or completely try a different
+forecasting method.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ darts.utils.statistics }\ImportTok{import}\NormalTok{ plot\_acf, plot\_pacf}
+
+\NormalTok{plot\_acf(train\_series, alpha }\OperatorTok{=} \FloatTok{0.05}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-37-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot\_pacf(train\_series, alpha }\OperatorTok{=} \FloatTok{0.05}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-38-output-1.png}
+
+Most of the correlations are outside the non-statistically significant
+blue region which indicates that the residuals are correlated.
 
 \subsection{Exercise 4}\label{exercise-4}
 
