@@ -226,13 +226,11 @@ Toolbox}\label{chapter-5-the-forecasters-toolbox}
 \ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveMean}
 \ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveSeasonal }\CommentTok{\# K=1 for last value, K=4 for quarterly data}
 \ImportTok{from}\NormalTok{ darts.models }\ImportTok{import}\NormalTok{ NaiveDrift}
+
+\CommentTok{\# residual analysis}
+\ImportTok{from}\NormalTok{ darts.utils.statistics }\ImportTok{import}\NormalTok{ plot\_residuals\_analysis}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsforecast\core.py:26: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
-  from tqdm.autonotebook import tqdm
-\end{verbatim}
 
 Resource:
 
@@ -896,13 +894,7 @@ What do you conclude?
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ matplotlib.pyplot }\ImportTok{import}\NormalTok{ hlines}
-
-
-\NormalTok{resid }\OperatorTok{=}\NormalTok{ test\_series }\OperatorTok{{-}}\NormalTok{ forecast}
-\NormalTok{resid.plot()}
-\NormalTok{plt.axhline(y}\OperatorTok{=}\DecValTok{0}\NormalTok{, color}\OperatorTok{=}\StringTok{\textquotesingle{}black\textquotesingle{}}\NormalTok{, linestyle}\OperatorTok{=}\StringTok{\textquotesingle{}{-}{-}\textquotesingle{}}\NormalTok{)}
-\NormalTok{plt.show()}
+\NormalTok{plot\_residuals\_analysis(model.residuals(test\_series))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -913,30 +905,6 @@ this data. Specifically, the mean of the residuals being far from zero
 suggests a some bias in our predictions. This suggests we should either
 significantly adjust the existing model's parameters or explore a
 fundamentally different forecasting approach altogether
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ darts.utils.statistics }\ImportTok{import}\NormalTok{ plot\_acf, plot\_pacf}
-
-\NormalTok{plot\_acf(train\_series, alpha }\OperatorTok{=} \FloatTok{0.05}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{hw3_files/figure-pdf/cell-38-output-1.png}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{plot\_pacf(train\_series, alpha }\OperatorTok{=} \FloatTok{0.05}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{hw3_files/figure-pdf/cell-39-output-1.png}
-
-The majority of correlations falling outside the blue region signals a
-problem with our model. This pattern indicates there's a strong
-correlation within the residuals themselves, violating the assumption of
-independent errors. We'll need to address this issue, as it suggests our
-model isn't capturing all the important patterns within the data.
 
 \subsection{Exercise 4}\label{exercise-4}
 
@@ -1000,17 +968,48 @@ Naive Method would be the better forecasting tool.
 \NormalTok{forecast }\OperatorTok{=}\NormalTok{ seasonal.predict(}\BuiltInTok{len}\NormalTok{(test\_series))}
 
 \NormalTok{series.plot()}
-\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Seasonal Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Forecast\textquotesingle{}}\NormalTok{)}
 \NormalTok{plt.legend()}
 \NormalTok{plt.show()}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{hw3_files/figure-pdf/cell-45-output-1.png}
+\includegraphics{hw3_files/figure-pdf/cell-43-output-1.png}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{plot\_acf(train\_series, alpha}\OperatorTok{=}\FloatTok{0.05}\NormalTok{)}
+\NormalTok{plot\_residuals\_analysis(seasonal.residuals(series))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-44-output-1.png}
+
+\paragraph{Australian Bricks}\label{australian-bricks}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(df\_bricks, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Bricks\textquotesingle{}}\NormalTok{, freq}\OperatorTok{=}\VariableTok{None}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{train\_size }\OperatorTok{=} \BuiltInTok{int}\NormalTok{(}\BuiltInTok{len}\NormalTok{(series) }\OperatorTok{*} \FloatTok{0.8}\NormalTok{)}
+
+\NormalTok{train\_series}\OperatorTok{=}\NormalTok{ series[:train\_size]}
+\NormalTok{test\_series }\OperatorTok{=}\NormalTok{ series[train\_size:]}
+
+\NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{4}\NormalTok{)}
+
+\NormalTok{model.fit(train\_series)}
+
+\NormalTok{forecast }\OperatorTok{=}\NormalTok{ model.predict(}\BuiltInTok{len}\NormalTok{(test\_series))}
+
+\NormalTok{series.plot()}
+\NormalTok{forecast.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}Naive Seasonal Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1018,44 +1017,11 @@ Naive Method would be the better forecasting tool.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{residuals }\OperatorTok{=}\NormalTok{ forecast }\OperatorTok{{-}}\NormalTok{ test\_series}
-\NormalTok{residuals.plot()}
-\NormalTok{plt.axhline(y}\OperatorTok{=}\DecValTok{0}\NormalTok{, color}\OperatorTok{=}\StringTok{\textquotesingle{}black\textquotesingle{}}\NormalTok{, linestyle}\OperatorTok{=}\StringTok{\textquotesingle{}{-}{-}\textquotesingle{}}\NormalTok{)}
-
-\NormalTok{plt.show()}
+\NormalTok{plot\_residuals\_analysis(model.residuals(train\_series))}
 \end{Highlighting}
 \end{Shaded}
 
 \includegraphics{hw3_files/figure-pdf/cell-47-output-1.png}
-
-\paragraph{Australian Bricks}\label{australian-bricks}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{df\_bricks}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{longtable}[]{@{}lll@{}}
-\toprule\noalign{}
-& Quarter & Bricks \\
-time & & \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-0 & 1956-01-01 & 189.0 \\
-1 & 1956-02-01 & 204.0 \\
-2 & 1956-03-01 & 208.0 \\
-3 & 1956-04-01 & 197.0 \\
-4 & 1957-01-01 & 187.0 \\
-... & ... & ... \\
-193 & 2004-02-01 & 423.0 \\
-194 & 2004-03-01 & 428.0 \\
-195 & 2004-04-01 & 397.0 \\
-196 & 2005-01-01 & 355.0 \\
-197 & 2005-02-01 & 435.0 \\
-\end{longtable}
 
 \subsection{Exercise 7}\label{exercise-7}
 
@@ -1075,6 +1041,52 @@ For your retail time series (from Exercise 7 in Section 2.10):
 \end{Highlighting}
 \end{Shaded}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{np.random.seed(}\DecValTok{12345678}\NormalTok{)}
+
+\NormalTok{random\_series\_id }\OperatorTok{=}\NormalTok{ df\_retail[}\StringTok{\textquotesingle{}Series ID\textquotesingle{}}\NormalTok{].sample(n}\OperatorTok{=}\DecValTok{1}\NormalTok{).iloc[}\DecValTok{0}\NormalTok{]}
+
+\NormalTok{myseries }\OperatorTok{=}\NormalTok{ df\_retail[df\_retail[}\StringTok{\textquotesingle{}Series ID\textquotesingle{}}\NormalTok{] }\OperatorTok{==}\NormalTok{ random\_series\_id]}
+\NormalTok{myseries }\OperatorTok{=}\NormalTok{ myseries.set\_index(}\StringTok{\textquotesingle{}Month\textquotesingle{}}\NormalTok{)}
+\NormalTok{myseries\_train }\OperatorTok{=}\NormalTok{ myseries.query(}\StringTok{\textquotesingle{}Month \textless{} 2011\textquotesingle{}}\NormalTok{)}
+\NormalTok{myseries\_test }\OperatorTok{=}\NormalTok{ myseries.query(}\StringTok{\textquotesingle{}Month \textgreater{}= 2011\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myseries }\OperatorTok{=}\NormalTok{ myseries[[}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{]]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myseries}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+& Turnover \\
+Month & \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1982-04-01 & 39.7 \\
+1982-05-01 & 45.7 \\
+1982-06-01 & 43.9 \\
+1982-07-01 & 49.3 \\
+1982-08-01 & 48.9 \\
+... & ... \\
+2018-08-01 & 254.9 \\
+2018-09-01 & 260.1 \\
+2018-10-01 & 292.3 \\
+2018-11-01 & 308.6 \\
+2018-12-01 & 336.9 \\
+\end{longtable}
+
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
 \setcounter{enumi}{1}
@@ -1090,6 +1102,34 @@ For your retail time series (from Exercise 7 in Section 2.10):
 \NormalTok{  autolayer(myseries\_train, Turnover, colour = "red")}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{plt.plot(myseries[}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{], color}\OperatorTok{=}\StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)  }
+
+
+\NormalTok{plt.plot(myseries\_train[}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{], color}\OperatorTok{=}\StringTok{\textquotesingle{}red\textquotesingle{}}\NormalTok{)}
+
+\NormalTok{plt.xlabel(}\StringTok{\textquotesingle{}Time\textquotesingle{}}\NormalTok{) }
+\NormalTok{plt.ylabel(}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.title(}\StringTok{\textquotesingle{}Turnover with Training Subset\textquotesingle{}}\NormalTok{) }
+
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-51-output-1.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{myseries\_train.shape}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+(345, 5)
+\end{verbatim}
 
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
@@ -1107,6 +1147,25 @@ For your retail time series (from Exercise 7 in Section 2.10):
 \end{Highlighting}
 \end{Shaded}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{series }\OperatorTok{=}\NormalTok{ TimeSeries.from\_dataframe(myseries, value\_cols}\OperatorTok{=}\StringTok{\textquotesingle{}Turnover\textquotesingle{}}\NormalTok{)  }
+\NormalTok{size }\OperatorTok{=}\DecValTok{345}
+\NormalTok{series\_train }\OperatorTok{=}\NormalTok{ series[:size]}
+\NormalTok{series\_test }\OperatorTok{=}\NormalTok{ series[size:]}
+\NormalTok{model }\OperatorTok{=}\NormalTok{ NaiveSeasonal(K}\OperatorTok{=}\DecValTok{12}\NormalTok{) }
+\NormalTok{model.fit(series\_train)}
+
+\NormalTok{forecasts }\OperatorTok{=}\NormalTok{ model.predict(}\DecValTok{24}\NormalTok{) }
+\NormalTok{series\_train.plot()}
+\NormalTok{forecasts.plot(label}\OperatorTok{=}\StringTok{\textquotesingle{}NaiveSeasonal Forecast\textquotesingle{}}\NormalTok{)}
+\NormalTok{plt.legend()}
+\NormalTok{plt.show()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-53-output-1.png}
+
 \begin{enumerate}
 \def\labelenumi{\alph{enumi}.}
 \setcounter{enumi}{3}
@@ -1122,6 +1181,18 @@ For your retail time series (from Exercise 7 in Section 2.10):
 \end{Shaded}
 
 Do the residuals appear to be uncorrelated and normally distributed?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot\_residuals\_analysis(model.residuals(series\_train))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-54-output-1.png}
+
+The residuals appear to be correleted until lag 8. While the histogram
+does look normal but is not center at zero. It seams to have mean of 8
+by visually looking at the plot.
 
 e.Produce forecasts for the test data
 
@@ -1148,8 +1219,43 @@ e.Produce forecasts for the test data
 \end{Highlighting}
 \end{Shaded}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from}\NormalTok{ darts.metrics }\ImportTok{import}\NormalTok{ mape}
+
+\NormalTok{mape(series\_test, forecasts)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+12.338808133431534
+\end{verbatim}
+
+Our forecast accuracy is 88\% since we have mape value of 12.33 tells us
+that, on average, the forecasts is off by 12\%. Ideally, we would want
+our mape value to be close to zero as possible.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\NormalTok{plot\_residuals\_analysis(model.residuals(series\_test))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{hw3_files/figure-pdf/cell-57-output-1.png}
+
 g.How sensitive are the accuracy measures to the amount of training data
 used?
+
+The size of the training data definitely has an impact on the accuracy
+of the measurements since the more data a model learn from generally a
+better model. We should account the complexity of the model we plan to
+imploy since more complex models require a larger training datset
+relative to simple one, for instance a simple linear regression.
+Moreover, there are some measures that are more robust than ones to the
+size of the training data. We can assume that the sensitivity of the
+measurements have high variation between the different prediction models
+and performance metrics.
 
 
 
