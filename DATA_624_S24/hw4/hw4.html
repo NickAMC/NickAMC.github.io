@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-02-19">
+<meta name="dcterms.date" content="2024-02-20">
 
 <title>Homework 3</title>
 <style>
@@ -123,7 +123,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 19, 2024</p>
+      <p class="date">February 20, 2024</p>
     </div>
   </div>
   
@@ -514,7 +514,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="part-b">Part B</h3>
 <section id="do-there-appear-to-be-any-outliers-in-the-data-are-any-predictors-skewed" class="level4">
 <h4 class="anchored" data-anchor-id="do-there-appear-to-be-any-outliers-in-the-data-are-any-predictors-skewed">Do there appear to be any outliers in the data? Are any predictors skewed?</h4>
-<p>If we consider data outside the IQR, then almost all predictors have outlier with the expection of <code>Mg</code> column having no visuable outliers. The column with the most outliers seems to be <code>Ba</code> suggests that Barium is not a common ingredient in glass while the amount of magnesiumn found in glass fairly common. Moreover, another method to detect outliers that I like to use is z-scores where we consider a datapoint to be an outliers if it is more than 1.96 standard deviations away from the mean since that should capture 95% of the data.</p>
+<p>If we consider data outside the IQR, then almost all predictors have outliers with the expection of <code>Mg</code> column having no visuable outliers. The column with the most outliers seems to be <code>Ba</code> suggests that Barium is not a common ingredient in glass while the amount of magnesiumn found in glass fairly common. Moreover, another method to detect outliers that I like to use is z-scores where we consider a datapoint to be an outliers if it is more than 1.96 standard deviations away from the mean since that should capture 95% of the data.</p>
 <p>All of the predictors are skewed albeit some are more skewed than others. For instance, <code>K</code>,<code>Ba</code> and <code>Fe</code> looks more like a poisson distribution with a low-value lambda.</p>
 </section>
 </section>
@@ -522,7 +522,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="part-c">Part C</h3>
 <section id="are-there-any-relevant-transformations-of-one-or-more-predictors-that-might-improve-the-classification-model" class="level4">
 <h4 class="anchored" data-anchor-id="are-there-any-relevant-transformations-of-one-or-more-predictors-that-might-improve-the-classification-model">Are there any relevant transformations of one or more predictors that might improve the classification model?</h4>
-<p>Some transformations we might use to improve the classification model is a log transform so that the distribution resembles normality. Specifically for models that assume normal data such as a linear regression. Another transformation, I would suggest is to standardize the predictors where their scales are from -1 to 1 or normalize the scale from 0-1 which works better for the task.</p>
+<p>Some transformations we might use to improve the classification model is a log transform so that the distribution resembles normality. Specifically for models that assume normal data such as a linear regression. Another transformation, I would suggest is to standardize the predictors where their scales are from -1 to 1 or normalize the scale from 0-1 which ever works better for the task.</p>
 <hr>
 </section>
 </section>
@@ -684,7 +684,7 @@ Name: count, dtype: int64</code></pre>
 <pre><code>0.006733852496564359</code></pre>
 </div>
 </div>
-<p>While there no predictors will a 100% denegerate distribution, there are definitely a lot of predictors that are very close to denegerate distribution just to name a few: <code>mycelium</code> is the closes to a complete degenerate distribution, and other like <code>seed-size</code>, <code>shriveling</code>, and <code>sclerotia</code>.</p>
+<p>While there no predictors will a 100% denegerate distribution, there are definitely a lot of predictors that are very close to the denegerate distribution just to name a few: <code>mycelium</code> is the closest to a complete degenerate distribution, and others like <code>seed-size</code>, <code>shriveling</code>, and <code>sclerotia</code>.</p>
 </section>
 </section>
 <section id="part-b-1" class="level3">
@@ -754,7 +754,7 @@ dtype: int64</code></pre>
 <h3 class="anchored" data-anchor-id="part-c-1">Part C</h3>
 <section id="develop-a-strategy-for-handling-missing-data-either-by-eliminating-predictors-or-imputation." class="level4">
 <h4 class="anchored" data-anchor-id="develop-a-strategy-for-handling-missing-data-either-by-eliminating-predictors-or-imputation.">Develop a strategy for handling missing data, either by eliminating predictors or imputation.</h4>
-<p>We would consider completely removing the 2-3 classes with the most missing values because we suspect that the missing was due to errors in data collection. While for rest of the missing values, we suggest employ a combination of imputation techiniques in a way it mitigates its impact on the ditribution of each predictor and the quality of the predictions after model training.</p>
+<p>We would consider completely removing the 2-3 classes with the most missing values because we suspect that the missing value was possibly due to errors in data collection. While for rest of the missing values, we suggest employing a combination of imputation techniques in a way it mitigates its impact on the ditribution of each predictor and the quality of the predictions after model training.</p>
 </section>
 </section>
 </section>
