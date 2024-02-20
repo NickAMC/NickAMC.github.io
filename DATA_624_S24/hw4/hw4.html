@@ -6,8 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="author" content="Nick Climaco">
+<meta name="dcterms.date" content="2024-02-19">
 
-<title>Homework 4</title>
+<title>Homework 3</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -74,22 +76,56 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#kj-chapter-3-data-preprocessing" id="toc-kj-chapter-3-data-preprocessing" class="nav-link active" data-scroll-target="#kj-chapter-3-data-preprocessing">KJ Chapter 3: Data Preprocessing</a>
+  <ul class="collapse">
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a>
+  <ul class="collapse">
+  <li><a href="#part-a" id="toc-part-a" class="nav-link" data-scroll-target="#part-a">Part A</a></li>
+  <li><a href="#part-b" id="toc-part-b" class="nav-link" data-scroll-target="#part-b">Part B</a></li>
+  <li><a href="#part-c" id="toc-part-c" class="nav-link" data-scroll-target="#part-c">Part C</a></li>
+  </ul></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a>
+  <ul class="collapse">
+  <li><a href="#part-a-1" id="toc-part-a-1" class="nav-link" data-scroll-target="#part-a-1">Part A</a></li>
+  <li><a href="#part-b-1" id="toc-part-b-1" class="nav-link" data-scroll-target="#part-b-1">Part B</a></li>
+  <li><a href="#part-c-1" id="toc-part-c-1" class="nav-link" data-scroll-target="#part-c-1">Part C</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="hw4.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Homework 4</h1>
+<h1 class="title">Homework 3</h1>
 </div>
 
 
 
 <div class="quarto-title-meta">
 
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nick Climaco </p>
+          </div>
+  </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 19, 2024</p>
+    </div>
+  </div>
   
     
   </div>
@@ -99,49 +135,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="kj-chapter-3-data-preprocessing" class="level1">
+<h1>KJ Chapter 3: Data Preprocessing</h1>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
 <p>The UC Irvine Machine Learning Repository6 contains a data set related to glass identification. The data consist of 214 glass samples labeled as one of seven class categories. There are nine predictors, including the refractive index and percentages of eight elements: Na, Mg, Al, Si, K, Ca, Ba, and Fe. The data can be accessed via:</p>
-<pre class="{r}"><code>&gt; library(mlbench)
-&gt; data(Glass)
-&gt; str(Glass)</code></pre>
-<pre class="{python}"><code>data.frame': 214 obs. of 10 variables:
-$ RI : num 1.52 1.52 1.52 1.52 1.52 ...
-$ Na : num 13.6 13.9 13.5 13.2 13.3 ...
-$ Mg : num 4.49 3.6 3.55 3.69 3.62 3.61 3.6 3.61 3.58 3.6 ...
-$ Al : num 1.1 1.36 1.54 1.29 1.24 1.62 1.14 1.05 1.37 1.36 ...
-$ Si : num 71.8 72.7 73 72.6 73.1 ...
-$ K : num 0.06 0.48 0.39 0.57 0.55 0.64 0.58 0.57 0.56 0.57 ...
-$ Ca : num 8.75 7.83 7.78 8.22 8.07 8.07 8.17 8.24 8.3 8.4 ...
-$ Ba : num 0 0 0 0 0 0 0 0 0 0 ...
-$ Fe : num 0 0 0 0 0 0.26 0 0 0 0.11 ...
-$ Type: Factor w/ 6 levels "1","2","3","5",..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
-<ul>
-<li><ol type="a">
-<li>Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.</li>
-</ol></li>
-<li><ol start="2" type="a">
-<li>Do there appear to be any outliers in the data? Are any predictors skewed?</li>
-</ol></li>
-<li><ol start="3" type="a">
-<li>Are there any relevant transformations of one or more predictors that might improve the classification model?</li>
-</ol></li>
-</ul>
-<div id="cell-5" class="cell" data-execution_count="8">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> kaggle</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-5" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>kaggle.api.authenticate()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>kaggle.api.dataset_download_files(<span class="st">'uciml/glass'</span>, path<span class="op">=</span><span class="st">'./'</span>, unzip<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>kaggle.api.authenticate()</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>kaggle.api.dataset_download_files(<span class="st">'uciml/glass'</span>, path<span class="op">=</span><span class="st">'./'</span>, unzip<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-7" class="cell" data-execution_count="15">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_glass <span class="op">=</span> pd.read_csv(<span class="st">'glass.csv'</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>df_glass</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="15">
+<div id="cell-6" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df_glass <span class="op">=</span> pd.read_csv(<span class="st">'glass.csv'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df_glass</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="43">
 <div>
 
 
@@ -312,9 +319,32 @@ $ Type: Factor w/ 6 levels "1","2","3","5",..: 1 1 1 1 1 1 1 1 1 1 ...</code></p
 </div>
 </div>
 </div>
-<div id="cell-8" class="cell" data-execution_count="16">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>df_glass.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div id="cell-7" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> df_glass.drop([<span class="st">'Type'</span>], axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> df_glass.Type</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="part-a" class="level3">
+<h3 class="anchored" data-anchor-id="part-a">Part A</h3>
+<section id="using-visualizations-explore-the-predictor-variables-to-understand-their-distributions-as-well-as-the-relationships-between-predictors." class="level4">
+<h4 class="anchored" data-anchor-id="using-visualizations-explore-the-predictor-variables-to-understand-their-distributions-as-well-as-the-relationships-between-predictors.">Using visualizations, explore the predictor variables to understand their distributions as well as the relationships between predictors.</h4>
+<div id="cell-9" class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calc corr between predictors</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>correlation_matrix <span class="op">=</span> X.corr()</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>mask <span class="op">=</span> np.triu(correlation_matrix) <span class="co"># halves the matrix </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>np.fill_diagonal(mask, <span class="va">False</span>) <span class="co"># shows the diagonal </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>sns.heatmap(correlation_matrix, cmap <span class="op">=</span> <span class="st">'coolwarm'</span>, annot<span class="op">=</span><span class="va">True</span>, mask <span class="op">=</span> mask ).set_title(<span class="st">'Correlation Matrix for Glass Data'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-10" class="cell" data-execution_count="39">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_glass.describe().T <span class="co"># transpose it since its easier to view this way</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="39">
 <div>
 
 
@@ -322,122 +352,126 @@ $ Type: Factor w/ 6 levels "1","2","3","5",..: 1 1 1 1 1 1 1 1 1 1 ...</code></p
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">RI</th>
-<th data-quarto-table-cell-role="th">Na</th>
-<th data-quarto-table-cell-role="th">Mg</th>
-<th data-quarto-table-cell-role="th">Al</th>
-<th data-quarto-table-cell-role="th">Si</th>
-<th data-quarto-table-cell-role="th">K</th>
-<th data-quarto-table-cell-role="th">Ca</th>
-<th data-quarto-table-cell-role="th">Ba</th>
-<th data-quarto-table-cell-role="th">Fe</th>
-<th data-quarto-table-cell-role="th">Type</th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">count</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-<td>214.000000</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">mean</td>
+<td data-quarto-table-cell-role="th">RI</td>
+<td>214.0</td>
 <td>1.518365</td>
-<td>13.407850</td>
-<td>2.684533</td>
-<td>1.444907</td>
-<td>72.650935</td>
-<td>0.497056</td>
-<td>8.956963</td>
-<td>0.175047</td>
-<td>0.057009</td>
-<td>2.780374</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">std</td>
 <td>0.003037</td>
-<td>0.816604</td>
-<td>1.442408</td>
-<td>0.499270</td>
-<td>0.774546</td>
-<td>0.652192</td>
-<td>1.423153</td>
-<td>0.497219</td>
-<td>0.097439</td>
-<td>2.103739</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">min</td>
-<td>1.511150</td>
-<td>10.730000</td>
-<td>0.000000</td>
-<td>0.290000</td>
-<td>69.810000</td>
-<td>0.000000</td>
-<td>5.430000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>1.000000</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">25%</td>
+<td>1.51115</td>
 <td>1.516522</td>
-<td>12.907500</td>
-<td>2.115000</td>
-<td>1.190000</td>
-<td>72.280000</td>
-<td>0.122500</td>
-<td>8.240000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>1.000000</td>
+<td>1.51768</td>
+<td>1.519157</td>
+<td>1.53393</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">50%</td>
-<td>1.517680</td>
-<td>13.300000</td>
-<td>3.480000</td>
-<td>1.360000</td>
-<td>72.790000</td>
-<td>0.555000</td>
-<td>8.600000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>2.000000</td>
+<td data-quarto-table-cell-role="th">Na</td>
+<td>214.0</td>
+<td>13.407850</td>
+<td>0.816604</td>
+<td>10.73000</td>
+<td>12.907500</td>
+<td>13.30000</td>
+<td>13.825000</td>
+<td>17.38000</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">75%</td>
-<td>1.519157</td>
-<td>13.825000</td>
+<td data-quarto-table-cell-role="th">Mg</td>
+<td>214.0</td>
+<td>2.684533</td>
+<td>1.442408</td>
+<td>0.00000</td>
+<td>2.115000</td>
+<td>3.48000</td>
 <td>3.600000</td>
-<td>1.630000</td>
-<td>73.087500</td>
-<td>0.610000</td>
-<td>9.172500</td>
-<td>0.000000</td>
-<td>0.100000</td>
-<td>3.000000</td>
+<td>4.49000</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">max</td>
-<td>1.533930</td>
-<td>17.380000</td>
-<td>4.490000</td>
-<td>3.500000</td>
-<td>75.410000</td>
-<td>6.210000</td>
-<td>16.190000</td>
-<td>3.150000</td>
-<td>0.510000</td>
-<td>7.000000</td>
+<td data-quarto-table-cell-role="th">Al</td>
+<td>214.0</td>
+<td>1.444907</td>
+<td>0.499270</td>
+<td>0.29000</td>
+<td>1.190000</td>
+<td>1.36000</td>
+<td>1.630000</td>
+<td>3.50000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Si</td>
+<td>214.0</td>
+<td>72.650935</td>
+<td>0.774546</td>
+<td>69.81000</td>
+<td>72.280000</td>
+<td>72.79000</td>
+<td>73.087500</td>
+<td>75.41000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">K</td>
+<td>214.0</td>
+<td>0.497056</td>
+<td>0.652192</td>
+<td>0.00000</td>
+<td>0.122500</td>
+<td>0.55500</td>
+<td>0.610000</td>
+<td>6.21000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Ca</td>
+<td>214.0</td>
+<td>8.956963</td>
+<td>1.423153</td>
+<td>5.43000</td>
+<td>8.240000</td>
+<td>8.60000</td>
+<td>9.172500</td>
+<td>16.19000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Ba</td>
+<td>214.0</td>
+<td>0.175047</td>
+<td>0.497219</td>
+<td>0.00000</td>
+<td>0.000000</td>
+<td>0.00000</td>
+<td>0.000000</td>
+<td>3.15000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Fe</td>
+<td>214.0</td>
+<td>0.057009</td>
+<td>0.097439</td>
+<td>0.00000</td>
+<td>0.000000</td>
+<td>0.00000</td>
+<td>0.100000</td>
+<td>0.51000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Type</td>
+<td>214.0</td>
+<td>2.780374</td>
+<td>2.103739</td>
+<td>1.00000</td>
+<td>1.000000</td>
+<td>2.00000</td>
+<td>3.000000</td>
+<td>7.00000</td>
 </tr>
 </tbody>
 </table>
@@ -445,28 +479,285 @@ $ Type: Factor w/ 6 levels "1","2","3","5",..: 1 1 1 1 1 1 1 1 1 1 ...</code></p
 </div>
 </div>
 </div>
-<div id="cell-9" class="cell" data-execution_count="17">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_glass.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
-RangeIndex: 214 entries, 0 to 213
-Data columns (total 10 columns):
- #   Column  Non-Null Count  Dtype  
----  ------  --------------  -----  
- 0   RI      214 non-null    float64
- 1   Na      214 non-null    float64
- 2   Mg      214 non-null    float64
- 3   Al      214 non-null    float64
- 4   Si      214 non-null    float64
- 5   K       214 non-null    float64
- 6   Ca      214 non-null    float64
- 7   Ba      214 non-null    float64
- 8   Fe      214 non-null    float64
- 9   Type    214 non-null    int64  
-dtypes: float64(9), int64(1)
-memory usage: 16.8 KB</code></pre>
+<div id="cell-11" class="cell" data-execution_count="64">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>X.hist(grid<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
 </div>
+</div>
+<div id="cell-12" class="cell" data-execution_count="96">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">3</span>, ncols<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, col <span class="kw">in</span> <span class="bu">enumerate</span>(X.columns):</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>     sns.boxplot(x<span class="op">=</span>col, data<span class="op">=</span>X, ax<span class="op">=</span>ax.flatten()[i])</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">'Boxplot for each Predictor'</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>plt.show()   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="part-b" class="level3">
+<h3 class="anchored" data-anchor-id="part-b">Part B</h3>
+<section id="do-there-appear-to-be-any-outliers-in-the-data-are-any-predictors-skewed" class="level4">
+<h4 class="anchored" data-anchor-id="do-there-appear-to-be-any-outliers-in-the-data-are-any-predictors-skewed">Do there appear to be any outliers in the data? Are any predictors skewed?</h4>
+<p>If we consider data outside the IQR, then almost all predictors have outlier with the expection of <code>Mg</code> column having no visuable outliers. The column with the most outliers seems to be <code>Ba</code> suggests that Barium is not a common ingredient in glass while the amount of magnesiumn found in glass fairly common. Moreover, another method to detect outliers that I like to use is z-scores where we consider a datapoint to be an outliers if it is more than 1.96 standard deviations away from the mean since that should capture 95% of the data.</p>
+<p>All of the predictors are skewed albeit some are more skewed than others. For instance, <code>K</code>,<code>Ba</code> and <code>Fe</code> looks more like a poisson distribution with a low-value lambda.</p>
+</section>
+</section>
+<section id="part-c" class="level3">
+<h3 class="anchored" data-anchor-id="part-c">Part C</h3>
+<section id="are-there-any-relevant-transformations-of-one-or-more-predictors-that-might-improve-the-classification-model" class="level4">
+<h4 class="anchored" data-anchor-id="are-there-any-relevant-transformations-of-one-or-more-predictors-that-might-improve-the-classification-model">Are there any relevant transformations of one or more predictors that might improve the classification model?</h4>
+<p>Some transformations we might use to improve the classification model is a log transform so that the distribution resembles normality. Specifically for models that assume normal data such as a linear regression. Another transformation, I would suggest is to standardize the predictors where their scales are from -1 to 1 or normalize the scale from 0-1 which works better for the task.</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<p>The soybean data can also be found at the UC Irvine Machine Learning Repository. Data were collected to predict disease in 683 soybeans. The 35 predictors are mostly categorical and include information on the environmental conditions (e.g., temperature, precipitation) and plant conditions (e.g., left spots, mold growth). The outcome labels consist of 19 distinct classes.</p>
+<div id="cell-20" class="cell" data-execution_count="97">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ucimlrepo <span class="im">import</span> fetch_ucirepo </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>soybean_large <span class="op">=</span> fetch_ucirepo(<span class="bu">id</span><span class="op">=</span><span class="dv">90</span>) </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> soybean_large.data.features </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> soybean_large.data.targets </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-21" class="cell" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>X.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="110">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">date</th>
+<th data-quarto-table-cell-role="th">plant-stand</th>
+<th data-quarto-table-cell-role="th">precip</th>
+<th data-quarto-table-cell-role="th">temp</th>
+<th data-quarto-table-cell-role="th">hail</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">mold-growth</th>
+<th data-quarto-table-cell-role="th">seed-discolor</th>
+<th data-quarto-table-cell-role="th">seed-size</th>
+<th data-quarto-table-cell-role="th">shriveling</th>
+<th data-quarto-table-cell-role="th">roots</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>6.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>4.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>3.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>6.0</td>
+<td>0.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>...</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 35 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="109">
+<pre><code>(307, 35)</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="100">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>y.nunique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="100">
+<pre><code>class    19
+dtype: int64</code></pre>
+</div>
+</div>
+<p>Making sure the correct dataset is loaded. It seems the data from UC Irvine has less observations from the data in the R library mlbench</p>
+<section id="part-a-1" class="level3">
+<h3 class="anchored" data-anchor-id="part-a-1">Part A</h3>
+<section id="investigate-the-frequency-distributions-for-the-categorical-predictors.-are-any-of-the-distributions-degenerate-in-the-ways-discussed-earlier-in-this-chapter" class="level4">
+<h4 class="anchored" data-anchor-id="investigate-the-frequency-distributions-for-the-categorical-predictors.-are-any-of-the-distributions-degenerate-in-the-ways-discussed-earlier-in-this-chapter">Investigate the frequency distributions for the categorical predictors. Are any of the distributions degenerate in the ways discussed earlier in this chapter?</h4>
+<div id="cell-26" class="cell" data-execution_count="124">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X.hist(grid<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hw4_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-27" class="cell" data-execution_count="139">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>X.mycelium.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="139">
+<pre><code>mycelium
+0.0    294
+1.0      2
+Name: count, dtype: int64</code></pre>
+</div>
+</div>
+<div id="cell-28" class="cell" data-execution_count="140">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>X.mycelium.var()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="140">
+<pre><code>0.006733852496564359</code></pre>
+</div>
+</div>
+<p>While there no predictors will a 100% denegerate distribution, there are definitely a lot of predictors that are very close to denegerate distribution just to name a few: <code>mycelium</code> is the closes to a complete degenerate distribution, and other like <code>seed-size</code>, <code>shriveling</code>, and <code>sclerotia</code>.</p>
+</section>
+</section>
+<section id="part-b-1" class="level3">
+<h3 class="anchored" data-anchor-id="part-b-1">Part B</h3>
+<section id="roughly-18-of-the-data-are-missing.-are-there-particular-predictors-that-are-more-likely-to-be-missing-is-the-pattern-of-missing-data-related-to-the-classes" class="level4">
+<h4 class="anchored" data-anchor-id="roughly-18-of-the-data-are-missing.-are-there-particular-predictors-that-are-more-likely-to-be-missing-is-the-pattern-of-missing-data-related-to-the-classes">Roughly 18% of the data are missing. Are there particular predictors that are more likely to be missing? Is the pattern of missing data related to the classes?</h4>
+<div id="cell-31" class="cell" data-execution_count="152">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>X.isna().<span class="bu">sum</span>().sort_values(ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="152">
+<pre><code>hail               41
+lodging            41
+severity           41
+seed-tmt           41
+germination        36
+fruit-spots        35
+fruiting-bodies    35
+shriveling         35
+seed-discolor      35
+leaf-mild          30
+dtype: int64</code></pre>
+</div>
+</div>
+<p>We have 41 rows with at least one missing data.</p>
+<div id="cell-33" class="cell" data-execution_count="123">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="dv">41</span> <span class="op">/</span> X.shape[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="123">
+<pre><code>0.13355048859934854</code></pre>
+</div>
+</div>
+<div id="cell-35" class="cell" data-execution_count="153">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df_soybean.mycelium.isna().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="153">
+<pre><code>11</code></pre>
+</div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="166">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>df_soybean.groupby(<span class="st">'class'</span>).<span class="bu">apply</span>(<span class="kw">lambda</span> x: x.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()).sort_values(ascending <span class="op">=</span> <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="166">
+<pre><code>class
+phytophthora-rot               390
+cyst-nematode                  144
+herbicide-injury                80
+diaporthe-pod-&amp;-stem-blight     68
+2-4-d-injury                    30
+brown-spot                       0
+brown-stem-rot                   0
+charcoal-rot                     0
+bacterial-pustule                0
+alternarialeaf-spot              0
+diaporthe-stem-canker            0
+downy-mildew                     0
+frog-eye-leaf-spot               0
+bacterial-blight                 0
+phyllosticta-leaf-spot           0
+anthracnose                      0
+powdery-mildew                   0
+purple-seed-stain                0
+rhizoctonia-root-rot             0
+dtype: int64</code></pre>
+</div>
+</div>
+<p>This exercise reiterates the importance of domain knowledge in this field. For the soybean dataset, understanding the “mycelium” is a fungi, after a google search, represents whether the soybean plant has fungi or not clarifies the possible reasons why it is missing 11 values. Due to the nature of this binary condition indicates that those 11 was possibly not recorded as the cause of missingness. The documentation confirms that all predictors are categorical with ranks ranging from 2-6.</p>
+<p>Futher examiniation of the data reveals that certain soybean classes hold higher concentration of missing data suggesting systematic missingness rather missingness completely at random (MCAR). Leading our examination to the data colleciton process for specifically those classes.</p>
+</section>
+</section>
+<section id="part-c-1" class="level3">
+<h3 class="anchored" data-anchor-id="part-c-1">Part C</h3>
+<section id="develop-a-strategy-for-handling-missing-data-either-by-eliminating-predictors-or-imputation." class="level4">
+<h4 class="anchored" data-anchor-id="develop-a-strategy-for-handling-missing-data-either-by-eliminating-predictors-or-imputation.">Develop a strategy for handling missing data, either by eliminating predictors or imputation.</h4>
+<p>We would consider completely removing the 2-3 classes with the most missing values because we suspect that the missing was due to errors in data collection. While for rest of the missing values, we suggest employ a combination of imputation techiniques in a way it mitigates its impact on the ditribution of each predictor and the quality of the predictions after model training.</p>
+</section>
+</section>
+</section>
 </section>
 
 </main>
