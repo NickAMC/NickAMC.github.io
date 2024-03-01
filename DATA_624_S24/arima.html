@@ -99,7 +99,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="cell-1" class="cell" data-execution_count="2">
+<div id="cell-1" class="cell" data-execution_count="85">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -108,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.statespace.sarimax <span class="im">import</span> SARIMAX</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller, kpss</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-2" class="cell" data-execution_count="3">
+<div id="cell-2" class="cell" data-execution_count="86">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using the augmented dicky fuller test </span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> adfuller_test(series) : </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>     result <span class="op">=</span> adfuller(series)</span>
@@ -132,13 +132,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="load-the-data" class="level1">
 <h1>Load the Data</h1>
-<div id="cell-4" class="cell" data-execution_count="4">
+<div id="cell-4" class="cell" data-execution_count="87">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>gafa_stock <span class="op">=</span> pd.read_csv(<span class="st">'C:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/rdata/gafa_stock.csv'</span>, parse_dates<span class="op">=</span><span class="va">True</span>, index_col <span class="op">=</span> <span class="st">'Date'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-5" class="cell" data-execution_count="5">
+<div id="cell-5" class="cell" data-execution_count="88">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>google <span class="op">=</span> gafa_stock.query(<span class="st">'Symbol == "GOOG"'</span>)[[<span class="st">'Open'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-6" class="cell" data-execution_count="6">
+<div id="cell-6" class="cell" data-execution_count="89">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>expected_range <span class="op">=</span> pd.date_range(start <span class="op">=</span> google.index.<span class="bu">min</span>(), end <span class="op">=</span> google.index.<span class="bu">max</span>())</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>missing_dates <span class="op">=</span> expected_range.difference(google.index)</span>
@@ -162,7 +162,7 @@ DatetimeIndex(['2014-01-04', '2014-01-05', '2014-01-11', '2014-01-12',
 Number of Missing Dates:  567</code></pre>
 </div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="7">
+<div id="cell-7" class="cell" data-execution_count="90">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>google.plot()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -173,7 +173,7 @@ Number of Missing Dates:  567</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-8" class="cell" data-execution_count="8">
+<div id="cell-8" class="cell" data-execution_count="91">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>display(adfuller_test(google))</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>display(kpss_test(google))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -207,7 +207,7 @@ look-up table. The actual p-value is smaller than the p-value returned.
 <pre><code>None</code></pre>
 </div>
 </div>
-<div id="cell-9" class="cell" data-execution_count="9">
+<div id="cell-9" class="cell" data-execution_count="92">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>google_log <span class="op">=</span> np.log(google)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>google_log_diff <span class="op">=</span> google_log.diff().dropna()</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>plt.plot(google_log_diff)</span>
@@ -220,7 +220,7 @@ look-up table. The actual p-value is smaller than the p-value returned.
 </div>
 </div>
 </div>
-<div id="cell-10" class="cell" data-execution_count="10">
+<div id="cell-10" class="cell" data-execution_count="93">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(adfuller_test(google_log_diff))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(kpss_test(google_log_diff))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -259,7 +259,7 @@ look-up table. The actual p-value is greater than the p-value returned.
 </section>
 <section id="find-the-best-parameters-for-the-arima-models" class="level1">
 <h1>FInd the Best Parameters for the ARIMA Models</h1>
-<div id="cell-13" class="cell" data-execution_count="81">
+<div id="cell-13" class="cell" data-execution_count="94">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>order_aic_bic <span class="op">=</span> []</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> p <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>) :</span>
@@ -334,7 +334,7 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\base\model.py:60
   warnings.warn("Maximum Likelihood optimization failed to "</code></pre>
 </div>
 </div>
-<div id="cell-14" class="cell" data-execution_count="82">
+<div id="cell-14" class="cell" data-execution_count="95">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Construct DataFrame from order_aic_bic</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>order_df <span class="op">=</span> pd.DataFrame(order_aic_bic, </span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                        columns<span class="op">=</span>[<span class="st">'p'</span>,<span class="st">'q'</span>,<span class="st">'AIC'</span>,<span class="st">'BIC'</span>])</span>
@@ -369,7 +369,7 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\base\model.py:60
 7  2  1 -6880.097196 -6859.551263</code></pre>
 </div>
 </div>
-<div id="cell-15" class="cell" data-execution_count="83">
+<div id="cell-15" class="cell" data-execution_count="96">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> ARIMA(google_log, order <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>))</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit()</span>
@@ -390,7 +390,7 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\base\model.py:60
 Dep. Variable:                   Open   No. Observations:                 1258
 Model:                 ARIMA(2, 1, 2)   Log Likelihood                3450.813
 Date:                Thu, 29 Feb 2024   AIC                          -6891.626
-Time:                        20:15:38   BIC                          -6865.944
+Time:                        20:53:20   BIC                          -6865.944
 Sample:                             0   HQIC                         -6881.974
                                - 1258                                         
 Covariance Type:                  opg                                         
@@ -422,7 +422,7 @@ Warnings:
 </section>
 <section id="residual-analysis" class="level1">
 <h1>Residual Analysis</h1>
-<div id="cell-18" class="cell" data-execution_count="14">
+<div id="cell-18" class="cell" data-execution_count="97">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>result.plot_diagnostics()</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -434,18 +434,18 @@ Warnings:
 </div>
 </div>
 </div>
-<div id="cell-19" class="cell" data-execution_count="15">
+<div id="cell-19" class="cell" data-execution_count="98">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> np.mean(np.<span class="bu">abs</span>(result.resid))</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'MAE: </span><span class="sc">{</span>mae<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>MAE: 0.01564654735555415</code></pre>
+<pre><code>MAE: 0.015628640273744304</code></pre>
 </div>
 </div>
 </section>
 <section id="auto-arima" class="level1">
 <h1>AUTO ARIMA</h1>
-<div id="cell-21" class="cell" data-execution_count="16">
+<div id="cell-21" class="cell" data-execution_count="99">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pmdarima <span class="im">import</span> plot_acf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="quarto-figure quarto-figure-center">
@@ -466,40 +466,40 @@ Warnings:
 <figcaption>image.png</figcaption>
 </figure>
 </div>
-<div id="cell-25" class="cell" data-execution_count="17">
+<div id="cell-25" class="cell" data-execution_count="100">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pmdarima <span class="im">as</span> pm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-26" class="cell" data-execution_count="18">
+<div id="cell-26" class="cell" data-execution_count="101">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> pm.auto_arima(google_log, </span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                        information_criterion<span class="op">=</span><span class="st">'aic'</span>,</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>                        trace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Performing stepwise search to minimize aic
- ARIMA(2,1,2)(0,0,0)[0] intercept   : AIC=-6881.065, Time=0.60 sec
- ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-6877.258, Time=0.10 sec
- ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-6883.357, Time=0.16 sec
+ ARIMA(2,1,2)(0,0,0)[0] intercept   : AIC=-6881.065, Time=0.63 sec
+ ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-6877.258, Time=0.09 sec
+ ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-6883.357, Time=0.17 sec
  ARIMA(0,1,1)(0,0,0)[0] intercept   : AIC=-6883.070, Time=0.15 sec
  ARIMA(0,1,0)(0,0,0)[0]             : AIC=-6877.931, Time=0.07 sec
- ARIMA(2,1,0)(0,0,0)[0] intercept   : AIC=-6881.575, Time=0.23 sec
+ ARIMA(2,1,0)(0,0,0)[0] intercept   : AIC=-6881.575, Time=0.24 sec
  ARIMA(1,1,1)(0,0,0)[0] intercept   : AIC=-6881.471, Time=0.16 sec
  ARIMA(2,1,1)(0,0,0)[0] intercept   : AIC=-6879.609, Time=0.70 sec
- ARIMA(1,1,0)(0,0,0)[0]             : AIC=-6883.801, Time=0.09 sec
+ ARIMA(1,1,0)(0,0,0)[0]             : AIC=-6883.801, Time=0.07 sec
  ARIMA(2,1,0)(0,0,0)[0]             : AIC=-6882.060, Time=0.14 sec
- ARIMA(1,1,1)(0,0,0)[0]             : AIC=-6881.930, Time=0.12 sec
+ ARIMA(1,1,1)(0,0,0)[0]             : AIC=-6881.930, Time=0.13 sec
  ARIMA(0,1,1)(0,0,0)[0]             : AIC=-6883.505, Time=0.19 sec
  ARIMA(2,1,1)(0,0,0)[0]             : AIC=-6880.097, Time=0.19 sec
 
 Best model:  ARIMA(1,1,0)(0,0,0)[0]          
-Total fit time: 2.921 seconds</code></pre>
+Total fit time: 2.925 seconds</code></pre>
 </div>
 </div>
-<div id="cell-27" class="cell" data-execution_count="19">
+<div id="cell-27" class="cell" data-execution_count="102">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="19">
-<style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre> ARIMA(1,1,0)(0,0,0)[0]          </pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked=""><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">ARIMA</label><div class="sk-toggleable__content"><pre> ARIMA(1,1,0)(0,0,0)[0]          </pre></div></div></div></div></div>
+<div class="cell-output cell-output-display" data-execution_count="102">
+<style>#sk-container-id-2 {color: black;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre> ARIMA(1,1,0)(0,0,0)[0]          </pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked=""><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">ARIMA</label><div class="sk-toggleable__content"><pre> ARIMA(1,1,0)(0,0,0)[0]          </pre></div></div></div></div></div>
 </div>
 </div>
-<div id="cell-28" class="cell" data-execution_count="20">
+<div id="cell-28" class="cell" data-execution_count="103">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(results.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                               SARIMAX Results                                
@@ -507,7 +507,7 @@ Total fit time: 2.921 seconds</code></pre>
 Dep. Variable:                      y   No. Observations:                 1258
 Model:               SARIMAX(1, 1, 0)   Log Likelihood                3443.900
 Date:                Thu, 29 Feb 2024   AIC                          -6883.801
-Time:                        15:03:56   BIC                          -6873.528
+Time:                        20:53:24   BIC                          -6873.528
 Sample:                             0   HQIC                         -6879.940
                                - 1258                                         
 Covariance Type:                  opg                                         
@@ -527,7 +527,7 @@ Warnings:
 [1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
 </div>
 </div>
-<div id="cell-29" class="cell" data-execution_count="21">
+<div id="cell-29" class="cell" data-execution_count="104">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>results.plot_diagnostics()</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -544,7 +544,7 @@ Warnings:
 <h1>Forecasting</h1>
 <section id="in-sample-forecasting" class="level2">
 <h2 class="anchored" data-anchor-id="in-sample-forecasting">In Sample Forecasting</h2>
-<div id="cell-32" class="cell" data-execution_count="60">
+<div id="cell-32" class="cell" data-execution_count="105">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> result.get_prediction(start <span class="op">=-</span><span class="dv">45</span>)</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -577,7 +577,7 @@ Warnings:
 </section>
 <section id="dynamic-forecasting" class="level2">
 <h2 class="anchored" data-anchor-id="dynamic-forecasting">Dynamic Forecasting</h2>
-<div id="cell-34" class="cell" data-execution_count="52">
+<div id="cell-34" class="cell" data-execution_count="106">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>forecast <span class="op">=</span> result.get_prediction(start <span class="op">=-</span><span class="dv">90</span>, dynamic <span class="op">=</span> <span class="va">False</span>)</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -606,13 +606,13 @@ Warnings:
 </div>
 </div>
 </div>
-<div id="cell-35" class="cell" data-execution_count="70">
+<div id="cell-35" class="cell" data-execution_count="107">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> google[google.index <span class="op">&gt;=</span> <span class="st">'2018-10-25'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-36" class="cell" data-execution_count="72">
+<div id="cell-36" class="cell" data-execution_count="108">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>prediction <span class="op">=</span> np.exp(mean_forecast)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-37" class="cell" data-execution_count="80">
+<div id="cell-37" class="cell" data-execution_count="109">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_absolute_error</span>
 <span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -627,17 +627,14 @@ Warnings:
 <span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>mape <span class="op">=</span> mean_absolute_percentage_error(y, prediction)</span>
 <span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'MAPE:'</span><span class="op">+</span><span class="bu">str</span>(mape))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>MSE: 736.607766564463
-RMSE: 27.140518907428113
-MAE: 21.296959913103482
-MAPE:0.020383501340318882</code></pre>
+<div class="cell-output cell-output-error">
+<pre><code>ValueError: Found input variables with inconsistent numbers of samples: [45, 90]</code></pre>
 </div>
 </div>
 </section>
 <section id="out-sample-forecasting" class="level2">
 <h2 class="anchored" data-anchor-id="out-sample-forecasting">Out Sample Forecasting</h2>
-<div id="cell-39" class="cell" data-execution_count="56">
+<div id="cell-39" class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>arima_value_forecasting <span class="op">=</span> results.predict(<span class="dv">60</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:836: ValueWarning: No supported index is available. Prediction results will be given with an integer index beginning at `start`.
@@ -646,7 +643,7 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_mod
   return get_prediction_index(</code></pre>
 </div>
 </div>
-<div id="cell-40" class="cell" data-execution_count="53">
+<div id="cell-40" class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> statsmodels.tsa.arima.model <span class="im">import</span> ARIMA</span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error, mean_absolute_error, mean_absolute_percentage_error</span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
@@ -680,7 +677,7 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_mod
 </section>
 <section id="rolling-arima-forecasting" class="level1">
 <h1>Rolling ARIMA Forecasting</h1>
-<div id="cell-44" class="cell" data-execution_count="37">
+<div id="cell-44" class="cell">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rolling forecasts</span></span>
 <span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(y)):</span>
 <span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># predict</span></span>
@@ -697,13 +694,13 @@ c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_mod
   obs = y[i]</code></pre>
 </div>
 </div>
-<div id="cell-45" class="cell" data-execution_count="38">
+<div id="cell-45" class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>mean_absolute_percentage_error(y, predictions)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="38">
 <pre><code>0.01452699433119438</code></pre>
 </div>
 </div>
-<div id="cell-46" class="cell" data-execution_count="39">
+<div id="cell-46" class="cell">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># report performance</span></span>
 <span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>mse <span class="op">=</span> mean_squared_error(y, predictions)</span>
 <span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'MSE: '</span><span class="op">+</span><span class="bu">str</span>(mse))</span>
@@ -717,7 +714,7 @@ MAE: 15.942807574495335
 RMSE: 21.14504352349408</code></pre>
 </div>
 </div>
-<div id="cell-47" class="cell" data-execution_count="28">
+<div id="cell-47" class="cell">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">16</span>,<span class="dv">8</span>))</span>
 <span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>plt.plot(google.index[<span class="op">-</span><span class="dv">600</span>:], google[<span class="st">'Open'</span>].tail(<span class="dv">600</span>), color<span class="op">=</span><span class="st">'green'</span>, label <span class="op">=</span> <span class="st">'Google Stock Price'</span>)</span>
 <span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>plt.plot(test_data.index, y, color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Real Stock Price'</span>)</span>
