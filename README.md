@@ -30,6 +30,8 @@ The program covers a broad range of disciplines:
 * D607 - Data Acquisition and Management
 * D608 - Knowledge and Visual Analytics
 * D621 - Data Mining
+* D622 - Machine Learning and Big Data
+* D624 - Predictive Analytics
 
 
 ## Projects
