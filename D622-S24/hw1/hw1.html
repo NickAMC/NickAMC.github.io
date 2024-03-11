@@ -189,18 +189,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="essay" class="level1">
 <h1>Essay</h1>
-<p>500 words minimum</p>
-<p>For this task</p>
+<p>For this task, we will be using the <a href="https://www.kaggle.com/datasets/lucas142129silva/fifa-23-ultimate-team-players-database">EA FC24 Players Data</a> and <a href="https://www.kaggle.com/datasets/justinas/nba-players-data">NBA Players Data</a> for exploratory data analysis (EDA), both datasets are sourced from Kaggle. We will determine the underlying patterns in these data by calculating the correlation between columns, examining its distribution and employ outliers detection mainly using boxplots.</p>
+<p>The EA FC24 data has a shape of 21389 rows and 27 columns with an mix of numerical and categorical values such as <code>League</code> and <code>Passing</code> statistic. This dataset had no missing values which helps us the analysis because we do not have to consider whether to remove or impute the missing values. As for the distributions of the numerical columns, we notice that <code>Price</code> and <code>Popularity</code> demonstrated degenerate distributions and therefore the removal of those columns must be considered. Moreover, the summary statistics of player rating showed that the average player had a rating of 68 out of 99 with a standard deviation of 8.46. Next, we calculated the correlation matrices and found that defensive minded players have high correlation with only one statistic <code>Defense / Speed</code> while attacking minded players were correlated with all the other statistic except for defense which supports common knowledge that defenders should be good at defending. A correlation that was surprising was between <code>Popularity</code> and <code>Rating</code>, it had a correlation of 0.29 which indicates that being a good player does not necessarily mean being popular with the fans. Due the nature of this data, allowed us to able to explore regression and classifications models. We wanted to know how well a OLS regression model can predict player ratings based on their abilities provided by the data. However, before we could move to fitting a model we had to create dummy variables for the categorical features in this data. So, our regression model performed with a MAE of 2.42. which provide a baseline in where we can improve from. As for the classification task, we took the same features but this time trained a model predict/suggest the optimal position of the players.</p>
+<p>On to the next dataset, we have the NBA players data where it has a shape of 12844 rows and 22 columns. Its distribution, some looks normal while some are skewed mosty to the right. Again, we notice the presence of degenerate distributions in this data where we will consider removing it from the analysis. We examined the correlation of the players weight and height and found a strong positive correlation of 0.82. Moreover, we found that Kentucky State followed by Duke University produces the most NBA players and thus leads us to consider whether their athletic program would be statistically better than other programs in the country. Next, we created a correlation matrix where <code>Age</code> has the least correlations with all the other columns. This is important because we might want to consider <code>Age</code> as our response variable for model building. In addition, another potential response variable would be <code>pts</code> which is the average points the players has made in a season.</p>
+<p>Both datasets offer valuable insights into the world of professional sports, specifically football (soccer) and basketball. While their core purpose is to quantify athletic performance, the specific metrics used naturally differ due to the distinct nature of each sport. The EA FC24 dataset highlights crucial football skills like pace and shooting accuracy. In contrast, the NBA dataset prioritizes statistics that drive basketball success, such as rebounds, points, and assists. This tailoring of measurements reflects the unique demands and strategic elements within each sport.</p>
 </section>
 <section id="ea-fc-24-players-data" class="level1">
 <h1>EA FC 24 Players Data</h1>
-<div id="cell-8" class="cell" data-execution_count="519">
+<div id="cell-6" class="cell" data-execution_count="519">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>kaggle.api.authenticate()</span>
 <span id="cb2-2"><a href="#cb2-2"></a>kaggle.api.dataset_download_files(<span class="st">'lucas142129silva/fifa-23-ultimate-team-players-database'</span>, path<span class="op">=</span><span class="st">'./'</span>, unzip<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="exploratory-data-analysis-data-wrangling" class="level2">
 <h2 class="anchored" data-anchor-id="exploratory-data-analysis-data-wrangling">Exploratory Data Analysis / Data Wrangling</h2>
-<div id="cell-10" class="cell" data-execution_count="520">
+<div id="cell-8" class="cell" data-execution_count="520">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">'eafc24_players_2024-03-08.csv'</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="520">
@@ -578,7 +580,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-11" class="cell" data-execution_count="521">
+<div id="cell-9" class="cell" data-execution_count="521">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">def</span> show_summary(df) :</span>
 <span id="cb4-2"><a href="#cb4-2"></a>    </span>
 <span id="cb4-3"><a href="#cb4-3"></a>    <span class="bu">print</span>(<span class="dv">80</span> <span class="op">*</span> <span class="st">"+"</span>)</span>
@@ -600,7 +602,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-19"><a href="#cb4-19"></a>    <span class="bu">print</span>(<span class="st">"NUMBER OF UNIQUE VALUES:"</span>)</span>
 <span id="cb4-20"><a href="#cb4-20"></a>    <span class="bu">print</span>(df.nunique())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-12" class="cell" data-execution_count="522">
+<div id="cell-10" class="cell" data-execution_count="522">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>show_summary(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -708,7 +710,7 @@ dtype: int64</code></pre>
 </div>
 <section id="distribution-of-player-statistics" class="level3">
 <h3 class="anchored" data-anchor-id="distribution-of-player-statistics">Distribution of Player Statistics</h3>
-<div id="cell-14" class="cell" data-execution_count="523">
+<div id="cell-12" class="cell" data-execution_count="523">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>df.hist()</span>
 <span id="cb7-2"><a href="#cb7-2"></a>plt.tight_layout()</span>
 <span id="cb7-3"><a href="#cb7-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -721,7 +723,7 @@ dtype: int64</code></pre>
 </div>
 </div>
 <p><code>Price</code> and <code>Popularity</code> are exhibiting degenerate distributions consider removing features from data.</p>
-<div id="cell-16" class="cell" data-execution_count="524">
+<div id="cell-14" class="cell" data-execution_count="524">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>df.describe().T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="524">
 <div>
@@ -891,15 +893,15 @@ dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-17" class="cell" data-execution_count="525">
+<div id="cell-15" class="cell" data-execution_count="525">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># filter df </span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>filtered_df <span class="op">=</span> df.query(<span class="st">'Club != "HERO" &amp; Card_Version == "normal" &amp; Gender == "Male"'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-18" class="cell" data-execution_count="526">
+<div id="cell-16" class="cell" data-execution_count="526">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># removes price columns </span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>filtered_df.drop([<span class="st">'Price'</span>, <span class="st">'Price_Variation'</span>, <span class="st">'Gender'</span>], axis<span class="op">=</span><span class="dv">1</span>, inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-19" class="cell" data-execution_count="527">
+<div id="cell-17" class="cell" data-execution_count="527">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>fig, axes <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">4</span>, ncols<span class="op">=</span><span class="dv">3</span>)</span>
 <span id="cb11-2"><a href="#cb11-2"></a><span class="cf">for</span> i, col <span class="kw">in</span> <span class="bu">enumerate</span>(numeric_columns):</span>
 <span id="cb11-3"><a href="#cb11-3"></a>    row <span class="op">=</span> i <span class="op">//</span> <span class="dv">3</span></span>
@@ -920,7 +922,7 @@ dtype: int64</code></pre>
 </section>
 <section id="who-are-top-10-rated-players-in-world" class="level3">
 <h3 class="anchored" data-anchor-id="who-are-top-10-rated-players-in-world">Who are top 10 rated players in World?</h3>
-<div id="cell-21" class="cell" data-execution_count="528">
+<div id="cell-19" class="cell" data-execution_count="528">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>filtered_df.sort_values(<span class="st">'Rating'</span>, ascending<span class="op">=</span><span class="va">False</span>)[[<span class="st">'Name'</span>,<span class="st">'Club'</span>, <span class="st">'Main_Position'</span>, <span class="st">'Rating'</span>]].head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="528">
 <div>
@@ -1016,7 +1018,7 @@ dtype: int64</code></pre>
 </section>
 <section id="how-many-are-players-are-in-each-position" class="level3">
 <h3 class="anchored" data-anchor-id="how-many-are-players-are-in-each-position">How many are players are in each position?</h3>
-<div id="cell-23" class="cell" data-execution_count="529">
+<div id="cell-21" class="cell" data-execution_count="529">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a>position_counts.sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="529">
 <pre><code>Main_Position
@@ -1038,7 +1040,7 @@ CF      135
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
-<div id="cell-24" class="cell" data-execution_count="530">
+<div id="cell-22" class="cell" data-execution_count="530">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>position_counts <span class="op">=</span> filtered_df.groupby(<span class="st">'Main_Position'</span>)[<span class="st">'Main_Position'</span>].value_counts().sort_values(ascending<span class="op">=</span><span class="va">True</span>)</span>
 <span id="cb15-2"><a href="#cb15-2"></a>positions <span class="op">=</span> position_counts.index.get_level_values(<span class="dv">0</span>).to_list()</span>
 <span id="cb15-3"><a href="#cb15-3"></a>counts <span class="op">=</span> position_counts.values</span>
@@ -1056,7 +1058,7 @@ Name: count, dtype: int64</code></pre>
 </section>
 <section id="which-nation-have-the-most-players" class="level3">
 <h3 class="anchored" data-anchor-id="which-nation-have-the-most-players">Which nation have the most players?</h3>
-<div id="cell-26" class="cell" data-execution_count="531">
+<div id="cell-24" class="cell" data-execution_count="531">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>filtered_df.groupby(<span class="st">'Main_Position'</span>)[<span class="st">'Rating'</span>].mean().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="531">
 <pre><code>Main_Position
@@ -1078,7 +1080,7 @@ GK     64.821058
 Name: Rating, dtype: float64</code></pre>
 </div>
 </div>
-<div id="cell-27" class="cell" data-execution_count="532">
+<div id="cell-25" class="cell" data-execution_count="532">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a>filtered_df.groupby(<span class="st">'Nation'</span>)[<span class="st">'Nation'</span>].value_counts().sort_values(ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="532">
 <pre><code>Nation
@@ -1099,7 +1101,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </section>
 <section id="overall-correlation-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="overall-correlation-matrix">Overall Correlation Matrix</h3>
-<div id="cell-29" class="cell" data-execution_count="533">
+<div id="cell-27" class="cell" data-execution_count="533">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a>corr_matrix <span class="op">=</span> df[numeric_columns].corr()</span>
 <span id="cb20-2"><a href="#cb20-2"></a></span>
 <span id="cb20-3"><a href="#cb20-3"></a>mask <span class="op">=</span> np.triu(np.ones_like(corr_matrix, dtype<span class="op">=</span><span class="bu">bool</span>)).copy()  </span>
@@ -1123,7 +1125,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </section>
 <section id="defense-correlation-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="defense-correlation-matrix">Defense Correlation Matrix</h3>
-<div id="cell-31" class="cell" data-execution_count="534">
+<div id="cell-29" class="cell" data-execution_count="534">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a>defenders <span class="op">=</span> [<span class="st">'CB'</span>, <span class="st">'LB'</span>, <span class="st">'RB'</span>,<span class="st">'LWB'</span>, <span class="st">'RWB'</span>]</span>
 <span id="cb21-2"><a href="#cb21-2"></a></span>
 <span id="cb21-3"><a href="#cb21-3"></a>def_df <span class="op">=</span> filtered_df[filtered_df[<span class="st">'Main_Position'</span>].isin(defenders)]</span>
@@ -1150,7 +1152,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </section>
 <section id="attack-correlation-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="attack-correlation-matrix">Attack Correlation Matrix</h3>
-<div id="cell-33" class="cell" data-execution_count="535">
+<div id="cell-31" class="cell" data-execution_count="535">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>attackers <span class="op">=</span> [<span class="st">'ST'</span>,<span class="st">'CF'</span>,<span class="st">'RW'</span>,<span class="st">'LW'</span>]</span>
 <span id="cb22-2"><a href="#cb22-2"></a></span>
 <span id="cb22-3"><a href="#cb22-3"></a>att_df <span class="op">=</span> filtered_df[filtered_df[<span class="st">'Main_Position'</span>].isin(attackers)]</span>
@@ -1174,7 +1176,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-34" class="cell" data-message="false" data-execution_count="536">
+<div id="cell-32" class="cell" data-message="false" data-execution_count="536">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>filtered_df.drop([<span class="st">'Card_Version'</span>, <span class="st">'Alternate_Positions'</span>], axis<span class="op">=</span> <span class="dv">1</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
 <span id="cb23-2"><a href="#cb23-2"></a></span>
 <span id="cb23-3"><a href="#cb23-3"></a>filtered_df[<span class="st">'Weight'</span>] <span class="op">=</span> filtered_df[<span class="st">'BodyType'</span>].<span class="bu">str</span>.extract(<span class="vs">r'\((\d+)kg\)'</span>)</span>
@@ -1189,7 +1191,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 <section id="which-clubs-do-quality-players-tend-to-play-for" class="level3">
 <h3 class="anchored" data-anchor-id="which-clubs-do-quality-players-tend-to-play-for">Which clubs do quality players tend to play for?</h3>
 <p>Quality Players := 80 rating or above</p>
-<div id="cell-36" class="cell" data-execution_count="537">
+<div id="cell-34" class="cell" data-execution_count="537">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a>club_counts <span class="op">=</span> filtered_df.query(<span class="st">'Rating &gt;= 80'</span>).groupby(<span class="st">'Club'</span>)[<span class="st">'Club'</span>].value_counts().sort_values(ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">15</span>) </span>
 <span id="cb24-2"><a href="#cb24-2"></a></span>
 <span id="cb24-3"><a href="#cb24-3"></a>player_counts <span class="op">=</span> club_counts.values</span>
@@ -1211,10 +1213,10 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </section>
 <section id="what-is-the-average-rating-of-players-per-club-in-the-premier-league" class="level3">
 <h3 class="anchored" data-anchor-id="what-is-the-average-rating-of-players-per-club-in-the-premier-league">What is the average rating of players per club in the Premier League ?</h3>
-<div id="cell-38" class="cell" data-execution_count="538">
+<div id="cell-36" class="cell" data-execution_count="538">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a>epl <span class="op">=</span> filtered_df.query(<span class="st">'League == "Premier League"'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-39" class="cell" data-execution_count="539">
+<div id="cell-37" class="cell" data-execution_count="539">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># sort by median since some clubs have more academy kids in the squad than others</span></span>
 <span id="cb26-2"><a href="#cb26-2"></a>club_stats <span class="op">=</span> epl.groupby(<span class="st">'Club'</span>)[<span class="st">'Rating'</span>].describe().sort_values(by<span class="op">=</span><span class="st">'50%'</span>,ascending<span class="op">=</span><span class="va">False</span>).T</span>
 <span id="cb26-3"><a href="#cb26-3"></a></span>
@@ -1234,7 +1236,7 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </div>
 </div>
 <p>Here is the tabular form:</p>
-<div id="cell-41" class="cell" data-execution_count="540">
+<div id="cell-39" class="cell" data-execution_count="540">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>club_stats.T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="540">
 <div>
@@ -1495,12 +1497,12 @@ Name: count, Length: 157, dtype: int64</code></pre>
 </section>
 <section id="comparative-analysis-of-player-quality-in-the-top-5-leagues" class="level3">
 <h3 class="anchored" data-anchor-id="comparative-analysis-of-player-quality-in-the-top-5-leagues">Comparative Analysis of Player Quality in the Top 5 Leagues</h3>
-<div id="cell-43" class="cell" data-execution_count="541">
+<div id="cell-41" class="cell" data-execution_count="541">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>top_5_leagues <span class="op">=</span> [<span class="st">'Premier League'</span>, <span class="st">'Bundesliga'</span>, <span class="st">'LALIGA EA SPORTS'</span>, <span class="st">'Serie A TIM'</span>, <span class="st">'Ligue 1 Uber Eats'</span>]</span>
 <span id="cb28-2"><a href="#cb28-2"></a></span>
 <span id="cb28-3"><a href="#cb28-3"></a>top_league_players <span class="op">=</span> filtered_df[filtered_df[<span class="st">'League'</span>].isin(top_5_leagues)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-44" class="cell" data-execution_count="542">
+<div id="cell-42" class="cell" data-execution_count="542">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># standard deviation of the player rating ins the top 5 leagues</span></span>
 <span id="cb29-2"><a href="#cb29-2"></a>top_league_players.groupby(<span class="st">'League'</span>)[<span class="st">'Rating'</span>].std()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="542">
@@ -1513,7 +1515,7 @@ Serie A TIM          6.123019
 Name: Rating, dtype: float64</code></pre>
 </div>
 </div>
-<div id="cell-45" class="cell" data-execution_count="543">
+<div id="cell-43" class="cell" data-execution_count="543">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a>sns.boxplot(x<span class="op">=</span><span class="st">'Rating'</span>, y<span class="op">=</span><span class="st">'League'</span>, data<span class="op">=</span>top_league_players)</span>
 <span id="cb31-2"><a href="#cb31-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -1524,7 +1526,7 @@ Name: Rating, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-46" class="cell" data-execution_count="544">
+<div id="cell-44" class="cell" data-execution_count="544">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a><span class="im">import</span> pingouin <span class="im">as</span> pg</span>
 <span id="cb32-2"><a href="#cb32-2"></a></span>
 <span id="cb32-3"><a href="#cb32-3"></a>alpha <span class="op">=</span> <span class="fl">0.05</span></span>
@@ -1564,7 +1566,7 @@ Name: Rating, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-47" class="cell" data-execution_count="545">
+<div id="cell-45" class="cell" data-execution_count="545">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>pairwise_comparisons <span class="op">=</span> pg.pairwise_tests(dv<span class="op">=</span><span class="st">'Rating'</span>, between<span class="op">=</span><span class="st">'League'</span>, data<span class="op">=</span>top_league_players, padjust<span class="op">=</span><span class="st">'bonf'</span>) <span class="co"># use bonferroni correction</span></span>
 <span id="cb33-2"><a href="#cb33-2"></a>pairwise_comparisons</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="545">
@@ -1761,11 +1763,11 @@ Name: Rating, dtype: float64</code></pre>
 </section>
 <section id="linear-regression" class="level2">
 <h2 class="anchored" data-anchor-id="linear-regression">Linear Regression</h2>
-<div id="cell-49" class="cell" data-execution_count="546">
+<div id="cell-47" class="cell" data-execution_count="546">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>filtered_df <span class="op">=</span>filtered_df.drop([<span class="st">'Height'</span>, <span class="st">'Popularity'</span>, <span class="st">'Base_Stats'</span>,</span>
 <span id="cb34-2"><a href="#cb34-2"></a>       <span class="st">'Ingame_Stats'</span>, <span class="st">'Weight'</span>],axis <span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-50" class="cell" data-execution_count="547">
+<div id="cell-48" class="cell" data-execution_count="547">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> OneHotEncoder</span>
 <span id="cb35-2"><a href="#cb35-2"></a></span>
 <span id="cb35-3"><a href="#cb35-3"></a></span>
@@ -1777,20 +1779,20 @@ Name: Rating, dtype: float64</code></pre>
 <span id="cb35-9"><a href="#cb35-9"></a>df2 <span class="op">=</span> filtered_df.drop(columns_to_encode, axis<span class="op">=</span><span class="dv">1</span>).join(encoded_df)</span>
 <span id="cb35-10"><a href="#cb35-10"></a>df2.dropna(inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-51" class="cell" data-execution_count="548">
+<div id="cell-49" class="cell" data-execution_count="548">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>X <span class="op">=</span> df2.iloc[:, <span class="dv">6</span>:]</span>
 <span id="cb36-2"><a href="#cb36-2"></a>y <span class="op">=</span> df2[<span class="st">'Rating'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-52" class="cell" data-execution_count="549">
+<div id="cell-50" class="cell" data-execution_count="549">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span> <span class="fl">0.2</span>, random_state <span class="op">=</span> <span class="dv">1998</span>, shuffle <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-53" class="cell" data-execution_count="550">
+<div id="cell-51" class="cell" data-execution_count="550">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>lm <span class="op">=</span> LinearRegression()</span>
 <span id="cb38-2"><a href="#cb38-2"></a>lm.fit(X_train, y_train)</span>
 <span id="cb38-3"><a href="#cb38-3"></a></span>
 <span id="cb38-4"><a href="#cb38-4"></a>pred <span class="op">=</span> lm.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-54" class="cell" data-execution_count="551">
+<div id="cell-52" class="cell" data-execution_count="551">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a><span class="kw">def</span> evaluate_model(y_test, y_pred):</span>
 <span id="cb39-2"><a href="#cb39-2"></a>    metrics <span class="op">=</span> {<span class="st">'Metric'</span>: [<span class="st">'MSE'</span>, <span class="st">'RMSE'</span>, <span class="st">'MAE'</span>, <span class="st">'MAPE'</span>],</span>
 <span id="cb39-3"><a href="#cb39-3"></a>               <span class="st">'Value'</span>: [mean_squared_error(y_test, y_pred),</span>
@@ -1802,7 +1804,7 @@ Name: Rating, dtype: float64</code></pre>
 <span id="cb39-9"><a href="#cb39-9"></a>    results_df <span class="op">=</span> pd.DataFrame(metrics)</span>
 <span id="cb39-10"><a href="#cb39-10"></a>    <span class="bu">print</span>(results_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-55" class="cell" data-execution_count="552">
+<div id="cell-53" class="cell" data-execution_count="552">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>evaluate_model(y_test, pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Metric     Value
@@ -1815,23 +1817,23 @@ Name: Rating, dtype: float64</code></pre>
 </section>
 <section id="classification" class="level2">
 <h2 class="anchored" data-anchor-id="classification">Classification</h2>
-<div id="cell-57" class="cell" data-execution_count="553">
+<div id="cell-55" class="cell" data-execution_count="553">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>X_clf <span class="op">=</span> X.iloc[:, <span class="dv">2</span>:<span class="dv">8</span>]</span>
 <span id="cb42-2"><a href="#cb42-2"></a>y_clf <span class="op">=</span> df2[<span class="st">'Main_Position'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-58" class="cell" data-execution_count="554">
+<div id="cell-56" class="cell" data-execution_count="554">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
 <span id="cb43-2"><a href="#cb43-2"></a></span>
 <span id="cb43-3"><a href="#cb43-3"></a>X_clf_train, X_clf_test, y_clf_train, y_clf_test <span class="op">=</span> train_test_split(X_clf, y_clf, test_size <span class="op">=</span> <span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">1998</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-59" class="cell" data-execution_count="555">
+<div id="cell-57" class="cell" data-execution_count="555">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>rf_model <span class="op">=</span> RandomForestClassifier(n_estimators<span class="op">=</span><span class="dv">150</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
 <span id="cb44-2"><a href="#cb44-2"></a></span>
 <span id="cb44-3"><a href="#cb44-3"></a>rf_model.fit(X_clf_train,y_clf_train)</span>
 <span id="cb44-4"><a href="#cb44-4"></a></span>
 <span id="cb44-5"><a href="#cb44-5"></a>clf_pred <span class="op">=</span> rf_model.predict(X_clf_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-60" class="cell" data-execution_count="556">
+<div id="cell-58" class="cell" data-execution_count="556">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
 <span id="cb45-2"><a href="#cb45-2"></a></span>
 <span id="cb45-3"><a href="#cb45-3"></a>accuracy <span class="op">=</span> accuracy_score(y_clf_test, clf_pred)</span>
@@ -1845,10 +1847,10 @@ Name: Rating, dtype: float64</code></pre>
 </section>
 <section id="nba-players-data" class="level1">
 <h1>NBA Players Data</h1>
-<div id="cell-62" class="cell" data-execution_count="557">
+<div id="cell-60" class="cell" data-execution_count="557">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a>kaggle.api.dataset_download_files(<span class="st">'justinas/nba-players-data'</span>, path<span class="op">=</span><span class="st">'./'</span>, unzip<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-63" class="cell" data-execution_count="558">
+<div id="cell-61" class="cell" data-execution_count="558">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a>nba <span class="op">=</span> pd.read_csv(<span class="st">'all_seasons.csv'</span>)</span>
 <span id="cb48-2"><a href="#cb48-2"></a>nba</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="558">
@@ -2166,7 +2168,7 @@ Name: Rating, dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-64" class="cell" data-execution_count="559">
+<div id="cell-62" class="cell" data-execution_count="559">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a>show_summary(nba)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2256,7 +2258,7 @@ dtype: int64</code></pre>
 </div>
 <section id="distribution-of-nba-players-statistics" class="level2">
 <h2 class="anchored" data-anchor-id="distribution-of-nba-players-statistics">Distribution of NBA Players Statistics</h2>
-<div id="cell-66" class="cell" data-execution_count="560">
+<div id="cell-64" class="cell" data-execution_count="560">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>nba.hist()</span>
 <span id="cb51-2"><a href="#cb51-2"></a>plt.tight_layout()</span>
 <span id="cb51-3"><a href="#cb51-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -2271,7 +2273,7 @@ dtype: int64</code></pre>
 </section>
 <section id="player-height-v-weight" class="level2">
 <h2 class="anchored" data-anchor-id="player-height-v-weight">Player Height v Weight</h2>
-<div id="cell-68" class="cell" data-execution_count="561">
+<div id="cell-66" class="cell" data-execution_count="561">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>sns.relplot(x <span class="op">=</span>nba[<span class="st">'player_height'</span>], y <span class="op">=</span> nba[<span class="st">'player_weight'</span>], kind <span class="op">=</span> <span class="st">'scatter'</span>)</span>
 <span id="cb52-2"><a href="#cb52-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -2285,7 +2287,7 @@ dtype: int64</code></pre>
 </section>
 <section id="which-colleges-produce-the-most-nba-players" class="level2">
 <h2 class="anchored" data-anchor-id="which-colleges-produce-the-most-nba-players">Which colleges produce the most NBA players?</h2>
-<div id="cell-70" class="cell" data-execution_count="563">
+<div id="cell-68" class="cell" data-execution_count="563">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>nba_college_count <span class="op">=</span> nba.groupby(<span class="st">'college'</span>)[<span class="st">'college'</span>].value_counts().sort_values(ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span>
 <span id="cb53-2"><a href="#cb53-2"></a></span>
 <span id="cb53-3"><a href="#cb53-3"></a>colleges <span class="op">=</span> nba_college_count.index.get_level_values(<span class="dv">0</span>).to_list()</span>
@@ -2301,10 +2303,10 @@ dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-72" class="cell" data-execution_count="567">
+<div id="cell-70" class="cell" data-execution_count="567">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a>nba <span class="op">=</span> nba.iloc[:, <span class="dv">1</span>:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-73" class="cell" data-execution_count="570">
+<div id="cell-71" class="cell" data-execution_count="570">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>numerics <span class="op">=</span> nba.select_dtypes(include<span class="op">=</span>np.number)</span>
 <span id="cb55-2"><a href="#cb55-2"></a>corr_matrix <span class="op">=</span> numerics.corr()</span>
 <span id="cb55-3"><a href="#cb55-3"></a>corr_matrix <span class="op">=</span> corr_matrix.<span class="bu">round</span>(<span class="dv">2</span>)</span>
@@ -2330,23 +2332,23 @@ dtype: int64</code></pre>
 </section>
 <section id="regression" class="level2">
 <h2 class="anchored" data-anchor-id="regression">Regression</h2>
-<div id="cell-75" class="cell" data-execution_count="576">
+<div id="cell-73" class="cell" data-execution_count="576">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># predict the average points </span></span>
 <span id="cb56-2"><a href="#cb56-2"></a></span>
 <span id="cb56-3"><a href="#cb56-3"></a>X <span class="op">=</span> numerics.drop(<span class="st">'pts'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-76" class="cell" data-execution_count="577">
+<div id="cell-74" class="cell" data-execution_count="577">
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1"></a>y <span class="op">=</span> numerics[<span class="st">'pts'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-77" class="cell" data-execution_count="579">
+<div id="cell-75" class="cell" data-execution_count="579">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">1998</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-78" class="cell" data-execution_count="580">
+<div id="cell-76" class="cell" data-execution_count="580">
 <div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1"></a>model <span class="op">=</span> LinearRegression()</span>
 <span id="cb59-2"><a href="#cb59-2"></a>model.fit(X_train,y_train)</span>
 <span id="cb59-3"><a href="#cb59-3"></a>pred <span class="op">=</span> model.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-79" class="cell" data-execution_count="581">
+<div id="cell-77" class="cell" data-execution_count="581">
 <div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>evaluate_model(y_test, pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Metric         Value
@@ -2356,7 +2358,7 @@ dtype: int64</code></pre>
 3   MAPE  3.647905e+16</code></pre>
 </div>
 </div>
-<div id="cell-80" class="cell" data-execution_count="586">
+<div id="cell-78" class="cell" data-execution_count="586">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a><span class="co"># KKN approach</span></span>
 <span id="cb62-2"><a href="#cb62-2"></a></span>
 <span id="cb62-3"><a href="#cb62-3"></a><span class="im">from</span> sklearn.neighbors <span class="im">import</span> KNeighborsRegressor</span>
@@ -2367,7 +2369,7 @@ dtype: int64</code></pre>
 <style>#sk-container-id-3 {color: black;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>KNeighborsRegressor()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" checked=""><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">KNeighborsRegressor</label><div class="sk-toggleable__content"><pre>KNeighborsRegressor()</pre></div></div></div></div></div>
 </div>
 </div>
-<div id="cell-81" class="cell" data-execution_count="585">
+<div id="cell-79" class="cell" data-execution_count="585">
 <div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a>knn_pred <span class="op">=</span> knn_model.predict(X_test)</span>
 <span id="cb63-2"><a href="#cb63-2"></a></span>
 <span id="cb63-3"><a href="#cb63-3"></a>evaluate_model(y_test, knn_pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
