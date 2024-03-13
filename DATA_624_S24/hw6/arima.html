@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nick Climaco">
+<meta name="dcterms.date" content="2024-03-13">
+
+<title>HA Chapter 9: ARIMA Models</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="arima_files/libs/clipboard/clipboard.min.js"></script>
+<script src="arima_files/libs/quarto-html/quarto.js"></script>
+<script src="arima_files/libs/quarto-html/popper.min.js"></script>
+<script src="arima_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="arima_files/libs/quarto-html/anchor.min.js"></script>
+<link href="arima_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="arima_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="arima_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="arima_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="arima_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link active" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5">Exercise 5</a></li>
+  <li><a href="#exercise-6" id="toc-exercise-6" class="nav-link" data-scroll-target="#exercise-6">Exercise 6</a></li>
+  <li><a href="#exercise-7" id="toc-exercise-7" class="nav-link" data-scroll-target="#exercise-7">Exercise 7</a></li>
+  <li><a href="#exercise-8" id="toc-exercise-8" class="nav-link" data-scroll-target="#exercise-8">Exercise 8</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">HA Chapter 9: ARIMA Models</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nick Climaco </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 13, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div id="cell-1" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>pd.set_option(<span class="st">'display.max_columns'</span>, <span class="dv">10</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>plt.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-1" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
+<p>Figure 9.32 shows the ACFs for 36 random numbers, 360 random numbers and 1,000 random numbers.</p>
+<ol type="a">
+<li>Explain the differences among these figures. Do they all indicate that the data are white noise?</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-3-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<p>All three ACF plots indicates white noise because there are not significant autocorrelation in any of the plots. The main difference among the plots is the data size begining with 36 number on the left plot then 360 numbers in the middle and 1000 numbers in the right plot. As the data set size get larger the narrower the significant boundaries become because with more data the ACF becomes more precise and random datapoints have less influence, leading to a narrower boundaries.</p>
+<ol start="2" type="a">
+<li>Why are the critical values at different distances from the mean of zero? Why are the autocorrelations different in each figure when they each refer to white noise?</li>
+</ol>
+<p>The critical values are different because of the size of the data as more data is available lower the critical values are. As for why the autocorrelations are different is due to the random fluctuations in the data. With a smaller data size these random fluctuations have a relatively larger impact on the ACF compared to a larger data size. That is why the correlation magnitudes on the left plot is larger compared to the rest since it has the smallest data size.</p>
+</section>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<p>A classic example of a non-stationary series are stock prices. Plot the daily closing prices for Amazon stock (contained in gafa_stock), along with the ACF and PACF. Explain how each plot shows that the series is non-stationary and should be differenced.</p>
+<div id="cell-8" class="cell" data-execution_count="68">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>stocks <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/rdata/gafa_stock.csv'</span>, parse_dates<span class="op">=</span> [<span class="st">'Date'</span>], index_col<span class="op">=</span><span class="st">'Date'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>amazon <span class="op">=</span> stocks.query(<span class="st">'Symbol == "AMZN"'</span>)[[<span class="st">'Close'</span>]]</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a>amazon.plot()</span>
+<span id="cb2-6"><a href="#cb2-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-3-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf, plot_pacf</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>plot_acf (amazon, lags <span class="op">=</span> <span class="dv">30</span>) <span class="co"># chose 30 since its daily data. other choices were 7 or 14</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>plt.show()</span>
+<span id="cb3-5"><a href="#cb3-5"></a></span>
+<span id="cb3-6"><a href="#cb3-6"></a>plot_pacf(amazon, lags <span class="op">=</span> <span class="dv">30</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-4-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The ACF plot demonstrates non-stationarity in the <code>amazon</code> data. The slow decay of autocorrelation values as the lag approaches 30 indicates a dependence on past values. Additionally, the PACF shows multiple significant correlations beyond lag zero, indicative of significant correlations between lagged errors.</p>
+</section>
+<section id="exercise-3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<p>For the following series, find an appropriate Box-Cox transformation and order of differencing in order to obtain stationary data.</p>
+<p>a.Turkish GDP from <code>global_economy</code>.</p>
+<div id="cell-13" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>global_economy <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/rdata/global_economy.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'Year'</span>], index_col<span class="op">=</span><span class="st">'Year'</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>turkey_gdp <span class="op">=</span> global_economy.query(<span class="st">'Country == "Turkey"'</span>)[[<span class="st">'GDP'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> statsmodels.tsa.stattools <span class="im">import</span> adfuller, kpss</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># using the augmented dicky fuller test </span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">def</span> adfuller_test(series) : </span>
+<span id="cb5-4"><a href="#cb5-4"></a>     result <span class="op">=</span> adfuller(series)</span>
+<span id="cb5-5"><a href="#cb5-5"></a>     <span class="bu">print</span>(<span class="st">'ADF Statistic: </span><span class="sc">%f</span><span class="st">'</span> <span class="op">%</span> result[<span class="dv">0</span>]) <span class="co"># the more negative this value is the more likely ts is stationary</span></span>
+<span id="cb5-6"><a href="#cb5-6"></a>     <span class="bu">print</span>(<span class="st">'p-value: </span><span class="sc">%f</span><span class="st">'</span> <span class="op">%</span> result[<span class="dv">1</span>])       <span class="co"># if p-values is less than 0.05 we reject the null: ts is non-stationary</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>     <span class="bu">print</span>(<span class="st">'Critical Values:'</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a>     <span class="cf">for</span> key, value <span class="kw">in</span> result[<span class="dv">4</span>].items():</span>
+<span id="cb5-9"><a href="#cb5-9"></a>          <span class="bu">print</span>(<span class="st">'</span><span class="ch">\t</span><span class="sc">%s</span><span class="st">: </span><span class="sc">%.3f</span><span class="st">'</span> <span class="op">%</span> (key, value))</span>
+<span id="cb5-10"><a href="#cb5-10"></a>     <span class="bu">print</span>(<span class="ss">f'Result: The series is </span><span class="sc">{</span><span class="st">"not "</span> <span class="cf">if</span> result[<span class="dv">1</span>] <span class="op">&gt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">""</span><span class="sc">}</span><span class="ss">stationary'</span>)</span>
+<span id="cb5-11"><a href="#cb5-11"></a></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="kw">def</span> kpss_test(series, <span class="op">**</span>kw):    </span>
+<span id="cb5-13"><a href="#cb5-13"></a>    statistic, p_value, n_lags, critical_values <span class="op">=</span> kpss(series, <span class="op">**</span>kw)</span>
+<span id="cb5-14"><a href="#cb5-14"></a>    <span class="co"># Format Output</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a>    <span class="bu">print</span>(<span class="ss">f'KPSS Statistic: </span><span class="sc">{</span>statistic<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb5-16"><a href="#cb5-16"></a>    <span class="bu">print</span>(<span class="ss">f'p-value: </span><span class="sc">{</span>p_value<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb5-17"><a href="#cb5-17"></a>    <span class="bu">print</span>(<span class="ss">f'num lags: </span><span class="sc">{</span>n_lags<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb5-18"><a href="#cb5-18"></a>    <span class="bu">print</span>(<span class="st">'Critial Values:'</span>)</span>
+<span id="cb5-19"><a href="#cb5-19"></a>    <span class="cf">for</span> key, value <span class="kw">in</span> critical_values.items():</span>
+<span id="cb5-20"><a href="#cb5-20"></a>        <span class="bu">print</span>(<span class="ss">f'   </span><span class="sc">{</span>key<span class="sc">}</span><span class="ss"> : </span><span class="sc">{</span>value<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb5-21"><a href="#cb5-21"></a>    <span class="bu">print</span>(<span class="ss">f'Result: The series is </span><span class="sc">{</span><span class="st">"not "</span> <span class="cf">if</span> p_value <span class="op">&lt;</span> <span class="fl">0.05</span> <span class="cf">else</span> <span class="st">""</span><span class="sc">}</span><span class="ss">stationary'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-15" class="cell" data-message="false" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>adfuller_test(turkey_gdp)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>kpss_test(turkey_gdp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: 2.940485
+p-value: 1.000000
+Critical Values:
+    1%: -3.581
+    5%: -2.927
+    10%: -2.602
+Result: The series is not stationary
+KPSS Statistic: 1.0019195473013205
+p-value: 0.01
+num lags: 4
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-16" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> boxcox</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a>gdp_boxcox, lmbda <span class="op">=</span> boxcox(turkey_gdp[<span class="st">'GDP'</span>])</span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a>turkey_gdp[<span class="st">'gdp_boxcox'</span>] <span class="op">=</span> gdp_boxcox</span>
+<span id="cb8-6"><a href="#cb8-6"></a></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="bu">print</span>(<span class="ss">f'Best lambda esitmate for Turkish GDP: </span><span class="sc">{</span>lmbda<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best lambda esitmate for Turkish GDP: 0.03601462574818967</code></pre>
+</div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>ax[<span class="dv">0</span>].plot(turkey_gdp[<span class="st">'GDP'</span>])</span>
+<span id="cb10-3"><a href="#cb10-3"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'Original GDP Data'</span>)</span>
+<span id="cb10-4"><a href="#cb10-4"></a>ax[<span class="dv">1</span>].plot(turkey_gdp[<span class="st">'gdp_boxcox'</span>])</span>
+<span id="cb10-5"><a href="#cb10-5"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'BoxCox Transformed'</span>)</span>
+<span id="cb10-6"><a href="#cb10-6"></a>plt.tight_layout()</span>
+<span id="cb10-7"><a href="#cb10-7"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-18" class="cell" data-message="false" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># assuming we are differencing the transformed time series</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a>gdp_boxcox_diff <span class="op">=</span> turkey_gdp[<span class="st">'gdp_boxcox'</span>].diff().dropna()</span>
+<span id="cb11-4"><a href="#cb11-4"></a></span>
+<span id="cb11-5"><a href="#cb11-5"></a>adfuller_test(gdp_boxcox_diff)</span>
+<span id="cb11-6"><a href="#cb11-6"></a>kpss_test(gdp_boxcox_diff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -4.343396
+p-value: 0.000373
+Critical Values:
+    1%: -3.560
+    5%: -2.918
+    10%: -2.597
+Result: The series is stationary
+KPSS Statistic: 0.06480360009853287
+p-value: 0.1
+num lags: 1
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is stationary</code></pre>
+</div>
+</div>
+<p>The best lambda estimate for the BoxCox transformation 0.036 and the time series data was stationary after one order of differencing.</p>
+<ol start="2" type="a">
+<li>Accommodation takings in the state of Tasmania from <code>aus_accommodation</code>.</li>
+</ol>
+<div id="cell-21" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a>aus_accommodation <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/rdata/aus_accomodation.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'Date'</span>], index_col<span class="op">=</span><span class="st">'Date'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a>tasmania <span class="op">=</span> aus_accommodation.query(<span class="st">'State == "Tasmania"'</span>)[[<span class="st">'Takings'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\nickc\AppData\Local\Temp\ipykernel_61000\2384435477.py:4: UserWarning: Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
+  aus_accommodation = pd.read_csv('c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/rdata/aus_accomodation.csv', parse_dates=['Date'], index_col='Date')</code></pre>
+</div>
+</div>
+<div id="cell-22" class="cell" data-message="false" data-execution_count="77">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>adfuller_test(tasmania)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>kpss_test(tasmania)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: 0.104930
+p-value: 0.966396
+Critical Values:
+    1%: -3.535
+    5%: -2.907
+    10%: -2.591
+Result: The series is not stationary
+KPSS Statistic: 1.5036891770531675
+p-value: 0.01
+num lags: 4
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>takings_boxcox, lmbda <span class="op">=</span> boxcox(tasmania[<span class="st">'Takings'</span>])</span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a>tasmania[<span class="st">'takings_boxcox'</span>] <span class="op">=</span> takings_boxcox</span>
+<span id="cb17-4"><a href="#cb17-4"></a></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="bu">print</span>(<span class="ss">f'Best lambda esitmate for Tasmania Takings: </span><span class="sc">{</span>lmbda<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best lambda esitmate for Tasmania Takings: 0.31489193114284464</code></pre>
+</div>
+</div>
+<div id="cell-24" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb19-2"><a href="#cb19-2"></a>ax[<span class="dv">0</span>].plot(tasmania[<span class="st">'Takings'</span>])</span>
+<span id="cb19-3"><a href="#cb19-3"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'Original Data'</span>)</span>
+<span id="cb19-4"><a href="#cb19-4"></a>ax[<span class="dv">1</span>].plot(tasmania[<span class="st">'takings_boxcox'</span>])</span>
+<span id="cb19-5"><a href="#cb19-5"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'BoxCox Transformed'</span>)</span>
+<span id="cb19-6"><a href="#cb19-6"></a>plt.tight_layout()</span>
+<span id="cb19-7"><a href="#cb19-7"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-25" class="cell" data-message="false" data-execution_count="80">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a>takings_boxcox_diff <span class="op">=</span> turkey_gdp[<span class="st">'gdp_boxcox'</span>].diff().dropna()</span>
+<span id="cb20-2"><a href="#cb20-2"></a></span>
+<span id="cb20-3"><a href="#cb20-3"></a>adfuller_test(takings_boxcox_diff)</span>
+<span id="cb20-4"><a href="#cb20-4"></a>kpss_test(takings_boxcox_diff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -4.343396
+p-value: 0.000373
+Critical Values:
+    1%: -3.560
+    5%: -2.918
+    10%: -2.597
+Result: The series is stationary
+KPSS Statistic: 0.06480360009853287
+p-value: 0.1
+num lags: 1
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is stationary</code></pre>
+</div>
+</div>
+<p>The best lambda estimate for the BoxCox transformation 0.32 and the time series data was stationary after one order of differencing. The transformation is very close to a cube root.</p>
+<ol start="3" type="a">
+<li>Monthly sales from <code>souvenirs</code>.</li>
+</ol>
+<div id="cell-28" class="cell" data-message="false" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>souvenirs <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/souvenirs.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'Month'</span>], index_col<span class="op">=</span><span class="st">'Month'</span>)[[<span class="st">'Sales'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-29" class="cell" data-message="false" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>adfuller_test(souvenirs)</span>
+<span id="cb23-2"><a href="#cb23-2"></a>kpss_test(souvenirs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: 2.316542
+p-value: 0.998965
+Critical Values:
+    1%: -3.526
+    5%: -2.903
+    10%: -2.589
+Result: The series is not stationary
+KPSS Statistic: 1.1649199329792983
+p-value: 0.01
+num lags: 4
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a>sales_boxcox, lmbda <span class="op">=</span> boxcox(souvenirs[<span class="st">'Sales'</span>])</span>
+<span id="cb25-2"><a href="#cb25-2"></a>souvenirs[<span class="st">'sales_boxcox'</span>] <span class="op">=</span> sales_boxcox</span>
+<span id="cb25-3"><a href="#cb25-3"></a><span class="bu">print</span>(<span class="ss">f'Best lambda esitmate for Tasmania Takings: </span><span class="sc">{</span>lmbda<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best lambda esitmate for Tasmania Takings: -0.216726069234196</code></pre>
+</div>
+</div>
+<div id="cell-31" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>fig, ax <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">1</span>)</span>
+<span id="cb27-2"><a href="#cb27-2"></a></span>
+<span id="cb27-3"><a href="#cb27-3"></a>ax[<span class="dv">0</span>].plot(souvenirs[<span class="st">'Sales'</span>])</span>
+<span id="cb27-4"><a href="#cb27-4"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'Original Data'</span>)</span>
+<span id="cb27-5"><a href="#cb27-5"></a></span>
+<span id="cb27-6"><a href="#cb27-6"></a>ax[<span class="dv">1</span>].plot(souvenirs[<span class="st">'sales_boxcox'</span>])</span>
+<span id="cb27-7"><a href="#cb27-7"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'BoxCox Transformed'</span>)</span>
+<span id="cb27-8"><a href="#cb27-8"></a></span>
+<span id="cb27-9"><a href="#cb27-9"></a>plt.tight_layout()</span>
+<span id="cb27-10"><a href="#cb27-10"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-19-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-32" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>sales_boxcox_diff <span class="op">=</span> souvenirs[<span class="st">'sales_boxcox'</span>].diff().dropna()</span>
+<span id="cb28-2"><a href="#cb28-2"></a></span>
+<span id="cb28-3"><a href="#cb28-3"></a>adfuller_test(sales_boxcox_diff)</span>
+<span id="cb28-4"><a href="#cb28-4"></a>kpss_test(sales_boxcox_diff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -3.398030
+p-value: 0.011026
+Critical Values:
+    1%: -3.527
+    5%: -2.904
+    10%: -2.589
+Result: The series is stationary
+KPSS Statistic: 0.1636415088328506
+p-value: 0.1
+num lags: 20
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is stationary</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\nickc\AppData\Local\Temp\ipykernel_61000\726354897.py:13: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+
+  statistic, p_value, n_lags, critical_values = kpss(series, **kw)</code></pre>
+</div>
+</div>
+<p>The best estimate lambda for this time series is -0.22, in order to create uniform variance. After one order of differencing both the ADFuller and KPSS test confirms it stationarity.</p>
+</section>
+<section id="exercise-5" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5">Exercise 5</h2>
+<p>For your retail data (from Exercise 7 in Section 2.10), find the appropriate order of differencing (after transformation if necessary) to obtain stationary data.</p>
+<div id="cell-35" class="cell" data-message="false" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a>aus_retail <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/rdata/aus_retail.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'Month'</span>], index_col<span class="op">=</span><span class="st">'Month'</span>)</span>
+<span id="cb31-2"><a href="#cb31-2"></a></span>
+<span id="cb31-3"><a href="#cb31-3"></a>takeaway <span class="op">=</span> aus_retail.query(<span class="st">'Industry == "Takeaway food services" &amp; State == "Australian Capital Territory"'</span>)[[<span class="st">'Turnover'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>takeaway.plot()</span>
+<span id="cb32-2"><a href="#cb32-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-22-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-37" class="cell" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>turnover_boxcox, lmbda <span class="op">=</span> boxcox(takeaway[<span class="st">'Turnover'</span>])</span>
+<span id="cb33-2"><a href="#cb33-2"></a><span class="bu">print</span>(lmbda)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.08194470335254905</code></pre>
+</div>
+</div>
+<p>Since the lambda estimate from the boxcox() function is very close to zero, we can use the log transform instead for better interpretibility.</p>
+<div id="cell-39" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>takeaway[<span class="st">'turnover_log'</span>] <span class="op">=</span> np.log(takeaway[<span class="st">'Turnover'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-40" class="cell" data-execution_count="90">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>takeaway[<span class="st">'turnover_log'</span>].plot()</span>
+<span id="cb36-2"><a href="#cb36-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-41" class="cell" data-message="false" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>adfuller_test(takeaway[<span class="st">'Turnover'</span>])</span>
+<span id="cb37-2"><a href="#cb37-2"></a>kpss_test(takeaway[<span class="st">'Turnover'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: 1.378437
+p-value: 0.997014
+Critical Values:
+    1%: -3.446
+    5%: -2.868
+    10%: -2.570
+Result: The series is not stationary
+KPSS Statistic: 3.114617088478788
+p-value: 0.01
+num lags: 12
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<p>After the transformation, the time series requires differencing.</p>
+<div id="cell-43" class="cell" data-execution_count="92">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>turnover_log_diff <span class="op">=</span> takeaway[<span class="st">'turnover_log'</span>].diff().dropna()</span>
+<span id="cb39-2"><a href="#cb39-2"></a></span>
+<span id="cb39-3"><a href="#cb39-3"></a>adfuller_test(turnover_log_diff)</span>
+<span id="cb39-4"><a href="#cb39-4"></a>kpss_test(turnover_log_diff)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -6.515463
+p-value: 0.000000
+Critical Values:
+    1%: -3.446
+    5%: -2.868
+    10%: -2.570
+Result: The series is stationary
+KPSS Statistic: 0.04900416256271348
+p-value: 0.1
+num lags: 9
+Critial Values:
+   10% : 0.347
+   5% : 0.463
+   2.5% : 0.574
+   1% : 0.739
+Result: The series is stationary</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\nickc\AppData\Local\Temp\ipykernel_61000\726354897.py:13: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+
+  statistic, p_value, n_lags, critical_values = kpss(series, **kw)</code></pre>
+</div>
+</div>
+<p>We applied a log tranform to the data to create constant variance and using the ADFuller and KPSS test required one order of differencing.</p>
+</section>
+<section id="exercise-6" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6">Exercise 6</h2>
+<p>Simulate and plot some data from simple ARIMA models.</p>
+<ol type="a">
+<li>Use the following R code to generate data from an AR(1) model with <span class="math inline">\phi_1 = 0.6</span> and <span class="math inline">\sigma^2 = 1</span> . The process starts with <span class="math inline">y_1 = 0</span>.</li>
+</ol>
+<div id="cell-47" class="cell" data-execution_count="93">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>phi_1 <span class="op">=</span> <span class="fl">0.6</span></span>
+<span id="cb42-2"><a href="#cb42-2"></a>sigma_sq <span class="op">=</span> <span class="dv">1</span> </span>
+<span id="cb42-3"><a href="#cb42-3"></a></span>
+<span id="cb42-4"><a href="#cb42-4"></a>n_samples <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb42-5"><a href="#cb42-5"></a></span>
+<span id="cb42-6"><a href="#cb42-6"></a>np.random.seed(<span class="dv">1998</span>)</span>
+<span id="cb42-7"><a href="#cb42-7"></a><span class="co"># we need normal errors</span></span>
+<span id="cb42-8"><a href="#cb42-8"></a>epsilon <span class="op">=</span> np.random.normal(<span class="dv">0</span>, np.sqrt(sigma_sq), size <span class="op">=</span> n_samples)</span>
+<span id="cb42-9"><a href="#cb42-9"></a></span>
+<span id="cb42-10"><a href="#cb42-10"></a><span class="co"># initialize the ar process </span></span>
+<span id="cb42-11"><a href="#cb42-11"></a>y <span class="op">=</span> np.zeros(n_samples)</span>
+<span id="cb42-12"><a href="#cb42-12"></a>y[<span class="dv">0</span>]<span class="op">=</span> <span class="dv">0</span> <span class="co"># start with zero </span></span>
+<span id="cb42-13"><a href="#cb42-13"></a></span>
+<span id="cb42-14"><a href="#cb42-14"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_samples) :</span>
+<span id="cb42-15"><a href="#cb42-15"></a>     y[i] <span class="op">=</span> phi_1 <span class="op">*</span> y[i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> epsilon[i] <span class="co"># equation for AR(1)</span></span>
+<span id="cb42-16"><a href="#cb42-16"></a></span>
+<span id="cb42-17"><a href="#cb42-17"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'index'</span> : <span class="bu">range</span>(<span class="dv">1</span>, n_samples<span class="op">+</span><span class="dv">1</span>), <span class="st">'y'</span>:y})</span>
+<span id="cb42-18"><a href="#cb42-18"></a>df.set_index(<span class="st">'index'</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb42-19"><a href="#cb42-19"></a></span>
+<span id="cb42-20"><a href="#cb42-20"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="93">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0.349943</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.998934</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-0.142503</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>1.070004</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">996</td>
+<td>-0.469707</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">997</td>
+<td>-1.043023</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">998</td>
+<td>-2.624032</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">999</td>
+<td>-0.980434</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1000</td>
+<td>-0.979543</td>
+</tr>
+</tbody>
+</table>
+
+<p>1000 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<ol start="2" type="a">
+<li>Produce a time plot for the series. How does the plot change as you change <span class="math inline">\phi_1</span> ?</li>
+</ol>
+<div id="cell-49" class="cell" data-execution_count="94">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a><span class="co"># for phi_1 = 0.6 </span></span>
+<span id="cb43-2"><a href="#cb43-2"></a>df.plot()</span>
+<span id="cb43-3"><a href="#cb43-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Changing it closer to 1.</p>
+<div id="cell-51" class="cell" data-execution_count="95">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>phi_1 <span class="op">=</span> <span class="fl">0.8</span></span>
+<span id="cb44-2"><a href="#cb44-2"></a>sigma_sq <span class="op">=</span> <span class="dv">1</span> </span>
+<span id="cb44-3"><a href="#cb44-3"></a></span>
+<span id="cb44-4"><a href="#cb44-4"></a>n_samples <span class="op">=</span> <span class="dv">1000</span></span>
+<span id="cb44-5"><a href="#cb44-5"></a></span>
+<span id="cb44-6"><a href="#cb44-6"></a>np.random.seed(<span class="dv">1998</span>)</span>
+<span id="cb44-7"><a href="#cb44-7"></a><span class="co"># we need normal errors</span></span>
+<span id="cb44-8"><a href="#cb44-8"></a>epsilon <span class="op">=</span> np.random.normal(<span class="dv">0</span>, np.sqrt(sigma_sq), size <span class="op">=</span> n_samples)</span>
+<span id="cb44-9"><a href="#cb44-9"></a></span>
+<span id="cb44-10"><a href="#cb44-10"></a><span class="co"># initialize the ar process </span></span>
+<span id="cb44-11"><a href="#cb44-11"></a>y <span class="op">=</span> np.zeros(n_samples)</span>
+<span id="cb44-12"><a href="#cb44-12"></a>y[<span class="dv">0</span>]<span class="op">=</span> <span class="dv">0</span> <span class="co"># start with zero </span></span>
+<span id="cb44-13"><a href="#cb44-13"></a></span>
+<span id="cb44-14"><a href="#cb44-14"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_samples) :</span>
+<span id="cb44-15"><a href="#cb44-15"></a>     y[i] <span class="op">=</span> phi_1 <span class="op">*</span> y[i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> epsilon[i] <span class="co"># equation for AR(1)</span></span>
+<span id="cb44-16"><a href="#cb44-16"></a></span>
+<span id="cb44-17"><a href="#cb44-17"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'index'</span> : <span class="bu">range</span>(<span class="dv">1</span>, n_samples<span class="op">+</span><span class="dv">1</span>), <span class="st">'y'</span>:y})</span>
+<span id="cb44-18"><a href="#cb44-18"></a>df.set_index(<span class="st">'index'</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb44-19"><a href="#cb44-19"></a></span>
+<span id="cb44-20"><a href="#cb44-20"></a>df.plot()</span>
+<span id="cb44-21"><a href="#cb44-21"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Changing the value of phi_1 change the appearance of the plot since it influences the dependence on past values. The closer the value is to 1 the more weight it puts on past values to generate the current value.</p>
+<ol start="3" type="a">
+<li>Write your own code to generate data from an MA(1) model with <span class="math inline">\theta_1 = 0.6</span> and <span class="math inline">\sigma^2 =1</span>.</li>
+</ol>
+<div id="cell-54" class="cell" data-execution_count="96">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>theta_1 <span class="op">=</span> <span class="fl">0.6</span></span>
+<span id="cb45-2"><a href="#cb45-2"></a></span>
+<span id="cb45-3"><a href="#cb45-3"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_samples) :</span>
+<span id="cb45-4"><a href="#cb45-4"></a>     y[i] <span class="op">=</span> theta_1 <span class="op">*</span> epsilon[i<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> epsilon[i] <span class="co"># MA(1) process</span></span>
+<span id="cb45-5"><a href="#cb45-5"></a></span>
+<span id="cb45-6"><a href="#cb45-6"></a>df <span class="op">=</span> pd.DataFrame({<span class="st">'index'</span> : <span class="bu">range</span>(<span class="dv">1</span>, n_samples<span class="op">+</span><span class="dv">1</span>), <span class="st">'y'</span>:y})</span>
+<span id="cb45-7"><a href="#cb45-7"></a>df.set_index(<span class="st">'index'</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb45-8"><a href="#cb45-8"></a></span>
+<span id="cb45-9"><a href="#cb45-9"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="96">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1.273549</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.998934</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-0.268483</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>0.710387</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">996</td>
+<td>-0.408712</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">997</td>
+<td>-0.624392</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">998</td>
+<td>-2.454938</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">999</td>
+<td>-0.604946</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1000</td>
+<td>-0.034891</td>
+</tr>
+</tbody>
+</table>
+
+<p>1000 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<ol start="4" type="a">
+<li>Produce a time plot for the series. How does the plot change as you change <span class="math inline">\theta_1</span>?</li>
+</ol>
+<div id="cell-56" class="cell" data-execution_count="97">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>df.plot()</span>
+<span id="cb46-2"><a href="#cb46-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Similar to how changing <span class="math inline">\phi_1</span> affects the influence of the past values on the current. For an MA process, <span class="math inline">\theta</span> determines the weight or influence of the past error term. For instance, the 0.6 coefficient means that previous error term affects 60% of how the current value is calculated.</p>
+<ol start="5" type="a">
+<li>Generate data from an ARMA(1,1) model with $_1 = 0.6, $ $_1 = 0.6 $ and <span class="math inline">\sigma^2 =1</span>.</li>
+</ol>
+<div id="cell-59" class="cell" data-execution_count="98">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_samples) :</span>
+<span id="cb47-2"><a href="#cb47-2"></a>     y[i] <span class="op">=</span> (phi_1 <span class="op">*</span> y[i<span class="op">-</span><span class="dv">1</span>]) <span class="op">+</span> (theta_1 <span class="op">*</span> epsilon[i<span class="op">-</span><span class="dv">1</span>]) <span class="op">+</span> epsilon[i] <span class="co"># ARMA(1,1) process</span></span>
+<span id="cb47-3"><a href="#cb47-3"></a></span>
+<span id="cb47-4"><a href="#cb47-4"></a>arma_1_1 <span class="op">=</span> pd.DataFrame({<span class="st">'index'</span> : <span class="bu">range</span>(<span class="dv">1</span>, n_samples<span class="op">+</span><span class="dv">1</span>), <span class="st">'y'</span>:y})</span>
+<span id="cb47-5"><a href="#cb47-5"></a>arma_1_1.set_index(<span class="st">'index'</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb47-6"><a href="#cb47-6"></a></span>
+<span id="cb47-7"><a href="#cb47-7"></a>arma_1_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="98">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1.273549</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2.017773</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1.345736</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>1.786976</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">996</td>
+<td>-1.704241</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">997</td>
+<td>-1.987785</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">998</td>
+<td>-4.045166</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">999</td>
+<td>-3.841079</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1000</td>
+<td>-3.107754</td>
+</tr>
+</tbody>
+</table>
+
+<p>1000 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<ol start="6" type="a">
+<li>Generate data from an AR(2) model with <span class="math inline">\phi_1 = -0.8</span>, <span class="math inline">\phi_2 = 0.3</span> and <span class="math inline">\sigma^2</span> = 1. (Note that these parameters will give a non-stationary series.)</li>
+</ol>
+<div id="cell-62" class="cell" data-execution_count="99">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a>phi_1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.8</span></span>
+<span id="cb48-2"><a href="#cb48-2"></a>phi_2 <span class="op">=</span> <span class="fl">0.3</span></span>
+<span id="cb48-3"><a href="#cb48-3"></a></span>
+<span id="cb48-4"><a href="#cb48-4"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, n_samples) :</span>
+<span id="cb48-5"><a href="#cb48-5"></a>     y[i] <span class="op">=</span> (phi_1 <span class="op">*</span> y[i<span class="op">-</span><span class="dv">1</span>]) <span class="op">+</span> (phi_2 <span class="op">*</span> y[i<span class="op">-</span><span class="dv">2</span>]) <span class="op">+</span> epsilon[i] <span class="co"># AR(2) process</span></span>
+<span id="cb48-6"><a href="#cb48-6"></a></span>
+<span id="cb48-7"><a href="#cb48-7"></a>ar_2 <span class="op">=</span> pd.DataFrame({<span class="st">'index'</span> : <span class="bu">range</span>(<span class="dv">1</span>, n_samples<span class="op">+</span><span class="dv">1</span>), <span class="st">'y'</span>:y})</span>
+<span id="cb48-8"><a href="#cb48-8"></a>ar_2.set_index(<span class="st">'index'</span>, inplace <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb48-9"><a href="#cb48-9"></a></span>
+<span id="cb48-10"><a href="#cb48-10"></a>ar_2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="99">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">y</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">index</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.000000e+00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>-5.823837e-01</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1.254876e+00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>-1.920479e+00</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>3.068352e+00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">996</td>
+<td>-1.756314e+33</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">997</td>
+<td>1.893716e+33</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">998</td>
+<td>-2.041867e+33</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">999</td>
+<td>2.201608e+33</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1000</td>
+<td>-2.373846e+33</td>
+</tr>
+</tbody>
+</table>
+
+<p>1000 rows × 1 columns</p>
+</div>
+</div>
+</div>
+<ol start="7" type="a">
+<li>Graph the latter two series and compare them</li>
+</ol>
+<div id="cell-64" class="cell" data-execution_count="100">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a>arma_1_1.plot()</span>
+<span id="cb49-2"><a href="#cb49-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-36-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-65" class="cell" data-execution_count="101">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>ar_2.plot()</span>
+<span id="cb50-2"><a href="#cb50-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The ARMA(1,1) plot suggests a stationary time series. In contrast, the AR(2) plot exhibits an exponentially increasing pattern, indicating non-stationarity and oscillating between positive and negative values.</p>
+</section>
+<section id="exercise-7" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
+<p>Consider <code>aus_airpassengers</code>, the total number of passengers (in millions) from Australian air carriers for the period 1970-2011.</p>
+<ol type="a">
+<li>Use ARIMA() to find an appropriate ARIMA model. What model was selected. Check that the residuals look like white noise. Plot forecasts for the next 10 periods.</li>
+</ol>
+<div id="cell-69" class="cell" data-execution_count="102">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>aus_airpassengers <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/ aus_air_passengers.csv'</span>, parse_dates<span class="op">=</span>[<span class="st">'Year'</span>], index_col <span class="op">=</span> <span class="st">'Year'</span>)[[<span class="st">'Passengers'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-70" class="cell" data-execution_count="103">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>aus_airpassengers[<span class="st">'Passengers_log'</span>] <span class="op">=</span> np.log(aus_airpassengers[<span class="st">'Passengers'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-71" class="cell" data-execution_count="104">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>adfuller_test(aus_airpassengers[<span class="st">'Passengers_log'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -0.638129
+p-value: 0.862132
+Critical Values:
+    1%: -3.581
+    5%: -2.927
+    10%: -2.602
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-72" class="cell" data-execution_count="105">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>aus_airpassengers[<span class="st">'Passengers_log_diff'</span>] <span class="op">=</span> aus_airpassengers[<span class="st">'Passengers_log'</span>].diff().dropna()</span>
+<span id="cb55-2"><a href="#cb55-2"></a>aus_airpassengers[<span class="st">'Passengers_log_diff'</span>].plot()</span>
+<span id="cb55-3"><a href="#cb55-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-41-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-73" class="cell" data-execution_count="106">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>adfuller_test(aus_airpassengers[<span class="st">'Passengers_log_diff'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -6.751068
+p-value: 0.000000
+Critical Values:
+    1%: -3.585
+    5%: -2.928
+    10%: -2.602
+Result: The series is stationary</code></pre>
+</div>
+</div>
+<div id="cell-74" class="cell" data-messge="false" data-execution_count="107">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a><span class="im">from</span> statsmodels.tsa.arima.model <span class="im">import</span> ARIMA</span>
+<span id="cb58-2"><a href="#cb58-2"></a></span>
+<span id="cb58-3"><a href="#cb58-3"></a>order_aic_bic <span class="op">=</span> []</span>
+<span id="cb58-4"><a href="#cb58-4"></a></span>
+<span id="cb58-5"><a href="#cb58-5"></a><span class="cf">for</span> p <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>) :</span>
+<span id="cb58-6"><a href="#cb58-6"></a>     <span class="cf">for</span> q <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>) :</span>
+<span id="cb58-7"><a href="#cb58-7"></a>          model <span class="op">=</span> ARIMA(aus_airpassengers[<span class="st">'Passengers_log'</span>], order <span class="op">=</span> (p,<span class="dv">1</span>,q)) <span class="co"># we know 1 order of differencing is needed</span></span>
+<span id="cb58-8"><a href="#cb58-8"></a>          results <span class="op">=</span> model.fit()</span>
+<span id="cb58-9"><a href="#cb58-9"></a></span>
+<span id="cb58-10"><a href="#cb58-10"></a>          order_aic_bic.append((p,q, results.aic, results.bic))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-75" class="cell" data-execution_count="108">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1"></a><span class="co"># Construct DataFrame from order_aic_bic</span></span>
+<span id="cb59-2"><a href="#cb59-2"></a>order_df <span class="op">=</span> pd.DataFrame(order_aic_bic, </span>
+<span id="cb59-3"><a href="#cb59-3"></a>                        columns<span class="op">=</span>[<span class="st">'p'</span>,<span class="st">'q'</span>,<span class="st">'AIC'</span>,<span class="st">'BIC'</span>])</span>
+<span id="cb59-4"><a href="#cb59-4"></a></span>
+<span id="cb59-5"><a href="#cb59-5"></a><span class="co"># Print order_df in order of increasing AIC</span></span>
+<span id="cb59-6"><a href="#cb59-6"></a><span class="bu">print</span>(order_df.sort_values(<span class="st">'AIC'</span>))</span>
+<span id="cb59-7"><a href="#cb59-7"></a></span>
+<span id="cb59-8"><a href="#cb59-8"></a><span class="bu">print</span>(<span class="st">'*********************************'</span>)</span>
+<span id="cb59-9"><a href="#cb59-9"></a><span class="co"># Print order_df in order of increasing BIC</span></span>
+<span id="cb59-10"><a href="#cb59-10"></a><span class="bu">print</span>(order_df.sort_values(<span class="st">'BIC'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    p  q         AIC        BIC
+6   1  1 -103.214373 -97.728449
+8   1  3 -101.443426 -92.300219
+11  2  1 -101.225130 -93.910564
+7   1  2 -101.221874 -93.907308
+16  3  1 -100.550607 -91.407400
+12  2  2  -99.261196 -90.117989
+13  2  3  -97.741436 -86.769588
+21  4  1  -97.534145 -86.562296
+14  2  4  -97.299704 -84.499214
+17  3  2  -97.270571 -86.298722
+22  4  2  -96.607655 -83.807165
+18  3  3  -95.819941 -83.019451
+5   1  0  -95.574901 -91.917618
+19  3  4  -95.275631 -80.646500
+23  4  3  -94.773243 -80.144112
+1   0  1  -94.741843 -91.084560
+10  2  0  -94.116678 -88.630754
+15  3  0  -93.566368 -86.251802
+24  4  4  -93.458743 -77.000970
+2   0  2  -93.173761 -87.687836
+0   0  0  -92.733049 -90.904408
+3   0  3  -92.415079 -85.100514
+20  4  0  -91.794478 -82.651271
+4   0  4  -90.460376 -81.317169
+9   1  4  -88.415091 -77.443243
+*********************************
+    p  q         AIC        BIC
+6   1  1 -103.214373 -97.728449
+11  2  1 -101.225130 -93.910564
+7   1  2 -101.221874 -93.907308
+8   1  3 -101.443426 -92.300219
+5   1  0  -95.574901 -91.917618
+16  3  1 -100.550607 -91.407400
+1   0  1  -94.741843 -91.084560
+0   0  0  -92.733049 -90.904408
+12  2  2  -99.261196 -90.117989
+10  2  0  -94.116678 -88.630754
+2   0  2  -93.173761 -87.687836
+13  2  3  -97.741436 -86.769588
+21  4  1  -97.534145 -86.562296
+17  3  2  -97.270571 -86.298722
+15  3  0  -93.566368 -86.251802
+3   0  3  -92.415079 -85.100514
+14  2  4  -97.299704 -84.499214
+22  4  2  -96.607655 -83.807165
+18  3  3  -95.819941 -83.019451
+20  4  0  -91.794478 -82.651271
+4   0  4  -90.460376 -81.317169
+19  3  4  -95.275631 -80.646500
+23  4  3  -94.773243 -80.144112
+9   1  4  -88.415091 -77.443243
+24  4  4  -93.458743 -77.000970</code></pre>
+</div>
+</div>
+<div id="cell-76" class="cell" data-execution_count="109">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a><span class="im">import</span> pmdarima <span class="im">as</span> pm </span>
+<span id="cb61-2"><a href="#cb61-2"></a></span>
+<span id="cb61-3"><a href="#cb61-3"></a>auto_arima <span class="op">=</span> pm.auto_arima(aus_airpassengers[<span class="st">'Passengers_log'</span>], information_criterion <span class="op">=</span> <span class="st">'aic'</span>,</span>
+<span id="cb61-4"><a href="#cb61-4"></a>trace <span class="op">=</span> <span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Performing stepwise search to minimize aic
+ ARIMA(2,1,2)(0,0,0)[0] intercept   : AIC=-109.726, Time=0.22 sec
+ ARIMA(0,1,0)(0,0,0)[0] intercept   : AIC=-109.376, Time=0.02 sec
+ ARIMA(1,1,0)(0,0,0)[0] intercept   : AIC=-107.402, Time=0.02 sec
+ ARIMA(0,1,1)(0,0,0)[0] intercept   : AIC=-107.420, Time=0.04 sec
+ ARIMA(0,1,0)(0,0,0)[0]             : AIC=-92.733, Time=0.01 sec
+ ARIMA(1,1,2)(0,0,0)[0] intercept   : AIC=inf, Time=0.15 sec
+ ARIMA(2,1,1)(0,0,0)[0] intercept   : AIC=inf, Time=0.15 sec
+ ARIMA(3,1,2)(0,0,0)[0] intercept   : AIC=-107.105, Time=0.19 sec
+ ARIMA(2,1,3)(0,0,0)[0] intercept   : AIC=inf, Time=0.21 sec
+ ARIMA(1,1,1)(0,0,0)[0] intercept   : AIC=-106.223, Time=0.06 sec
+ ARIMA(1,1,3)(0,0,0)[0] intercept   : AIC=-105.376, Time=0.22 sec
+ ARIMA(3,1,1)(0,0,0)[0] intercept   : AIC=-108.331, Time=0.17 sec
+ ARIMA(3,1,3)(0,0,0)[0] intercept   : AIC=inf, Time=0.24 sec
+ ARIMA(2,1,2)(0,0,0)[0]             : AIC=inf, Time=0.15 sec
+
+Best model:  ARIMA(2,1,2)(0,0,0)[0] intercept
+Total fit time: 1.851 seconds</code></pre>
+</div>
+</div>
+<p>Due to the small size of the data, we suspsect that auto.arima is overfitting and thus we will go with the grid search approach where it found that ARIMA(1,1,1) best capture the data.</p>
+<div id="cell-78" class="cell" data-execution_count="110">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a><span class="co"># 90-10 split of the time series data since the data is small</span></span>
+<span id="cb63-2"><a href="#cb63-2"></a>train <span class="op">=</span> aus_airpassengers[<span class="st">'Passengers_log'</span>].iloc[:<span class="bu">int</span>(<span class="fl">0.8</span> <span class="op">*</span> <span class="bu">len</span>(aus_airpassengers[<span class="st">'Passengers_log'</span>]))]</span>
+<span id="cb63-3"><a href="#cb63-3"></a>test <span class="op">=</span> aus_airpassengers[<span class="st">'Passengers_log'</span>].iloc[<span class="bu">int</span>(<span class="fl">0.8</span> <span class="op">*</span> <span class="bu">len</span>(aus_airpassengers[<span class="st">'Passengers_log'</span>])):]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-79" class="cell" data-message="false" data-execution_count="111">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a><span class="co"># ARIMA(1,1,1)</span></span>
+<span id="cb64-2"><a href="#cb64-2"></a></span>
+<span id="cb64-3"><a href="#cb64-3"></a>arima_111 <span class="op">=</span> ARIMA(train, order <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>))</span>
+<span id="cb64-4"><a href="#cb64-4"></a></span>
+<span id="cb64-5"><a href="#cb64-5"></a>results <span class="op">=</span> arima_111.fit()</span>
+<span id="cb64-6"><a href="#cb64-6"></a></span>
+<span id="cb64-7"><a href="#cb64-7"></a><span class="bu">print</span>(results.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:         Passengers_log   No. Observations:                   37
+Model:                 ARIMA(1, 1, 1)   Log Likelihood                  40.609
+Date:                Wed, 13 Mar 2024   AIC                            -75.218
+Time:                        19:05:00   BIC                            -70.468
+Sample:                    01-01-1970   HQIC                           -73.560
+                         - 01-01-2006                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ar.L1          0.9998      0.028     35.505      0.000       0.945       1.055
+ma.L1         -0.9873      0.931     -1.060      0.289      -2.812       0.838
+sigma2         0.0058      0.005      1.203      0.229      -0.004       0.015
+===================================================================================
+Ljung-Box (L1) (Q):                   0.10   Jarque-Bera (JB):                17.29
+Prob(Q):                              0.75   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.44   Skew:                            -0.73
+Prob(H) (two-sided):                  0.17   Kurtosis:                         6.06
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
+</div>
+</div>
+<div id="cell-80" class="cell" data-execution_count="112">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>results.plot_diagnostics()</span>
+<span id="cb66-2"><a href="#cb66-2"></a>plt.tight_layout()</span>
+<span id="cb66-3"><a href="#cb66-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-48-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-81" class="cell" data-execution_count="113">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a>forecast <span class="op">=</span> results.get_forecast(steps <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb67-2"><a href="#cb67-2"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
+<span id="cb67-3"><a href="#cb67-3"></a></span>
+<span id="cb67-4"><a href="#cb67-4"></a>conf_int <span class="op">=</span> forecast.conf_int()</span>
+<span id="cb67-5"><a href="#cb67-5"></a></span>
+<span id="cb67-6"><a href="#cb67-6"></a></span>
+<span id="cb67-7"><a href="#cb67-7"></a>lower_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'lower Passengers_log'</span>]</span>
+<span id="cb67-8"><a href="#cb67-8"></a>upper_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'upper Passengers_log'</span>]</span>
+<span id="cb67-9"><a href="#cb67-9"></a></span>
+<span id="cb67-10"><a href="#cb67-10"></a></span>
+<span id="cb67-11"><a href="#cb67-11"></a>plt.plot(aus_airpassengers.index, aus_airpassengers[<span class="st">'Passengers'</span>], label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb67-12"><a href="#cb67-12"></a></span>
+<span id="cb67-13"><a href="#cb67-13"></a>plt.plot(mean_forecast.index, np.exp(mean_forecast), color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Forecast'</span>) </span>
+<span id="cb67-14"><a href="#cb67-14"></a><span class="co"># reversing log transform</span></span>
+<span id="cb67-15"><a href="#cb67-15"></a></span>
+<span id="cb67-16"><a href="#cb67-16"></a>plt.fill_between(lower_limits.index, np.exp(lower_limits), np.exp(upper_limits), color <span class="op">=</span> <span class="st">'pink'</span>)</span>
+<span id="cb67-17"><a href="#cb67-17"></a></span>
+<span id="cb67-18"><a href="#cb67-18"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb67-19"><a href="#cb67-19"></a>plt.ylabel(<span class="st">'AUS Air Passengers'</span>)</span>
+<span id="cb67-20"><a href="#cb67-20"></a>plt.legend()</span>
+<span id="cb67-21"><a href="#cb67-21"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb67-22"><a href="#cb67-22"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-49-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>ARIMA(1,1,1) uses the autocorrelations from lagged values and lagged errors to capture the pattern of the data. While ARIMA(0,1,0) is essentially just a stationarity time series with Naive Drift being applied where it captures the overall trend of the data.</p>
+<ol start="2" type="a">
+<li>Write the model in terms of the backshift operator.</li>
+</ol>
+<p>For ARIMA(1,1,1) model in terms of the backshift operator: <span class="math display">
+(1 - \phi B) ( 1-B) y_t = c + (1 + \theta_1 B) \epsilon_t
+</span></p>
+<p>where p = 1, d = 1, and q = 1.</p>
+<ol start="3" type="a">
+<li>Plot forecasts from an ARIMA(0,1,0) model with drift and compare these to part a.</li>
+</ol>
+<div id="cell-86" class="cell" data-execution_count="114">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a>arima_010 <span class="op">=</span> ARIMA(train, order <span class="op">=</span> (<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>), trend<span class="op">=</span><span class="st">'t'</span>) <span class="co"># t adds the drift</span></span>
+<span id="cb68-2"><a href="#cb68-2"></a></span>
+<span id="cb68-3"><a href="#cb68-3"></a>results2 <span class="op">=</span> arima_010.fit()</span>
+<span id="cb68-4"><a href="#cb68-4"></a><span class="bu">print</span>(results2.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:         Passengers_log   No. Observations:                   37
+Model:                 ARIMA(0, 1, 0)   Log Likelihood                  42.546
+Date:                Wed, 13 Mar 2024   AIC                            -81.092
+Time:                        19:05:01   BIC                            -77.925
+Sample:                    01-01-1970   HQIC                           -79.987
+                         - 01-01-2006                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+x1             0.0516      0.013      3.886      0.000       0.026       0.078
+sigma2         0.0055      0.001      6.484      0.000       0.004       0.007
+===================================================================================
+Ljung-Box (L1) (Q):                   0.02   Jarque-Bera (JB):                21.54
+Prob(Q):                              0.90   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.49   Skew:                            -0.85
+Prob(H) (two-sided):                  0.24   Kurtosis:                         6.39
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)</code></pre>
+</div>
+</div>
+<div id="cell-87" class="cell" data-execution_count="115">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1"></a>results2.plot_diagnostics()</span>
+<span id="cb71-2"><a href="#cb71-2"></a>plt.tight_layout()</span>
+<span id="cb71-3"><a href="#cb71-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-51-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-88" class="cell" data-execution_count="116">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a>forecast <span class="op">=</span> results2.get_forecast(steps <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb72-2"><a href="#cb72-2"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
+<span id="cb72-3"><a href="#cb72-3"></a></span>
+<span id="cb72-4"><a href="#cb72-4"></a>conf_int <span class="op">=</span> forecast.conf_int()</span>
+<span id="cb72-5"><a href="#cb72-5"></a></span>
+<span id="cb72-6"><a href="#cb72-6"></a></span>
+<span id="cb72-7"><a href="#cb72-7"></a>lower_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'lower Passengers_log'</span>]</span>
+<span id="cb72-8"><a href="#cb72-8"></a>upper_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'upper Passengers_log'</span>]</span>
+<span id="cb72-9"><a href="#cb72-9"></a></span>
+<span id="cb72-10"><a href="#cb72-10"></a></span>
+<span id="cb72-11"><a href="#cb72-11"></a>plt.plot(aus_airpassengers.index, aus_airpassengers[<span class="st">'Passengers'</span>], label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb72-12"><a href="#cb72-12"></a></span>
+<span id="cb72-13"><a href="#cb72-13"></a>plt.plot(mean_forecast.index, np.exp(mean_forecast), color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Forecast'</span>) </span>
+<span id="cb72-14"><a href="#cb72-14"></a><span class="co"># reversing log transform</span></span>
+<span id="cb72-15"><a href="#cb72-15"></a></span>
+<span id="cb72-16"><a href="#cb72-16"></a>plt.fill_between(lower_limits.index, np.exp(lower_limits), np.exp(upper_limits), color <span class="op">=</span> <span class="st">'pink'</span>)</span>
+<span id="cb72-17"><a href="#cb72-17"></a></span>
+<span id="cb72-18"><a href="#cb72-18"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb72-19"><a href="#cb72-19"></a>plt.ylabel(<span class="st">'AUS Air Passengers'</span>)</span>
+<span id="cb72-20"><a href="#cb72-20"></a>plt.legend()</span>
+<span id="cb72-21"><a href="#cb72-21"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb72-22"><a href="#cb72-22"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-52-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>ARIMA(1,1,1) uses the autocorrelations from lagged values and lagged errors to capture the pattern of the data. While ARIMA(0,1,0) is essentially just a stationarity time series with linear Drift being applied where it captures the overall trend of the data. We tried to applying a constant drift but the code would not run so instead we used a linear drift.</p>
+<ol start="4" type="a">
+<li>Plot forecasts from an ARIMA(2,1,2) model with drift and compare these to parts a and c.&nbsp;Remove the constant and see what happens.</li>
+</ol>
+<div id="cell-91" class="cell" data-execution_count="117">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1"></a>arima_212 <span class="op">=</span> ARIMA(train, order <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>), trend<span class="op">=</span><span class="st">'t'</span>) <span class="co"># add drift</span></span>
+<span id="cb73-2"><a href="#cb73-2"></a></span>
+<span id="cb73-3"><a href="#cb73-3"></a>results3 <span class="op">=</span> arima_212.fit()</span>
+<span id="cb73-4"><a href="#cb73-4"></a></span>
+<span id="cb73-5"><a href="#cb73-5"></a><span class="bu">print</span>(results3.summary())</span>
+<span id="cb73-6"><a href="#cb73-6"></a></span>
+<span id="cb73-7"><a href="#cb73-7"></a>results3.plot_diagnostics()</span>
+<span id="cb73-8"><a href="#cb73-8"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\base\model.py:607: ConvergenceWarning: Maximum Likelihood optimization failed to converge. Check mle_retvals
+  warnings.warn("Maximum Likelihood optimization failed to "</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:         Passengers_log   No. Observations:                   37
+Model:                 ARIMA(2, 1, 2)   Log Likelihood                  46.051
+Date:                Wed, 13 Mar 2024   AIC                            -80.101
+Time:                        19:05:02   BIC                            -70.600
+Sample:                    01-01-1970   HQIC                           -76.785
+                         - 01-01-2006                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+x1             0.0503      0.005      9.637      0.000       0.040       0.061
+ar.L1         -0.0071      0.448     -0.016      0.987      -0.885       0.871
+ar.L2          0.3707      0.420      0.882      0.378      -0.453       1.195
+ma.L1         -0.1525      1.409     -0.108      0.914      -2.914       2.609
+ma.L2         -0.8297      1.159     -0.716      0.474      -3.102       1.442
+sigma2         0.0043      0.005      0.881      0.379      -0.005       0.014
+===================================================================================
+Ljung-Box (L1) (Q):                   0.03   Jarque-Bera (JB):                78.52
+Prob(Q):                              0.86   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.46   Skew:                            -1.86
+Prob(H) (two-sided):                  0.19   Kurtosis:                         9.20
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-53-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-92" class="cell" data-execution_count="118">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1"></a></span>
+<span id="cb76-2"><a href="#cb76-2"></a>forecast <span class="op">=</span> results3.get_forecast(steps <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb76-3"><a href="#cb76-3"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
+<span id="cb76-4"><a href="#cb76-4"></a></span>
+<span id="cb76-5"><a href="#cb76-5"></a>conf_int <span class="op">=</span> forecast.conf_int()</span>
+<span id="cb76-6"><a href="#cb76-6"></a></span>
+<span id="cb76-7"><a href="#cb76-7"></a></span>
+<span id="cb76-8"><a href="#cb76-8"></a>lower_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'lower Passengers_log'</span>]</span>
+<span id="cb76-9"><a href="#cb76-9"></a>upper_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'upper Passengers_log'</span>]</span>
+<span id="cb76-10"><a href="#cb76-10"></a></span>
+<span id="cb76-11"><a href="#cb76-11"></a></span>
+<span id="cb76-12"><a href="#cb76-12"></a>plt.plot(aus_airpassengers.index, aus_airpassengers[<span class="st">'Passengers'</span>], label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb76-13"><a href="#cb76-13"></a></span>
+<span id="cb76-14"><a href="#cb76-14"></a>plt.plot(mean_forecast.index, np.exp(mean_forecast), color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Forecast'</span>) </span>
+<span id="cb76-15"><a href="#cb76-15"></a><span class="co"># reversing log transform</span></span>
+<span id="cb76-16"><a href="#cb76-16"></a></span>
+<span id="cb76-17"><a href="#cb76-17"></a>plt.fill_between(lower_limits.index, np.exp(lower_limits), np.exp(upper_limits), color <span class="op">=</span> <span class="st">'pink'</span>)</span>
+<span id="cb76-18"><a href="#cb76-18"></a></span>
+<span id="cb76-19"><a href="#cb76-19"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb76-20"><a href="#cb76-20"></a>plt.ylabel(<span class="st">'AUS Air Passengers'</span>)</span>
+<span id="cb76-21"><a href="#cb76-21"></a>plt.legend()</span>
+<span id="cb76-22"><a href="#cb76-22"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb76-23"><a href="#cb76-23"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-54-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Visually ARIMA(2,1,2) looks similar to previous two models but adding drift we noticed that the confidence intervals narrows due to more parameters and the drift correctly capturing the trend, thus reducing the overall uncertainty.</p>
+<ol start="5" type="a">
+<li>Plot forecasts from an ARIMA(0,2,1) model with a constant. What happens?</li>
+</ol>
+<div id="cell-95" class="cell" data-execution_count="119">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1"></a>arima_021 <span class="op">=</span> ARIMA(train, order<span class="op">=</span>(<span class="dv">0</span>,<span class="dv">2</span>,<span class="dv">1</span>), trend<span class="op">=</span><span class="st">'n'</span>) <span class="co"># other values for trend wont run the code</span></span>
+<span id="cb77-2"><a href="#cb77-2"></a></span>
+<span id="cb77-3"><a href="#cb77-3"></a>results4 <span class="op">=</span> arima_021 .fit()</span>
+<span id="cb77-4"><a href="#cb77-4"></a></span>
+<span id="cb77-5"><a href="#cb77-5"></a><span class="bu">print</span>(results4.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                               SARIMAX Results                                
+==============================================================================
+Dep. Variable:         Passengers_log   No. Observations:                   37
+Model:                 ARIMA(0, 2, 1)   Log Likelihood                  39.078
+Date:                Wed, 13 Mar 2024   AIC                            -74.155
+Time:                        19:05:03   BIC                            -71.044
+Sample:                    01-01-1970   HQIC                           -73.081
+                         - 01-01-2006                                         
+Covariance Type:                  opg                                         
+==============================================================================
+                 coef    std err          z      P&gt;|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+ma.L1         -0.9952      2.660     -0.374      0.708      -6.209       4.218
+sigma2         0.0057      0.015      0.388      0.698      -0.023       0.034
+===================================================================================
+Ljung-Box (L1) (Q):                   0.07   Jarque-Bera (JB):                14.64
+Prob(Q):                              0.79   Prob(JB):                         0.00
+Heteroskedasticity (H):               0.42   Skew:                            -0.74
+Prob(H) (two-sided):                  0.14   Kurtosis:                         5.80
+===================================================================================
+
+Warnings:
+[1] Covariance matrix calculated using the outer product of gradients (complex-step).</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\ds_env\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency AS-JAN will be used.
+  self._init_dates(dates, freq)</code></pre>
+</div>
+</div>
+<div id="cell-96" class="cell" data-execution_count="120">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1"></a>results4.plot_diagnostics()</span>
+<span id="cb80-2"><a href="#cb80-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-56-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-97" class="cell" data-execution_count="121">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1"></a>forecast <span class="op">=</span> results4.get_forecast(steps <span class="op">=</span> <span class="dv">10</span>)</span>
+<span id="cb81-2"><a href="#cb81-2"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
+<span id="cb81-3"><a href="#cb81-3"></a></span>
+<span id="cb81-4"><a href="#cb81-4"></a>conf_int <span class="op">=</span> forecast.conf_int()</span>
+<span id="cb81-5"><a href="#cb81-5"></a></span>
+<span id="cb81-6"><a href="#cb81-6"></a></span>
+<span id="cb81-7"><a href="#cb81-7"></a>lower_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'lower Passengers_log'</span>]</span>
+<span id="cb81-8"><a href="#cb81-8"></a>upper_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'upper Passengers_log'</span>]</span>
+<span id="cb81-9"><a href="#cb81-9"></a></span>
+<span id="cb81-10"><a href="#cb81-10"></a></span>
+<span id="cb81-11"><a href="#cb81-11"></a>plt.plot(aus_airpassengers.index, aus_airpassengers[<span class="st">'Passengers'</span>], label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb81-12"><a href="#cb81-12"></a></span>
+<span id="cb81-13"><a href="#cb81-13"></a>plt.plot(mean_forecast.index, np.exp(mean_forecast), color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Forecast'</span>) </span>
+<span id="cb81-14"><a href="#cb81-14"></a><span class="co"># reversing log transform</span></span>
+<span id="cb81-15"><a href="#cb81-15"></a></span>
+<span id="cb81-16"><a href="#cb81-16"></a>plt.fill_between(lower_limits.index, np.exp(lower_limits), np.exp(upper_limits), color <span class="op">=</span> <span class="st">'pink'</span>)</span>
+<span id="cb81-17"><a href="#cb81-17"></a></span>
+<span id="cb81-18"><a href="#cb81-18"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb81-19"><a href="#cb81-19"></a>plt.ylabel(<span class="st">'AUS Air Passengers'</span>)</span>
+<span id="cb81-20"><a href="#cb81-20"></a>plt.legend()</span>
+<span id="cb81-21"><a href="#cb81-21"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb81-22"><a href="#cb81-22"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-57-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-8" class="level1">
+<h1>Exercise 8</h1>
+<p>For the United States GDP series (from global_economy):</p>
+<ol type="a">
+<li>if necessary, find a suitable Box-Cox transformation for the data;</li>
+</ol>
+<div id="cell-100" class="cell" data-execution_count="122">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1"></a>us_gdp <span class="op">=</span> global_economy.query(<span class="st">'Country == "United States"'</span>)[[<span class="st">'GDP'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-101" class="cell" data-execution_count="123">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1"></a>gdp_boxcox, lmbda <span class="op">=</span> boxcox(us_gdp[<span class="st">'GDP'</span>])</span>
+<span id="cb83-2"><a href="#cb83-2"></a><span class="bu">print</span>(lmbda)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.24036371825364905</code></pre>
+</div>
+</div>
+<ol start="2" type="a">
+<li>fit a suitable ARIMA model to the transformed data using ARIMA();</li>
+</ol>
+<div id="cell-103" class="cell" data-execution_count="124">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1"></a>adfuller_test(gdp_boxcox)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -1.124577
+p-value: 0.705172
+Critical Values:
+    1%: -3.553
+    5%: -2.915
+    10%: -2.595
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-104" class="cell" data-execution_count="125">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb87-1"><a href="#cb87-1"></a>us_gdp[<span class="st">'gdp_boxcox'</span>] <span class="op">=</span> gdp_boxcox</span>
+<span id="cb87-2"><a href="#cb87-2"></a>us_gdp[<span class="st">'gdp_boxcox_diff'</span>] <span class="op">=</span> us_gdp[<span class="st">'gdp_boxcox'</span>].diff()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-105" class="cell" data-execution_count="126">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1"></a>adfuller_test(us_gdp[<span class="st">'gdp_boxcox_diff'</span>].dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -4.670636
+p-value: 0.000096
+Critical Values:
+    1%: -3.553
+    5%: -2.915
+    10%: -2.595
+Result: The series is stationary</code></pre>
+</div>
+</div>
+<div id="cell-106" class="cell" data-message="false" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb90-1"><a href="#cb90-1"></a><span class="co"># usiung  grid search for p and q </span></span>
+<span id="cb90-2"><a href="#cb90-2"></a>order_aic_bic <span class="op">=</span> []</span>
+<span id="cb90-3"><a href="#cb90-3"></a></span>
+<span id="cb90-4"><a href="#cb90-4"></a><span class="cf">for</span> p <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>) :</span>
+<span id="cb90-5"><a href="#cb90-5"></a>     <span class="cf">for</span> q <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>) :</span>
+<span id="cb90-6"><a href="#cb90-6"></a>          model <span class="op">=</span> ARIMA(us_gdp[<span class="st">'gdp_boxcox'</span>], order <span class="op">=</span> (p,<span class="dv">1</span>,q))</span>
+<span id="cb90-7"><a href="#cb90-7"></a>          results <span class="op">=</span> model.fit()</span>
+<span id="cb90-8"><a href="#cb90-8"></a></span>
+<span id="cb90-9"><a href="#cb90-9"></a>          order_aic_bic.append((p,q, results.aic, results.bic))</span>
+<span id="cb90-10"><a href="#cb90-10"></a></span>
+<span id="cb90-11"><a href="#cb90-11"></a><span class="co"># Construct DataFrame from order_aic_bic</span></span>
+<span id="cb90-12"><a href="#cb90-12"></a>order_df <span class="op">=</span> pd.DataFrame(order_aic_bic, </span>
+<span id="cb90-13"><a href="#cb90-13"></a>                        columns<span class="op">=</span>[<span class="st">'p'</span>,<span class="st">'q'</span>,<span class="st">'AIC'</span>,<span class="st">'BIC'</span>])</span>
+<span id="cb90-14"><a href="#cb90-14"></a></span>
+<span id="cb90-15"><a href="#cb90-15"></a><span class="co"># Print order_df in order of increasing AIC</span></span>
+<span id="cb90-16"><a href="#cb90-16"></a><span class="bu">print</span>(order_df.sort_values(<span class="st">'AIC'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    p  q         AIC         BIC
+7   1  2  523.658050  531.830255
+11  2  1  523.887230  532.059435
+6   1  1  524.628237  530.757391
+16  3  1  525.526537  535.741793
+8   1  3  525.630822  535.846078
+12  2  2  525.639806  535.855063
+21  4  1  527.280101  539.538408
+17  3  2  527.512626  539.770934
+9   1  4  527.516250  539.774558
+13  2  3  527.618591  539.876899
+20  4  0  528.953169  539.168425
+15  3  0  529.050685  537.222890
+14  2  4  529.132898  543.434257
+18  3  3  529.328489  543.629847
+22  4  2  529.331172  543.632531
+23  4  3  529.541534  545.885944
+19  3  4  530.040500  546.384910
+10  2  0  530.216908  536.346062
+24  4  4  531.259994  549.647456
+5   1  0  532.192013  536.278115
+4   0  4  560.886713  571.101970
+3   0  3  568.981582  577.153787
+2   0  2  578.973630  585.102784
+1   0  1  600.688589  604.774691
+0   0  0  648.214911  650.257962</code></pre>
+</div>
+</div>
+<p>From this double for loop then using the AIC as our metric, it suggests that ARIMA(1,1,2) is the best model for the data.</p>
+<ol start="3" type="a">
+<li>try some other plausible models by experimenting with the orders chosen;</li>
+</ol>
+<p>Another way to select p and q is by using the ACF and PACF plots.</p>
+<div id="cell-110" class="cell" data-execution_count="128">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1"></a>plot_acf(train, lags <span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb92-2"><a href="#cb92-2"></a>plot_pacf(train, lags <span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb92-3"><a href="#cb92-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-64-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-64-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From this, we get an ARIMA(1,1,3) model from plots. Using the number of significant correlation beyond lag 0 as the potential values for p and q.</p>
+<ol start="4" type="a">
+<li>choose what you think is the best model and check the residual diagnostics;</li>
+</ol>
+<p>We add a linear drift since the data closely resembles a straight line.</p>
+<div id="cell-114" class="cell" data-message="false" data-execution_count="129">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1"></a>arima_112 <span class="op">=</span> ARIMA(us_gdp[<span class="st">'gdp_boxcox'</span>], order <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>), trend<span class="op">=</span><span class="st">'t'</span>)</span>
+<span id="cb93-2"><a href="#cb93-2"></a>result_112 <span class="op">=</span> arima_112.fit()</span>
+<span id="cb93-3"><a href="#cb93-3"></a></span>
+<span id="cb93-4"><a href="#cb93-4"></a>arima_113 <span class="op">=</span> ARIMA(us_gdp[<span class="st">'gdp_boxcox'</span>], order <span class="op">=</span> (<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">3</span>), trend <span class="op">=</span> <span class="st">'t'</span>)</span>
+<span id="cb93-5"><a href="#cb93-5"></a>result_113 <span class="op">=</span> arima_113.fit()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-115" class="cell" data-execution_count="130">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1"></a>result_112.plot_diagnostics()</span>
+<span id="cb94-2"><a href="#cb94-2"></a>result_113.plot_diagnostics()</span>
+<span id="cb94-3"><a href="#cb94-3"></a>plt.tight_layout()</span>
+<span id="cb94-4"><a href="#cb94-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-66-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-66-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Since both models’ residuals look identical, we have to use the AIC as the metric. We will use ARIMA(1,1,2) to generate forecast since it has the lower aic value.</p>
+<ol start="5" type="a">
+<li>produce forecasts of your fitted model. Do the forecasts look reasonable?</li>
+</ol>
+<div id="cell-118" class="cell" data-execution_count="131">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> inv_boxcox</span>
+<span id="cb95-2"><a href="#cb95-2"></a></span>
+<span id="cb95-3"><a href="#cb95-3"></a>forecast <span class="op">=</span> result_112.get_forecast(steps <span class="op">=</span> <span class="dv">20</span>) <span class="co"># forecast the next 20 time steps</span></span>
+<span id="cb95-4"><a href="#cb95-4"></a>mean_forecast <span class="op">=</span> forecast.predicted_mean</span>
+<span id="cb95-5"><a href="#cb95-5"></a></span>
+<span id="cb95-6"><a href="#cb95-6"></a>conf_int <span class="op">=</span> forecast.conf_int()</span>
+<span id="cb95-7"><a href="#cb95-7"></a></span>
+<span id="cb95-8"><a href="#cb95-8"></a>lower_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'lower gdp_boxcox'</span>]</span>
+<span id="cb95-9"><a href="#cb95-9"></a>upper_limits <span class="op">=</span> conf_int.loc[:,<span class="st">'upper gdp_boxcox'</span>]</span>
+<span id="cb95-10"><a href="#cb95-10"></a></span>
+<span id="cb95-11"><a href="#cb95-11"></a><span class="co"># </span><span class="al">TODO</span><span class="co"> : dont forget to reverse the boxcox tranformation</span></span>
+<span id="cb95-12"><a href="#cb95-12"></a></span>
+<span id="cb95-13"><a href="#cb95-13"></a>plt.plot(us_gdp.index, us_gdp[<span class="st">'GDP'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb95-14"><a href="#cb95-14"></a></span>
+<span id="cb95-15"><a href="#cb95-15"></a>plt.plot(mean_forecast.index, inv_boxcox(mean_forecast,lmbda), color <span class="op">=</span> <span class="st">'red'</span>, label <span class="op">=</span> <span class="st">'Forecast'</span>)</span>
+<span id="cb95-16"><a href="#cb95-16"></a></span>
+<span id="cb95-17"><a href="#cb95-17"></a>plt.fill_between(lower_limits.index, inv_boxcox(lower_limits,lmbda), inv_boxcox(upper_limits,lmbda), color <span class="op">=</span> <span class="st">'pink'</span>)</span>
+<span id="cb95-18"><a href="#cb95-18"></a></span>
+<span id="cb95-19"><a href="#cb95-19"></a>plt.xlabel(<span class="st">'Year'</span>)</span>
+<span id="cb95-20"><a href="#cb95-20"></a>plt.ylabel(<span class="st">'US GDP'</span>)</span>
+<span id="cb95-21"><a href="#cb95-21"></a>plt.title(<span class="st">'US GDP ARIMA(1,1,2) Forecast'</span>)</span>
+<span id="cb95-22"><a href="#cb95-22"></a>plt.legend(loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb95-23"><a href="#cb95-23"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb95-24"><a href="#cb95-24"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-67-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="6" type="a">
+<li>compare the results with what you would obtain using ETS() (with no transformation).</li>
+</ol>
+<div id="cell-120" class="cell" data-message="false" data-execution_count="132">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb96-1"><a href="#cb96-1"></a><span class="im">from</span> statsmodels.tsa.exponential_smoothing.ets <span class="im">import</span> ETSModel</span>
+<span id="cb96-2"><a href="#cb96-2"></a></span>
+<span id="cb96-3"><a href="#cb96-3"></a>model <span class="op">=</span> ETSModel(us_gdp[<span class="st">'GDP'</span>], trend <span class="op">=</span> <span class="st">'mul'</span>, damped_trend <span class="op">=</span> <span class="va">False</span>, seasonal<span class="op">=</span><span class="va">None</span>).fit()</span>
+<span id="cb96-4"><a href="#cb96-4"></a></span>
+<span id="cb96-5"><a href="#cb96-5"></a>ets_forecast <span class="op">=</span> model.forecast(steps <span class="op">=</span> <span class="dv">20</span>)</span>
+<span id="cb96-6"><a href="#cb96-6"></a></span>
+<span id="cb96-7"><a href="#cb96-7"></a>plt.plot(us_gdp.index, us_gdp[<span class="st">'GDP'</span>], color <span class="op">=</span> <span class="st">'blue'</span>, label <span class="op">=</span> <span class="st">'Observed'</span>)</span>
+<span id="cb96-8"><a href="#cb96-8"></a>ets_forecast.plot(label<span class="op">=</span><span class="st">'ETS Forecast'</span>, color <span class="op">=</span> <span class="st">'red'</span>)</span>
+<span id="cb96-9"><a href="#cb96-9"></a>plt.legend()</span>
+<span id="cb96-10"><a href="#cb96-10"></a>plt.title(<span class="st">'US GDP ETS Forecast'</span>)</span>
+<span id="cb96-11"><a href="#cb96-11"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb96-12"><a href="#cb96-12"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="arima_files/figure-html/cell-68-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
