@@ -104,7 +104,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#forecasts" id="toc-forecasts" class="nav-link" data-scroll-target="#forecasts">Forecasts</a></li>
   </ul></li>
-  <li><a href="#part-b-power-data" id="toc-part-b-power-data" class="nav-link" data-scroll-target="#part-b-power-data">Part B : Power Data</a></li>
+  <li><a href="#part-b-power-data" id="toc-part-b-power-data" class="nav-link" data-scroll-target="#part-b-power-data">Part B : Power Data</a>
+  <ul class="collapse">
+  <li><a href="#eda-and-data-wrangling" id="toc-eda-and-data-wrangling" class="nav-link" data-scroll-target="#eda-and-data-wrangling">EDA and Data Wrangling</a></li>
+  <li><a href="#model-building-and-selection-1" id="toc-model-building-and-selection-1" class="nav-link" data-scroll-target="#model-building-and-selection-1">Model Building and Selection</a>
+  <ul class="collapse">
+  <li><a href="#sarima-models" id="toc-sarima-models" class="nav-link" data-scroll-target="#sarima-models">SARIMA Models</a></li>
+  </ul></li>
+  <li><a href="#exponential-smoothing-2" id="toc-exponential-smoothing-2" class="nav-link" data-scroll-target="#exponential-smoothing-2">Exponential Smoothing</a></li>
+  </ul></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a></li>
   </ul>
 </nav>
 </div>
@@ -143,7 +152,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="objective" class="level1">
 <h1>Objective:</h1>
-<p>The primary objective of this project is to develop accurate forecasts of cash withdrawals for four distinct ATM machines during the month of May 2010.</p>
+<p>The primary objective of this project is to :</p>
+<ul>
+<li><p>develop accurate forecasts of cash withdrawals for four distinct ATM machines during the month of May 2010.</p></li>
+<li><p>develop forecasts of residential power consumption for the year 2014</p></li>
+</ul>
 </section>
 <section id="deliverables" class="level1">
 <h1>Deliverables:</h1>
@@ -678,7 +691,7 @@ Result: The series is not stationary</code></pre>
 </section>
 <section id="atm-4" class="level3">
 <h3 class="anchored" data-anchor-id="atm-4">ATM 4</h3>
-<p>ATM 4 has</p>
+<p>ATM 4 has an extreme outlier where we will impute with the second value of the time series because we want to keep that attribute of that day having a high cash withdrawal.</p>
 <div id="cell-41" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>atm4.plot()</span>
 <span id="cb23-2"><a href="#cb23-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -777,7 +790,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 <hr>
-<div id="cell-52" class="cell" data-execution_count="33">
+<div id="cell-49" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a><span class="im">from</span> statsmodels.tsa.seasonal <span class="im">import</span> seasonal_decompose</span>
 <span id="cb32-2"><a href="#cb32-2"></a></span>
 <span id="cb32-3"><a href="#cb32-3"></a>seasonal_decompose(atm1[<span class="st">'Cash'</span>], model <span class="op">=</span> <span class="st">'mul'</span>, period<span class="op">=</span><span class="dv">7</span>).plot()</span>
@@ -790,7 +803,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-53" class="cell" data-execution_count="34">
+<div id="cell-50" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a><span class="im">from</span> statsmodels.graphics.tsaplots <span class="im">import</span> plot_acf, plot_pacf</span>
 <span id="cb33-2"><a href="#cb33-2"></a></span>
 <span id="cb33-3"><a href="#cb33-3"></a>plot_acf(atm1[<span class="st">'Cash'</span>], lags<span class="op">=</span><span class="dv">30</span>)</span>
@@ -803,7 +816,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-54" class="cell" data-execution_count="35">
+<div id="cell-51" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a>plot_acf(atm1[<span class="st">'Cash'</span>], lags<span class="op">=</span>[<span class="dv">0</span>,<span class="dv">7</span>,<span class="dv">14</span>,<span class="dv">21</span>,<span class="dv">28</span>,<span class="dv">35</span>,<span class="dv">42</span>])</span>
 <span id="cb34-2"><a href="#cb34-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -828,7 +841,7 @@ Result: The series is stationary</code></pre>
 <h3 class="anchored" data-anchor-id="models-for-atm1">Models for ATM1</h3>
 <section id="sarima-model" class="level4">
 <h4 class="anchored" data-anchor-id="sarima-model">SARIMA Model</h4>
-<div id="cell-62" class="cell" data-message="false" data-execution_count="39">
+<div id="cell-59" class="cell" data-message="false" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>sarima_evaluation_results <span class="op">=</span> arima_model_evaluation(atm1)</span>
 <span id="cb36-2"><a href="#cb36-2"></a>sarima_evaluation_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="39">
@@ -889,13 +902,13 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<p>::: {#cell-63 .cell 0=‘e’ 1=‘c’ 2=‘h’ 3=‘o’ 4=’ ’ 5=‘f’ 6=‘a’ 7=‘l’ 8=‘s’ 9=‘e’ execution_count=40}</p>
+<p>::: {#cell-60 .cell 0=‘e’ 1=‘c’ 2=‘h’ 3=‘o’ 4=’ ’ 5=‘f’ 6=‘a’ 7=‘l’ 8=‘s’ 9=‘e’ execution_count=40}</p>
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a><span class="co"># train test 80-20 split</span></span>
 <span id="cb37-2"><a href="#cb37-2"></a></span>
 <span id="cb37-3"><a href="#cb37-3"></a>n <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(atm1) <span class="op">*</span> <span class="fl">0.8</span> )</span>
 <span id="cb37-4"><a href="#cb37-4"></a>train, test <span class="op">=</span> atm1.iloc[:n], atm1.iloc[n:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>:::</p>
-<div id="cell-64" class="cell" data-message="false" data-execution_count="41">
+<div id="cell-61" class="cell" data-message="false" data-execution_count="41">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a><span class="co"># forecast sarima models on test</span></span>
 <span id="cb38-2"><a href="#cb38-2"></a>sarima_1 <span class="op">=</span> SARIMAX(train[<span class="st">'Cash'</span>],order <span class="op">=</span> sarima_evaluation_results.Order[<span class="dv">0</span>], seasonal_order<span class="op">=</span> sarima_evaluation_results.Seasonal[<span class="dv">0</span>]).fit()</span>
 <span id="cb38-3"><a href="#cb38-3"></a>forecast_sarima_1 <span class="op">=</span> sarima_1.forecast(steps<span class="op">=</span><span class="bu">len</span>(test))</span>
@@ -906,7 +919,7 @@ Result: The series is stationary</code></pre>
 <span id="cb38-8"><a href="#cb38-8"></a>sarima_3 <span class="op">=</span> SARIMAX(train[<span class="st">'Cash'</span>],order <span class="op">=</span> sarima_evaluation_results.Order[<span class="dv">2</span>], seasonal_order<span class="op">=</span> sarima_evaluation_results.Seasonal[<span class="dv">2</span>]).fit()</span>
 <span id="cb38-9"><a href="#cb38-9"></a>forecast_sarima_3 <span class="op">=</span> sarima_3.forecast(steps<span class="op">=</span><span class="bu">len</span>(test))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-65" class="cell" data-execution_count="42">
+<div id="cell-62" class="cell" data-execution_count="42">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -918,7 +931,7 @@ Result: The series is stationary</code></pre>
 </section>
 <section id="exponential-smoothing-model" class="level4">
 <h4 class="anchored" data-anchor-id="exponential-smoothing-model">Exponential Smoothing Model</h4>
-<div id="cell-67" class="cell" data-message="false" data-execution_count="43">
+<div id="cell-64" class="cell" data-message="false" data-execution_count="43">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>exponential_smoothing_evaluation(atm1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="43">
 <div>
@@ -962,7 +975,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-68" class="cell" data-message="false" data-execution_count="44">
+<div id="cell-65" class="cell" data-message="false" data-execution_count="44">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># simple exponential smoothing</span></span>
 <span id="cb40-2"><a href="#cb40-2"></a>model_simple <span class="op">=</span> SimpleExpSmoothing(train[<span class="st">'Cash'</span>]).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
 <span id="cb40-3"><a href="#cb40-3"></a>forecasts_simple <span class="op">=</span> model_simple.forecast(<span class="bu">len</span>(test))</span>
@@ -975,7 +988,7 @@ Result: The series is stationary</code></pre>
 <span id="cb40-10"><a href="#cb40-10"></a>model_holt_winters <span class="op">=</span>  ExponentialSmoothing(train[<span class="st">'Cash'</span>], trend<span class="op">=</span><span class="st">'mul'</span>, seasonal<span class="op">=</span><span class="st">'mul'</span>, seasonal_periods<span class="op">=</span><span class="dv">7</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
 <span id="cb40-11"><a href="#cb40-11"></a>forecasts_holt_winters <span class="op">=</span> model_holt_winters.forecast(<span class="bu">len</span>(test)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-69" class="cell" data-execution_count="45">
+<div id="cell-66" class="cell" data-execution_count="45">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a>plot_func(forecasts_simple, forecasts_holt, forecasts_holt_winters, <span class="st">'Exponential Smoothing'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -985,20 +998,20 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<p>For ATM 1, SARIMA(3,1,1)[5,1,1,7] has the lowest error metrics</p>
+<p>For ATM 1, SARIMA(3,1,1)[5,1,1,7] had lower MSE and MAE than the Holt-Winter Model so we weill choose this model to forecast the value for May 2010. Although, this SARIMA model had the highest AIC and BIC value means that it has the worse fit on the data but had the better predictive capabilites.</p>
 </section>
 </section>
 <section id="models-for-atm2" class="level3">
 <h3 class="anchored" data-anchor-id="models-for-atm2">Models for ATM2</h3>
-<div id="cell-72" class="cell" data-message="false" data-execution_count="46">
+<div id="cell-69" class="cell" data-message="false" data-execution_count="46">
 <div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>atm2.drop(<span class="st">'ATM'</span>, inplace<span class="op">=</span><span class="va">True</span>, axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-73" class="cell" data-execution_count="47">
+<div id="cell-70" class="cell" data-execution_count="47">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>n <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(atm2) <span class="op">*</span> <span class="fl">0.8</span> )</span>
 <span id="cb43-2"><a href="#cb43-2"></a></span>
 <span id="cb43-3"><a href="#cb43-3"></a>train2, test2 <span class="op">=</span> atm2.iloc[:n], atm2.iloc[n:]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-74" class="cell" data-message="false" data-execution_count="48">
+<div id="cell-71" class="cell" data-message="false" data-execution_count="48">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>atm2_sarima <span class="op">=</span> arima_model_evaluation(atm2)</span>
 <span id="cb44-2"><a href="#cb44-2"></a>atm2_sarima</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="48">
@@ -1059,7 +1072,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-75" class="cell" data-message="false" data-execution_count="49">
+<div id="cell-72" class="cell" data-message="false" data-execution_count="49">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a><span class="co"># forecast sarima models on test</span></span>
 <span id="cb45-2"><a href="#cb45-2"></a>sarima_1 <span class="op">=</span> SARIMAX(train[<span class="st">'Cash'</span>],order <span class="op">=</span> atm2_sarima.Order[<span class="dv">0</span>], seasonal_order<span class="op">=</span> atm2_sarima.Seasonal[<span class="dv">0</span>]).fit()</span>
 <span id="cb45-3"><a href="#cb45-3"></a>forecast_sarima_1 <span class="op">=</span> sarima_1.forecast(steps<span class="op">=</span><span class="bu">len</span>(test))</span>
@@ -1070,7 +1083,7 @@ Result: The series is stationary</code></pre>
 <span id="cb45-8"><a href="#cb45-8"></a>sarima_3 <span class="op">=</span> SARIMAX(train[<span class="st">'Cash'</span>],order <span class="op">=</span> atm2_sarima.Order[<span class="dv">2</span>], seasonal_order<span class="op">=</span> atm2_sarima.Seasonal[<span class="dv">2</span>]).fit()</span>
 <span id="cb45-9"><a href="#cb45-9"></a>forecast_sarima_3 <span class="op">=</span> sarima_3.forecast(steps<span class="op">=</span><span class="bu">len</span>(test))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-76" class="cell" data-execution_count="50">
+<div id="cell-73" class="cell" data-execution_count="50">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1081,10 +1094,10 @@ Result: The series is stationary</code></pre>
 </div>
 <section id="exponential-smoothing" class="level4">
 <h4 class="anchored" data-anchor-id="exponential-smoothing">Exponential Smoothing</h4>
-<div id="cell-78" class="cell" data-message="false" data-execution_count="51">
+<div id="cell-75" class="cell" data-message="false" data-execution_count="51">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>atm2[<span class="st">'Cash'</span>] <span class="op">=</span> atm2[<span class="st">'Cash'</span>] <span class="op">+</span> <span class="fl">0.00001</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-79" class="cell" data-message="false" data-execution_count="52">
+<div id="cell-76" class="cell" data-message="false" data-execution_count="52">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a>exponential_smoothing_evaluation(atm2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="52">
 <div>
@@ -1128,7 +1141,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-81" class="cell" data-execution_count="54">
+<div id="cell-78" class="cell" data-execution_count="54">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a>plot_func(forecasts_simple, forecasts_holt, forecasts_holt_winters, <span class="st">'Exponential Smoothing (ATM 2)'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
@@ -1138,18 +1151,19 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
+<p>For ATM2, SARIMA(2,1,0)[5,1,2,7] has the lowest error values among the SARIMA models but has the high AIC and BIC values similar to ATM1’s SARIMA models. As for the Holt-winter models, it has higher error scores compared to the SARIMA model. Therefore, we will choose SARIMA(2,1,0)[5,1,2,7] to forecast MAy 2010.</p>
 </section>
 </section>
 <section id="models-for-atm3" class="level3">
 <h3 class="anchored" data-anchor-id="models-for-atm3">Models for ATM3</h3>
-<div id="cell-83" class="cell" data-message="false" data-execution_count="55">
+<div id="cell-81" class="cell" data-message="false" data-execution_count="55">
 <div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a>atm3.drop(<span class="st">'ATM'</span>, inplace<span class="op">=</span><span class="va">True</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-84" class="cell" data-message="false" data-execution_count="56">
+<div id="cell-82" class="cell" data-message="false" data-execution_count="98">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>naive <span class="op">=</span> SimpleExpSmoothing(atm3[<span class="st">'Cash'</span>]).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
 <span id="cb50-2"><a href="#cb50-2"></a>forecasts_simple <span class="op">=</span> naive.forecast(<span class="dv">31</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-85" class="cell" data-execution_count="57">
+<div id="cell-83" class="cell" data-execution_count="57">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>fig, ax <span class="op">=</span> plt.subplots() </span>
 <span id="cb51-2"><a href="#cb51-2"></a></span>
 <span id="cb51-3"><a href="#cb51-3"></a>ax.plot(atm3.index, atm3[<span class="st">'Cash'</span>], label<span class="op">=</span><span class="st">'Train'</span>)  </span>
@@ -1175,10 +1189,10 @@ Result: The series is stationary</code></pre>
 <h3 class="anchored" data-anchor-id="models-for-atm-4">Models for ATM 4</h3>
 <section id="sarima-model-1" class="level4">
 <h4 class="anchored" data-anchor-id="sarima-model-1">SARIMA Model</h4>
-<div id="cell-88" class="cell" data-message="false" data-execution_count="58">
+<div id="cell-86" class="cell" data-message="false" data-execution_count="58">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>atm4.drop(<span class="st">'ATM'</span>, inplace <span class="op">=</span><span class="va">True</span>, axis <span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-89" class="cell" data-message="false" data-execution_count="59">
+<div id="cell-87" class="cell" data-message="false" data-execution_count="59">
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>atm4_arima <span class="op">=</span> arima_model_evaluation(np.log(atm4))</span>
 <span id="cb53-2"><a href="#cb53-2"></a>atm4_arima</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="59">
@@ -1239,7 +1253,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-91" class="cell" data-message="false" data-execution_count="61">
+<div id="cell-89" class="cell" data-message="false" data-execution_count="61">
 <div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># forecast sarima models on test</span></span>
 <span id="cb54-2"><a href="#cb54-2"></a>sarima_1 <span class="op">=</span> SARIMAX(train4[<span class="st">'Cash'</span>],order <span class="op">=</span> atm4_arima.Order[<span class="dv">0</span>], seasonal_order<span class="op">=</span> atm4_arima.Seasonal[<span class="dv">0</span>]).fit()</span>
 <span id="cb54-3"><a href="#cb54-3"></a>forecast_sarima_1 <span class="op">=</span> sarima_1.forecast(steps<span class="op">=</span><span class="bu">len</span>(test4))</span>
@@ -1250,7 +1264,7 @@ Result: The series is stationary</code></pre>
 <span id="cb54-8"><a href="#cb54-8"></a>sarima_3 <span class="op">=</span> SARIMAX(train4[<span class="st">'Cash'</span>],order <span class="op">=</span> atm4_arima.Order[<span class="dv">2</span>], seasonal_order<span class="op">=</span> atm4_arima.Seasonal[<span class="dv">2</span>]).fit()</span>
 <span id="cb54-9"><a href="#cb54-9"></a>forecast_sarima_3 <span class="op">=</span> sarima_3.forecast(steps<span class="op">=</span><span class="bu">len</span>(test4))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-92" class="cell" data-execution_count="62">
+<div id="cell-90" class="cell" data-execution_count="62">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1262,7 +1276,7 @@ Result: The series is stationary</code></pre>
 </section>
 <section id="exponential-smoothing-1" class="level4">
 <h4 class="anchored" data-anchor-id="exponential-smoothing-1">Exponential Smoothing</h4>
-<div id="cell-94" class="cell" data-message="false" data-execution_count="63">
+<div id="cell-92" class="cell" data-message="false" data-execution_count="63">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>exponential_smoothing_evaluation(np.log(atm4))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="63">
 <div>
@@ -1306,7 +1320,7 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
-<div id="cell-95" class="cell" data-message="false" data-execution_count="64">
+<div id="cell-93" class="cell" data-message="false" data-execution_count="64">
 <div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># simple exponential smoothing</span></span>
 <span id="cb56-2"><a href="#cb56-2"></a>model_simple <span class="op">=</span> SimpleExpSmoothing(train4[<span class="st">'Cash'</span>]).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
 <span id="cb56-3"><a href="#cb56-3"></a>forecasts_simple <span class="op">=</span> model_simple.forecast(<span class="bu">len</span>(test4))</span>
@@ -1317,10 +1331,27 @@ Result: The series is stationary</code></pre>
 <span id="cb56-8"><a href="#cb56-8"></a></span>
 <span id="cb56-9"><a href="#cb56-9"></a><span class="co"># Holt Winters model</span></span>
 <span id="cb56-10"><a href="#cb56-10"></a>model_holt_winters <span class="op">=</span>  ExponentialSmoothing(train4[<span class="st">'Cash'</span>] <span class="op">+</span> <span class="fl">0.0001</span>, trend<span class="op">=</span><span class="st">'mul'</span>, seasonal<span class="op">=</span><span class="st">'mul'</span>, seasonal_periods<span class="op">=</span><span class="dv">7</span>, use_boxcox<span class="op">=</span><span class="va">True</span>,freq<span class="op">=</span><span class="st">'D'</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
-<span id="cb56-11"><a href="#cb56-11"></a>forecasts_holt_winters <span class="op">=</span> model_holt_winters.forecast(<span class="bu">len</span>(test4)) </span>
-<span id="cb56-12"><a href="#cb56-12"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb56-11"><a href="#cb56-11"></a>forecasts_holt_winters <span class="op">=</span> model_holt_winters.forecast(<span class="bu">len</span>(test4)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-96" class="cell" data-execution_count="65">
+<div id="cell-94" class="cell" data-execution_count="65">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1"></a></span>
+<span id="cb57-2"><a href="#cb57-2"></a><span class="co">#| echo : false</span></span>
+<span id="cb57-3"><a href="#cb57-3"></a></span>
+<span id="cb57-4"><a href="#cb57-4"></a>fig, ax <span class="op">=</span> plt.subplots() </span>
+<span id="cb57-5"><a href="#cb57-5"></a></span>
+<span id="cb57-6"><a href="#cb57-6"></a>ax.plot(train4.index, np.exp(train4[<span class="st">'Cash'</span>]), label<span class="op">=</span><span class="st">'Train'</span>) </span>
+<span id="cb57-7"><a href="#cb57-7"></a>ax.plot(test4.index, test4[<span class="st">'Cash'</span>], label<span class="op">=</span><span class="st">'Test'</span>) </span>
+<span id="cb57-8"><a href="#cb57-8"></a>ax.plot(test4.index, np.exp(forecasts_simple), label<span class="op">=</span><span class="st">'Simple'</span>) </span>
+<span id="cb57-9"><a href="#cb57-9"></a>ax.plot(test4.index, np.exp(forecasts_holt), label<span class="op">=</span><span class="st">"Holt's Linear"</span>) </span>
+<span id="cb57-10"><a href="#cb57-10"></a>ax.plot(test4.index, np.exp(forecasts_holt_winters), label<span class="op">=</span><span class="st">'Holt Winters'</span>) </span>
+<span id="cb57-11"><a href="#cb57-11"></a></span>
+<span id="cb57-12"><a href="#cb57-12"></a>ax.set_title(<span class="st">'Exponential Smoothing Model (ATM 4)'</span>)</span>
+<span id="cb57-13"><a href="#cb57-13"></a>ax.set_xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb57-14"><a href="#cb57-14"></a>ax.set_ylabel(<span class="st">'Cash Volume'</span>)</span>
+<span id="cb57-15"><a href="#cb57-15"></a>ax.grid(<span class="va">True</span>) </span>
+<span id="cb57-16"><a href="#cb57-16"></a>ax.legend(loc <span class="op">=</span> <span class="st">'upper left'</span>)</span>
+<span id="cb57-17"><a href="#cb57-17"></a></span>
+<span id="cb57-18"><a href="#cb57-18"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -1329,6 +1360,8 @@ Result: The series is stationary</code></pre>
 </div>
 </div>
 </div>
+<p>ATM4 data, we had the most trouble with this data since our models are a difficult time capture the nature of this data. We tried multiple different power transformations. At the end using the log() transform gave us the best model in terms of MSE, RMSE and MAE.</p>
+<p>We chose the Holt-Winter Model to forecast May 2010 since it had marginal better performance metrics compared to the SARIMA models. Even with cross validation to find the optimal paratameters for the SARIMA model, the Holt- Winters model performed better on average.</p>
 </section>
 </section>
 </section>
@@ -1344,11 +1377,899 @@ Result: The series is stationary</code></pre>
 <p>Don’t Just Give a Number: Explain your reasoning behind whatever value you suggest. Visualize the Forecast: Show a plot of your forecast along with potential confidence intervals. Quantify the Risk: If possible, estimate the probability of running out of cash at different suggested amounts. This makes the trade-off between risk and cost tangible. Contextualize: Help decision-makers understand the historical patterns and any upcoming events that might affect demand. Example Conversation:</p>
 <p>“My forecast suggests that the average daily cash withdrawal for next week is likely to be around $X. However, I recommend stocking the ATM with $Y (closer to the maximum forecast) for these reasons:</p>
 <p>[Reason 1 - e.g., There’s an upcoming event in the area that might increase demand] [Reason 2 - e.g., My model has some uncertainty, and this amount lowers our risk of running out of cash]</p>
+<p>ATM1 Model : SARIMA(3,1,1)[5,1,1,7]</p>
+<p>ATM2 Model : SARIMA(2,1,0)[5,1,2,7]</p>
+<p>ATM3 Model : Naive Model</p>
+<p>ATM4 Model : Holt-Winters Model</p>
+<p>Forecast 31 time steps out of the sample since May 2010 has 31 days.</p>
+<div id="cell-99" class="cell" data-message="false" data-execution_count="100">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>sarima_atm1 <span class="op">=</span> SARIMAX(atm1,order <span class="op">=</span> (<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>), seasonal_order<span class="op">=</span> (<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">7</span>)).fit()</span>
+<span id="cb58-2"><a href="#cb58-2"></a>atm1_may_forecast <span class="op">=</span> sarima_atm1.forecast(steps <span class="op">=</span> <span class="dv">31</span>)</span>
+<span id="cb58-3"><a href="#cb58-3"></a>df_atm1_may_forecast <span class="op">=</span> pd.DataFrame(atm1_may_forecast.values, index <span class="op">=</span> atm1_may_forecast.index, columns<span class="op">=</span>[<span class="st">'ATM1_Cash'</span>])</span>
+<span id="cb58-4"><a href="#cb58-4"></a></span>
+<span id="cb58-5"><a href="#cb58-5"></a>sarima_atm2 <span class="op">=</span> SARIMAX(atm2,order <span class="op">=</span> (<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">0</span>), seasonal_order<span class="op">=</span> (<span class="dv">5</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">7</span>)).fit()</span>
+<span id="cb58-6"><a href="#cb58-6"></a>atm2_may_forecast <span class="op">=</span> sarima_atm2.forecast(steps <span class="op">=</span> <span class="dv">31</span>)</span>
+<span id="cb58-7"><a href="#cb58-7"></a>df_atm2_may_forecast <span class="op">=</span> pd.DataFrame(atm2_may_forecast.values, index <span class="op">=</span> atm2_may_forecast.index, columns<span class="op">=</span>[<span class="st">'ATM2_Cash'</span>])</span>
+<span id="cb58-8"><a href="#cb58-8"></a></span>
+<span id="cb58-9"><a href="#cb58-9"></a>df_atm3_may_forecast <span class="op">=</span> pd.DataFrame(forecasts_simple, index<span class="op">=</span>forecasts_simple.index, columns<span class="op">=</span>[<span class="st">'ATM3_Cash'</span>])</span>
+<span id="cb58-10"><a href="#cb58-10"></a></span>
+<span id="cb58-11"><a href="#cb58-11"></a>atm4_exp_smoothing <span class="op">=</span> ExponentialSmoothing(atm4 <span class="op">+</span> <span class="fl">0.0001</span>, trend<span class="op">=</span><span class="st">'mul'</span>, seasonal<span class="op">=</span><span class="st">'mul'</span>, seasonal_periods<span class="op">=</span><span class="dv">7</span>, use_boxcox<span class="op">=</span><span class="va">True</span>,freq<span class="op">=</span><span class="st">'D'</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb58-12"><a href="#cb58-12"></a>atm4_may_forecast <span class="op">=</span> atm4_exp_smoothing.forecast(steps<span class="op">=</span><span class="dv">31</span>) </span>
+<span id="cb58-13"><a href="#cb58-13"></a>df_atm4_may_forecast <span class="op">=</span> pd.DataFrame(atm4_may_forecast.values, index <span class="op">=</span> atm4_may_forecast.index, columns<span class="op">=</span>[<span class="st">'ATM4_Cash'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-100" class="cell" data-execution_count="101">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1"></a><span class="co"># combine df then convert to excel file</span></span>
+<span id="cb59-2"><a href="#cb59-2"></a>ATM_May_2010_Forecast <span class="op">=</span> pd.concat([df_atm1_may_forecast, df_atm2_may_forecast, df_atm3_may_forecast, df_atm4_may_forecast], axis <span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-101" class="cell" data-execution_count="102">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>ATM_May_2010_Forecast.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="102">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ATM1_Cash</th>
+<th data-quarto-table-cell-role="th">ATM2_Cash</th>
+<th data-quarto-table-cell-role="th">ATM3_Cash</th>
+<th data-quarto-table-cell-role="th">ATM4_Cash</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-05-01</td>
+<td>87.260218</td>
+<td>83.511000</td>
+<td>84.583268</td>
+<td>315.545928</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-05-02</td>
+<td>103.136107</td>
+<td>79.893254</td>
+<td>84.583268</td>
+<td>374.189242</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-05-03</td>
+<td>74.655395</td>
+<td>24.993649</td>
+<td>84.583268</td>
+<td>381.475684</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-05-04</td>
+<td>5.095556</td>
+<td>11.059144</td>
+<td>84.583268</td>
+<td>103.213073</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-05-05</td>
+<td>100.947659</td>
+<td>111.359809</td>
+<td>84.583268</td>
+<td>412.473105</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-05-06</td>
+<td>80.677599</td>
+<td>101.626487</td>
+<td>84.583268</td>
+<td>263.181331</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-05-07</td>
+<td>86.071730</td>
+<td>82.463012</td>
+<td>84.583268</td>
+<td>485.602857</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-05-08</td>
+<td>88.694439</td>
+<td>92.153548</td>
+<td>84.583268</td>
+<td>314.049229</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2010-05-09</td>
+<td>102.555986</td>
+<td>92.310069</td>
+<td>84.583268</td>
+<td>372.403160</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2010-05-10</td>
+<td>72.257999</td>
+<td>32.725390</td>
+<td>84.583268</td>
+<td>379.653581</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-102" class="cell" data-execution_count="69">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a>ATM_May_2010_Forecast <span class="op">=</span> ATM_May_2010_Forecast.reset_index()</span>
+<span id="cb61-2"><a href="#cb61-2"></a>ATM_May_2010_Forecast  <span class="op">=</span> ATM_May_2010_Forecast.rename(columns<span class="op">=</span>{<span class="st">'index'</span>:<span class="st">'Date'</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-103" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>ATM_May_2010_Forecast.to_excel(<span class="st">'ATM_MAy_2010_Forecast.xlsx'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <hr>
 </section>
 </section>
 <section id="part-b-power-data" class="level1">
 <h1>Part B : Power Data</h1>
+<section id="eda-and-data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="eda-and-data-wrangling">EDA and Data Wrangling</h2>
+<div id="cell-108" class="cell" data-message="false" data-execution_count="71">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a>power_df <span class="op">=</span> pd.read_excel(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/project_1/data_files/ResidentialCustomerForecastLoad-624.xlsx'</span>, parse_dates<span class="op">=</span>[<span class="st">'YYYY-MMM'</span>], index_col <span class="op">=</span> <span class="st">'YYYY-MMM'</span>)</span>
+<span id="cb63-2"><a href="#cb63-2"></a>power_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="71">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">CaseSequence</th>
+<th data-quarto-table-cell-role="th">KWH</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">YYYY-MMM</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-01-01</td>
+<td>733</td>
+<td>6862583.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-02-01</td>
+<td>734</td>
+<td>5838198.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-03-01</td>
+<td>735</td>
+<td>5420658.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1998-04-01</td>
+<td>736</td>
+<td>5010364.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1998-05-01</td>
+<td>737</td>
+<td>4665377.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2013-08-01</td>
+<td>920</td>
+<td>9080226.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2013-09-01</td>
+<td>921</td>
+<td>7968220.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2013-10-01</td>
+<td>922</td>
+<td>5759367.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2013-11-01</td>
+<td>923</td>
+<td>5769083.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2013-12-01</td>
+<td>924</td>
+<td>9606304.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>192 rows × 2 columns</p>
+</div>
+</div>
+</div>
+<p>Removing <code>CaseSequence</code> since it will be helpful for forecasting.</p>
+<div id="cell-110" class="cell" data-execution_count="72">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a>power_df <span class="op">=</span> power_df[[<span class="st">'KWH'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-111" class="cell" data-execution_count="73">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a>power_df.plot()</span>
+<span id="cb65-2"><a href="#cb65-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-74-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>There is a gap in the time series plot between 2008 and 2009. We can check for missing value of skipped time steps.</p>
+<div id="cell-113" class="cell" data-execution_count="74">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>show_summary(power_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DIMENSIONS : (192, 1)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+COLUMNS: 
+
+['KWH']
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DATA INFO: 
+
+KWH    float64
+dtype: object
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MISSING VALUES: 
+
+KWH    1
+dtype: int64
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NUMBER OF UNIQUE VALUES: 
+
+KWH    191
+dtype: int64</code></pre>
+</div>
+</div>
+<p>So, there was one missing value at September 2008. We can impute the NA values with median of the data since it more resistant to outliers. Also, replace the outlier with median.</p>
+<div id="cell-115" class="cell" data-execution_count="75">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a>power_df.index[power_df.isna().<span class="bu">any</span>(axis <span class="op">=</span><span class="dv">1</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="75">
+<pre><code>DatetimeIndex(['2008-09-01'], dtype='datetime64[ns]', name='YYYY-MMM', freq=None)</code></pre>
+</div>
+</div>
+<div id="cell-116" class="cell" data-execution_count="76">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a>power_df.loc[<span class="st">'2010-07-01'</span>, <span class="st">'KWH'</span>] <span class="op">=</span> power_df[<span class="st">'KWH'</span>].median()</span>
+<span id="cb70-2"><a href="#cb70-2"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>C:\Users\nickc\AppData\Local\Temp\ipykernel_34840\2671974967.py:1: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+  power_df.loc['2010-07-01', 'KWH'] = power_df['KWH'].median()</code></pre>
+</div>
+</div>
+<div id="cell-117" class="cell" data-message="false" data-execution_count="77">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1"></a>power_df[<span class="st">'KWH'</span>].fillna(power_df[<span class="st">'KWH'</span>].median(), inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb72-2"><a href="#cb72-2"></a></span>
+<span id="cb72-3"><a href="#cb72-3"></a>power_df.plot()</span>
+<span id="cb72-4"><a href="#cb72-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-78-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-118" class="cell" data-execution_count="78">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb73-1"><a href="#cb73-1"></a>adfuller_test(power_df[<span class="st">'KWH'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -0.259931
+p-value: 0.930991
+Critical Values:
+    1%: -3.467
+    5%: -2.878
+    10%: -2.575
+Result: The series is not stationary</code></pre>
+</div>
+</div>
+<div id="cell-119" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb75-1"><a href="#cb75-1"></a>adfuller_test(power_df[<span class="st">'KWH'</span>].diff().dropna())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>ADF Statistic: -12.385605
+p-value: 0.000000
+Critical Values:
+    1%: -3.467
+    5%: -2.878
+    10%: -2.575
+Result: The series is stationary</code></pre>
+</div>
+</div>
+<p>So, the data requires differencing. After, differing it once the data becomes stationary.</p>
+<div id="cell-121" class="cell" data-execution_count="80">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb77-1"><a href="#cb77-1"></a>seasonal_decompose(power_df).plot()</span>
+<span id="cb77-2"><a href="#cb77-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-81-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-122" class="cell" data-execution_count="81">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1"></a>plot_acf(power_df[<span class="st">'KWH'</span>])</span>
+<span id="cb78-2"><a href="#cb78-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-82-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-123" class="cell" data-execution_count="82">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb79-1"><a href="#cb79-1"></a>plot_pacf(power_df[<span class="st">'KWH'</span>])</span>
+<span id="cb79-2"><a href="#cb79-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-83-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-124" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1"></a>sns.boxplot(data <span class="op">=</span> power_df, x <span class="op">=</span> power_df.index.month, y <span class="op">=</span> <span class="st">'KWH'</span>)</span>
+<span id="cb80-2"><a href="#cb80-2"></a>plt.title(<span class="st">'KWH per Month'</span>)</span>
+<span id="cb80-3"><a href="#cb80-3"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb80-4"><a href="#cb80-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-84-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the boxplot, power consumption peaks during the summer and winter months where residents are using the their power on AC units in the summer and heating in the winter.</p>
+<div id="cell-126" class="cell" data-execution_count="84">
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb81-1"><a href="#cb81-1"></a>power_df.describe().T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="84">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">KWH</td>
+<td>192.0</td>
+<td>6.530046e+06</td>
+<td>1.382828e+06</td>
+<td>4313019.0</td>
+<td>5443502.5</td>
+<td>6283324.0</td>
+<td>7608791.75</td>
+<td>10655730.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-127" class="cell" data-execution_count="85">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1"></a>sns.histplot(data<span class="op">=</span>power_df, x<span class="op">=</span><span class="st">'KWH'</span>, kde<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb82-2"><a href="#cb82-2"></a>plt.title(<span class="st">'Distribution of Power Consumption'</span>)</span>
+<span id="cb82-3"><a href="#cb82-3"></a>plt.xlabel(<span class="st">'KWH'</span>)</span>
+<span id="cb82-4"><a href="#cb82-4"></a>plt.ylabel(<span class="st">'Frequency'</span>)</span>
+<span id="cb82-5"><a href="#cb82-5"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-86-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><code>power_df</code> is centered around 0.6 KWH for the past 15 years of recorded data.</p>
+</section>
+<section id="model-building-and-selection-1" class="level2">
+<h2 class="anchored" data-anchor-id="model-building-and-selection-1">Model Building and Selection</h2>
+<p>Using the SARIMA and Exponential Smoothing techniques for forecasting.</p>
+<section id="sarima-models" class="level3">
+<h3 class="anchored" data-anchor-id="sarima-models">SARIMA Models</h3>
+<div id="cell-132" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb83-1"><a href="#cb83-1"></a>power_sarima <span class="op">=</span> arima_model_evaluation(power_df[<span class="st">'KWH'</span>], m <span class="op">=</span><span class="dv">12</span>, D <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb83-2"><a href="#cb83-2"></a>power_sarima</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="86">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Model</th>
+<th data-quarto-table-cell-role="th">Order</th>
+<th data-quarto-table-cell-role="th">Seasonal</th>
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th">RMSE</th>
+<th data-quarto-table-cell-role="th">MAE</th>
+<th data-quarto-table-cell-role="th">AIC</th>
+<th data-quarto-table-cell-role="th">BIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>SARIMA 1</td>
+<td>(0, 1, 0)</td>
+<td>(1, 0, 0, 12)</td>
+<td>1.199599e+12</td>
+<td>1.095262e+06</td>
+<td>958391.377650</td>
+<td>1163.163395</td>
+<td>1166.438568</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>SARIMA 2</td>
+<td>(2, 1, 2)</td>
+<td>(1, 0, 1, 12)</td>
+<td>7.846986e+11</td>
+<td>8.858321e+05</td>
+<td>688698.541995</td>
+<td>2297.379262</td>
+<td>2313.694395</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>SARIMA 3</td>
+<td>(2, 1, 2)</td>
+<td>(1, 0, 1, 12)</td>
+<td>4.982655e+11</td>
+<td>7.058792e+05</td>
+<td>554137.035650</td>
+<td>3440.197793</td>
+<td>3459.351182</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>SARIMA is able to predict new data well while not overfitting the model on the training data.</p>
+<div id="cell-134" class="cell" data-execution_count="87">
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb84-1"><a href="#cb84-1"></a>train_power, test_power <span class="op">=</span> power_df.iloc[:<span class="bu">int</span>(<span class="bu">len</span>(power_df) <span class="op">*</span> <span class="fl">0.8</span>)],power_df.iloc[<span class="bu">int</span>(<span class="bu">len</span>(power_df) <span class="op">*</span> <span class="fl">0.8</span>):]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-135" class="cell" data-message="false" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb85-1"><a href="#cb85-1"></a><span class="co"># forecast sarima models on test</span></span>
+<span id="cb85-2"><a href="#cb85-2"></a>sarima <span class="op">=</span> SARIMAX(train_power[<span class="st">'KWH'</span>],order <span class="op">=</span> power_sarima.Order[<span class="dv">2</span>], seasonal_order<span class="op">=</span> power_sarima.Seasonal[<span class="dv">2</span>]).fit()</span>
+<span id="cb85-3"><a href="#cb85-3"></a>forecast_power <span class="op">=</span> sarima.forecast(steps<span class="op">=</span><span class="bu">len</span>(test_power))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-136" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb86-1"><a href="#cb86-1"></a>fig, ax1 <span class="op">=</span> plt.subplots() </span>
+<span id="cb86-2"><a href="#cb86-2"></a></span>
+<span id="cb86-3"><a href="#cb86-3"></a>ax1.plot(train_power.index, train_power[<span class="st">'KWH'</span>], label<span class="op">=</span><span class="st">'Train'</span>) </span>
+<span id="cb86-4"><a href="#cb86-4"></a>ax1.plot(test_power.index, test_power[<span class="st">'KWH'</span>], label<span class="op">=</span><span class="st">'Test'</span>) </span>
+<span id="cb86-5"><a href="#cb86-5"></a>ax1.plot(test_power.index, forecast_power, label<span class="op">=</span><span class="st">'SARIMA Forecast'</span>) </span>
+<span id="cb86-6"><a href="#cb86-6"></a>ax1.set_title(<span class="ss">f'SARIMA </span><span class="sc">{</span>power_sarima<span class="sc">.</span>Order[<span class="dv">2</span>]<span class="sc">}{</span>power_sarima<span class="sc">.</span>Seasonal[<span class="dv">2</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb86-7"><a href="#cb86-7"></a>ax1.grid(<span class="va">True</span>)</span>
+<span id="cb86-8"><a href="#cb86-8"></a>ax1.legend(loc<span class="op">=</span><span class="st">'upper left'</span>)</span>
+<span id="cb86-9"><a href="#cb86-9"></a>plt.tight_layout()</span>
+<span id="cb86-10"><a href="#cb86-10"></a></span>
+<span id="cb86-11"><a href="#cb86-11"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-90-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="exponential-smoothing-2" class="level2">
+<h2 class="anchored" data-anchor-id="exponential-smoothing-2">Exponential Smoothing</h2>
+<div id="cell-138" class="cell" data-message="false" data-execution_count="90">
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)
+c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\holtwinters\model.py:917: ConvergenceWarning: Optimization failed to converge. Check mle_retvals.
+  warnings.warn(</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="90">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Model</th>
+<th data-quarto-table-cell-role="th">MSE</th>
+<th data-quarto-table-cell-role="th">RMSE</th>
+<th data-quarto-table-cell-role="th">MAE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Simple Exponential Smoothing</td>
+<td>1.986510e+12</td>
+<td>1.390061e+06</td>
+<td>1.152736e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Holt-Winters Model</td>
+<td>2.894206e+12</td>
+<td>1.652054e+06</td>
+<td>1.377027e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Holt's Linear Trend Model</td>
+<td>7.132355e+12</td>
+<td>2.529641e+06</td>
+<td>2.254770e+06</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-139" class="cell" data-message="false" data-execution_count="91">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb88-1"><a href="#cb88-1"></a><span class="co"># simple exponential smoothing</span></span>
+<span id="cb88-2"><a href="#cb88-2"></a>model_simple <span class="op">=</span> SimpleExpSmoothing(train_power[<span class="st">'KWH'</span>]).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb88-3"><a href="#cb88-3"></a>forecasts_simple <span class="op">=</span> model_simple.forecast(<span class="bu">len</span>(test_power))</span>
+<span id="cb88-4"><a href="#cb88-4"></a></span>
+<span id="cb88-5"><a href="#cb88-5"></a><span class="co"># Holt model</span></span>
+<span id="cb88-6"><a href="#cb88-6"></a>model_holt <span class="op">=</span> Holt(train_power[<span class="st">'KWH'</span>], exponential<span class="op">=</span><span class="va">False</span>, damped_trend<span class="op">=</span><span class="va">True</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb88-7"><a href="#cb88-7"></a>forecasts_holt <span class="op">=</span> model_holt.forecast(<span class="bu">len</span>(test_power))</span>
+<span id="cb88-8"><a href="#cb88-8"></a></span>
+<span id="cb88-9"><a href="#cb88-9"></a><span class="co"># Holt Winters model</span></span>
+<span id="cb88-10"><a href="#cb88-10"></a>model_holt_winters <span class="op">=</span>  ExponentialSmoothing(train_power[<span class="st">'KWH'</span>] <span class="op">+</span> <span class="fl">0.0001</span>, trend<span class="op">=</span><span class="st">'mul'</span>, seasonal<span class="op">=</span><span class="st">'mul'</span>, seasonal_periods<span class="op">=</span><span class="dv">12</span>, use_boxcox<span class="op">=</span><span class="va">True</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb88-11"><a href="#cb88-11"></a>forecasts_holt_winters <span class="op">=</span> model_holt_winters.forecast(<span class="bu">len</span>(test_power)) </span>
+<span id="cb88-12"><a href="#cb88-12"></a></span>
+<span id="cb88-13"><a href="#cb88-13"></a>fig, ax <span class="op">=</span> plt.subplots() </span>
+<span id="cb88-14"><a href="#cb88-14"></a></span>
+<span id="cb88-15"><a href="#cb88-15"></a>ax.plot(train_power.index, train_power[<span class="st">'KWH'</span>], label<span class="op">=</span><span class="st">'Train'</span>) </span>
+<span id="cb88-16"><a href="#cb88-16"></a>ax.plot(test_power.index, test_power[<span class="st">'KWH'</span>], label<span class="op">=</span><span class="st">'Test'</span>) </span>
+<span id="cb88-17"><a href="#cb88-17"></a>ax.plot(test_power.index, forecasts_simple, label<span class="op">=</span><span class="st">'Simple'</span>) </span>
+<span id="cb88-18"><a href="#cb88-18"></a>ax.plot(test_power.index, forecasts_holt, label<span class="op">=</span><span class="st">"Holt's Linear"</span>) </span>
+<span id="cb88-19"><a href="#cb88-19"></a>ax.plot(test_power.index, forecasts_holt_winters, label<span class="op">=</span><span class="st">'Holt Winters'</span>) </span>
+<span id="cb88-20"><a href="#cb88-20"></a></span>
+<span id="cb88-21"><a href="#cb88-21"></a>ax.set_title(<span class="st">'Exponential Smoothing Model (Power Consumption)'</span>)</span>
+<span id="cb88-22"><a href="#cb88-22"></a>ax.set_xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb88-23"><a href="#cb88-23"></a>ax.set_ylabel(<span class="st">'KWH'</span>)</span>
+<span id="cb88-24"><a href="#cb88-24"></a>ax.grid(<span class="va">True</span>) </span>
+<span id="cb88-25"><a href="#cb88-25"></a>ax.legend(loc <span class="op">=</span> <span class="st">'upper left'</span>)</span>
+<span id="cb88-26"><a href="#cb88-26"></a></span>
+<span id="cb88-27"><a href="#cb88-27"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="atm_forecasting_files/figure-html/cell-92-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We will use the Holt-Winters model since it captures the variability of the data bettter then the SARIMA model.</p>
+<div id="cell-141" class="cell" data-execution_count="92">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb89-1"><a href="#cb89-1"></a>power_model <span class="op">=</span> ExponentialSmoothing(power_df[<span class="st">'KWH'</span>] <span class="op">+</span> <span class="fl">0.0001</span>, trend<span class="op">=</span><span class="st">'mul'</span>, seasonal<span class="op">=</span><span class="st">'mul'</span>, seasonal_periods<span class="op">=</span><span class="dv">12</span>, use_boxcox<span class="op">=</span><span class="va">True</span>).fit(optimized <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb89-2"><a href="#cb89-2"></a>power_forecasts_holt_winters <span class="op">=</span> power_model.forecast(<span class="dv">12</span>) <span class="co"># 12 time steps</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\.venv\Lib\site-packages\statsmodels\tsa\base\tsa_model.py:473: ValueWarning: No frequency information was provided, so inferred frequency MS will be used.
+  self._init_dates(dates, freq)</code></pre>
+</div>
+</div>
+<div id="cell-142" class="cell" data-execution_count="93">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb91-1"><a href="#cb91-1"></a>df_power_forecasts_holt_winters <span class="op">=</span> pd.DataFrame(power_forecasts_holt_winters.values, index <span class="op">=</span> power_forecasts_holt_winters.index, columns <span class="op">=</span> [<span class="st">'KWH'</span>])</span>
+<span id="cb91-2"><a href="#cb91-2"></a>df_power_forecasts_holt_winters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="93">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">KWH</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-01-01</td>
+<td>1.005065e+07</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-02-01</td>
+<td>8.596080e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-03-01</td>
+<td>7.051000e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-04-01</td>
+<td>6.238878e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-05-01</td>
+<td>5.960655e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-06-01</td>
+<td>7.953689e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-07-01</td>
+<td>9.103111e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-08-01</td>
+<td>9.955047e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-09-01</td>
+<td>8.742001e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-10-01</td>
+<td>6.326984e+06</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2014-11-01</td>
+<td>6.024963e+06</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2014-12-01</td>
+<td>7.672234e+06</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-143" class="cell" data-execution_count="94">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb92-1"><a href="#cb92-1"></a>df_power_forecasts_holt_winters.to_excel(<span class="st">'Power_Forecasts.xlsx'</span>, index <span class="op">=</span> <span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<hr>
+</section>
+</section>
+<section id="appendix" class="level1">
+<h1>Appendix</h1>
+<div id="cell-146" class="cell" data-execution_count="95">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb93-1"><a href="#cb93-1"></a><span class="co"># repeat function each ATM to maKE  SARIMA models</span></span>
+<span id="cb93-2"><a href="#cb93-2"></a><span class="kw">def</span> arima_model_evaluation(df: pd.DataFrame, size: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.8</span>, m <span class="op">=</span> <span class="dv">7</span>, D <span class="op">=</span><span class="dv">1</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb93-3"><a href="#cb93-3"></a></span>
+<span id="cb93-4"><a href="#cb93-4"></a>    train_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(df) <span class="op">*</span> size)</span>
+<span id="cb93-5"><a href="#cb93-5"></a>    train, test <span class="op">=</span> df[:train_size], df[train_size:]</span>
+<span id="cb93-6"><a href="#cb93-6"></a></span>
+<span id="cb93-7"><a href="#cb93-7"></a>    tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">3</span>) </span>
+<span id="cb93-8"><a href="#cb93-8"></a>    <span class="co"># cross validation : approach Rolling window. test data must always be the future data from the training set. why? prevents data leakage</span></span>
+<span id="cb93-9"><a href="#cb93-9"></a></span>
+<span id="cb93-10"><a href="#cb93-10"></a>    mse_list <span class="op">=</span> []</span>
+<span id="cb93-11"><a href="#cb93-11"></a>    rmse_list <span class="op">=</span> []</span>
+<span id="cb93-12"><a href="#cb93-12"></a>    mae_list <span class="op">=</span> []</span>
+<span id="cb93-13"><a href="#cb93-13"></a>    order_list <span class="op">=</span> []</span>
+<span id="cb93-14"><a href="#cb93-14"></a>    seasonal_order_list <span class="op">=</span> []</span>
+<span id="cb93-15"><a href="#cb93-15"></a>    aic_list <span class="op">=</span> []</span>
+<span id="cb93-16"><a href="#cb93-16"></a>    bic_list <span class="op">=</span> []</span>
+<span id="cb93-17"><a href="#cb93-17"></a>    </span>
+<span id="cb93-18"><a href="#cb93-18"></a>    <span class="cf">for</span> train_index, val_index <span class="kw">in</span> tscv.split(train):</span>
+<span id="cb93-19"><a href="#cb93-19"></a></span>
+<span id="cb93-20"><a href="#cb93-20"></a>        train_data, val_data <span class="op">=</span> train.iloc[train_index], train.iloc[val_index]</span>
+<span id="cb93-21"><a href="#cb93-21"></a></span>
+<span id="cb93-22"><a href="#cb93-22"></a>        model <span class="op">=</span> auto_arima(train_data, </span>
+<span id="cb93-23"><a href="#cb93-23"></a>                            start_p <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb93-24"><a href="#cb93-24"></a>                            start_q <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb93-25"><a href="#cb93-25"></a>                            max_p <span class="op">=</span> <span class="dv">10</span>,</span>
+<span id="cb93-26"><a href="#cb93-26"></a>                            max_q <span class="op">=</span> <span class="dv">10</span>,</span>
+<span id="cb93-27"><a href="#cb93-27"></a>                            d <span class="op">=</span> <span class="dv">1</span>,</span>
+<span id="cb93-28"><a href="#cb93-28"></a>                            seasonal<span class="op">=</span><span class="va">True</span>, </span>
+<span id="cb93-29"><a href="#cb93-29"></a>                            start_P <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb93-30"><a href="#cb93-30"></a>                            start_Q <span class="op">=</span> <span class="dv">0</span>,</span>
+<span id="cb93-31"><a href="#cb93-31"></a>                            max_P <span class="op">=</span> <span class="dv">5</span>,</span>
+<span id="cb93-32"><a href="#cb93-32"></a>                            max_Q <span class="op">=</span> <span class="dv">5</span>,</span>
+<span id="cb93-33"><a href="#cb93-33"></a>                            max_order <span class="op">=</span> <span class="va">None</span>, <span class="co"># removes limit of p+q+P+Q</span></span>
+<span id="cb93-34"><a href="#cb93-34"></a>                            m <span class="op">=</span> m, </span>
+<span id="cb93-35"><a href="#cb93-35"></a>                            D <span class="op">=</span> D,</span>
+<span id="cb93-36"><a href="#cb93-36"></a>                            stepwise <span class="op">=</span> <span class="va">True</span>,</span>
+<span id="cb93-37"><a href="#cb93-37"></a>                            error_action <span class="op">=</span> <span class="st">'ignore'</span>,</span>
+<span id="cb93-38"><a href="#cb93-38"></a>                            scoring <span class="op">=</span> <span class="st">'mse'</span>)</span>
+<span id="cb93-39"><a href="#cb93-39"></a>  </span>
+<span id="cb93-40"><a href="#cb93-40"></a>        predictions <span class="op">=</span> model.predict(<span class="bu">len</span>(val_data)) <span class="co"># same size as test data</span></span>
+<span id="cb93-41"><a href="#cb93-41"></a></span>
+<span id="cb93-42"><a href="#cb93-42"></a>        mse <span class="op">=</span> mean_squared_error(val_data, predictions)</span>
+<span id="cb93-43"><a href="#cb93-43"></a>        rmse <span class="op">=</span> np.sqrt(mse)</span>
+<span id="cb93-44"><a href="#cb93-44"></a>        mae <span class="op">=</span> mean_absolute_error(val_data, predictions)</span>
+<span id="cb93-45"><a href="#cb93-45"></a></span>
+<span id="cb93-46"><a href="#cb93-46"></a>        order_list.append(model.order)</span>
+<span id="cb93-47"><a href="#cb93-47"></a>        seasonal_order_list.append(model.seasonal_order)</span>
+<span id="cb93-48"><a href="#cb93-48"></a>        mse_list.append(mse)</span>
+<span id="cb93-49"><a href="#cb93-49"></a>        rmse_list.append(rmse)</span>
+<span id="cb93-50"><a href="#cb93-50"></a>        mae_list.append(mae)</span>
+<span id="cb93-51"><a href="#cb93-51"></a>        aic_list.append(model.aic())</span>
+<span id="cb93-52"><a href="#cb93-52"></a>        bic_list.append(model.bic())</span>
+<span id="cb93-53"><a href="#cb93-53"></a></span>
+<span id="cb93-54"><a href="#cb93-54"></a>    avg_mse <span class="op">=</span> np.mean(mse_list)</span>
+<span id="cb93-55"><a href="#cb93-55"></a>    avg_rmse <span class="op">=</span> np.mean(rmse_list)</span>
+<span id="cb93-56"><a href="#cb93-56"></a>    avg_mae <span class="op">=</span> np.mean(mae_list)</span>
+<span id="cb93-57"><a href="#cb93-57"></a></span>
+<span id="cb93-58"><a href="#cb93-58"></a></span>
+<span id="cb93-59"><a href="#cb93-59"></a>    evaluation_df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb93-60"><a href="#cb93-60"></a>        <span class="st">'Model'</span>: [<span class="st">'SARIMA 1'</span>, <span class="st">'SARIMA 2'</span>, <span class="st">'SARIMA 3'</span>],</span>
+<span id="cb93-61"><a href="#cb93-61"></a>        <span class="st">'Order'</span> : order_list,</span>
+<span id="cb93-62"><a href="#cb93-62"></a>        <span class="st">'Seasonal'</span> : seasonal_order_list,</span>
+<span id="cb93-63"><a href="#cb93-63"></a>        <span class="st">'MSE'</span>: mse_list,</span>
+<span id="cb93-64"><a href="#cb93-64"></a>        <span class="st">'RMSE'</span>: rmse_list,</span>
+<span id="cb93-65"><a href="#cb93-65"></a>        <span class="st">'MAE'</span>: mae_list,</span>
+<span id="cb93-66"><a href="#cb93-66"></a>        <span class="st">'AIC'</span>: aic_list,</span>
+<span id="cb93-67"><a href="#cb93-67"></a>        <span class="st">'BIC'</span> : bic_list</span>
+<span id="cb93-68"><a href="#cb93-68"></a>    })</span>
+<span id="cb93-69"><a href="#cb93-69"></a></span>
+<span id="cb93-70"><a href="#cb93-70"></a></span>
+<span id="cb93-71"><a href="#cb93-71"></a></span>
+<span id="cb93-72"><a href="#cb93-72"></a>    <span class="cf">return</span> evaluation_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-147" class="cell" data-execution_count="96">
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb94-1"><a href="#cb94-1"></a></span>
+<span id="cb94-2"><a href="#cb94-2"></a><span class="kw">def</span> exponential_smoothing_evaluation(df: pd.DataFrame, size: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.8</span>) <span class="op">-&gt;</span> <span class="va">None</span>: </span>
+<span id="cb94-3"><a href="#cb94-3"></a>    <span class="co"># defualt it to 0.8</span></span>
+<span id="cb94-4"><a href="#cb94-4"></a>    train_size <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(df) <span class="op">*</span> size)</span>
+<span id="cb94-5"><a href="#cb94-5"></a>    train, test <span class="op">=</span> df[:train_size], df[train_size:]</span>
+<span id="cb94-6"><a href="#cb94-6"></a></span>
+<span id="cb94-7"><a href="#cb94-7"></a>    models <span class="op">=</span> []</span>
+<span id="cb94-8"><a href="#cb94-8"></a>    mse_values <span class="op">=</span> []</span>
+<span id="cb94-9"><a href="#cb94-9"></a>    rmse_values <span class="op">=</span> []</span>
+<span id="cb94-10"><a href="#cb94-10"></a>    mae_values <span class="op">=</span> []</span>
+<span id="cb94-11"><a href="#cb94-11"></a></span>
+<span id="cb94-12"><a href="#cb94-12"></a>    tscv <span class="op">=</span> TimeSeriesSplit(n_splits<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb94-13"><a href="#cb94-13"></a>    <span class="cf">for</span> train_index, test_index <span class="kw">in</span> tscv.split(train):</span>
+<span id="cb94-14"><a href="#cb94-14"></a>        train_cv, test_cv <span class="op">=</span> train.iloc[train_index], train.iloc[test_index]</span>
+<span id="cb94-15"><a href="#cb94-15"></a></span>
+<span id="cb94-16"><a href="#cb94-16"></a>        <span class="co"># simple exp model</span></span>
+<span id="cb94-17"><a href="#cb94-17"></a>        model_ses <span class="op">=</span> SimpleExpSmoothing(train_cv).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb94-18"><a href="#cb94-18"></a>        forecast_ses <span class="op">=</span> model_ses.forecast(<span class="bu">len</span>(test_cv))</span>
+<span id="cb94-19"><a href="#cb94-19"></a>        mse_ses <span class="op">=</span> mean_squared_error(test_cv, forecast_ses)</span>
+<span id="cb94-20"><a href="#cb94-20"></a>        rmse_ses <span class="op">=</span> np.sqrt(mse_ses)</span>
+<span id="cb94-21"><a href="#cb94-21"></a>        mae_ses <span class="op">=</span> mean_absolute_error(test_cv, forecast_ses)</span>
+<span id="cb94-22"><a href="#cb94-22"></a></span>
+<span id="cb94-23"><a href="#cb94-23"></a>        <span class="co"># holt model</span></span>
+<span id="cb94-24"><a href="#cb94-24"></a>        model_holt <span class="op">=</span> Holt(train_cv).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb94-25"><a href="#cb94-25"></a>        forecast_holt <span class="op">=</span> model_holt.forecast(<span class="bu">len</span>(test_cv))</span>
+<span id="cb94-26"><a href="#cb94-26"></a>        mse_holt <span class="op">=</span> mean_squared_error(test_cv, forecast_holt)</span>
+<span id="cb94-27"><a href="#cb94-27"></a>        rmse_holt <span class="op">=</span> np.sqrt(mse_holt)</span>
+<span id="cb94-28"><a href="#cb94-28"></a>        mae_holt <span class="op">=</span> mean_absolute_error(test_cv, forecast_holt)</span>
+<span id="cb94-29"><a href="#cb94-29"></a></span>
+<span id="cb94-30"><a href="#cb94-30"></a>        <span class="co"># holt winters model</span></span>
+<span id="cb94-31"><a href="#cb94-31"></a>        model_hw <span class="op">=</span> ExponentialSmoothing(train_cv, </span>
+<span id="cb94-32"><a href="#cb94-32"></a>                                        seasonal_periods<span class="op">=</span><span class="dv">7</span>, </span>
+<span id="cb94-33"><a href="#cb94-33"></a>                                        trend<span class="op">=</span><span class="st">'mul'</span>, </span>
+<span id="cb94-34"><a href="#cb94-34"></a>                                        seasonal<span class="op">=</span><span class="st">'mul'</span>).fit(optimized<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb94-35"><a href="#cb94-35"></a>                                        </span>
+<span id="cb94-36"><a href="#cb94-36"></a>        forecast_hw <span class="op">=</span> model_hw.forecast(<span class="bu">len</span>(test_cv))</span>
+<span id="cb94-37"><a href="#cb94-37"></a>        mse_hw <span class="op">=</span> mean_squared_error(test_cv, forecast_hw)</span>
+<span id="cb94-38"><a href="#cb94-38"></a>        rmse_hw <span class="op">=</span> np.sqrt(mse_hw)</span>
+<span id="cb94-39"><a href="#cb94-39"></a>        mae_hw <span class="op">=</span> mean_absolute_error(test_cv, forecast_hw)</span>
+<span id="cb94-40"><a href="#cb94-40"></a></span>
+<span id="cb94-41"><a href="#cb94-41"></a>        <span class="co"># add it to the empty lists</span></span>
+<span id="cb94-42"><a href="#cb94-42"></a>        models.extend([<span class="st">'Simple Exponential Smoothing'</span>, <span class="st">'Holt</span><span class="ch">\'</span><span class="st">s Linear Trend Model'</span>, <span class="st">'Holt-Winters Model'</span>])</span>
+<span id="cb94-43"><a href="#cb94-43"></a>        mse_values.extend([mse_ses, mse_holt, mse_hw])</span>
+<span id="cb94-44"><a href="#cb94-44"></a>        rmse_values.extend([rmse_ses, rmse_holt, rmse_hw])</span>
+<span id="cb94-45"><a href="#cb94-45"></a>        mae_values.extend([mae_ses, mae_holt, mae_hw])</span>
+<span id="cb94-46"><a href="#cb94-46"></a></span>
+<span id="cb94-47"><a href="#cb94-47"></a>    evaluation_results <span class="op">=</span> pd.DataFrame({<span class="st">'Model'</span>: models, </span>
+<span id="cb94-48"><a href="#cb94-48"></a>                                        <span class="st">'MSE'</span>: mse_values, </span>
+<span id="cb94-49"><a href="#cb94-49"></a>                                        <span class="st">'RMSE'</span>: rmse_values, </span>
+<span id="cb94-50"><a href="#cb94-50"></a>                                        <span class="st">'MAE'</span>: mae_values})</span>
+<span id="cb94-51"><a href="#cb94-51"></a></span>
+<span id="cb94-52"><a href="#cb94-52"></a>    <span class="co"># groupby models then agg mena</span></span>
+<span id="cb94-53"><a href="#cb94-53"></a>    average_metrics <span class="op">=</span> evaluation_results.groupby(<span class="st">'Model'</span>).mean().sort_values(<span class="st">'MSE'</span>, ascending <span class="op">=</span> <span class="va">True</span>).reset_index()</span>
+<span id="cb94-54"><a href="#cb94-54"></a></span>
+<span id="cb94-55"><a href="#cb94-55"></a>    <span class="cf">return</span> average_metrics</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-148" class="cell" data-execution_count="97">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb95-1"><a href="#cb95-1"></a></span>
+<span id="cb95-2"><a href="#cb95-2"></a><span class="kw">def</span> plot_func(forecast1: <span class="bu">list</span>[<span class="bu">float</span>],</span>
+<span id="cb95-3"><a href="#cb95-3"></a>              forecast2: <span class="bu">list</span>[<span class="bu">float</span>],</span>
+<span id="cb95-4"><a href="#cb95-4"></a>              forecast3: <span class="bu">list</span>[<span class="bu">float</span>],</span>
+<span id="cb95-5"><a href="#cb95-5"></a>              title: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="va">None</span>:</span>
+<span id="cb95-6"><a href="#cb95-6"></a>    <span class="co">"""Function to plot the forecasts."""</span></span>
+<span id="cb95-7"><a href="#cb95-7"></a>    fig, ax <span class="op">=</span> plt.subplots() </span>
+<span id="cb95-8"><a href="#cb95-8"></a></span>
+<span id="cb95-9"><a href="#cb95-9"></a>    ax.plot(train.index, train[<span class="st">'Cash'</span>], label<span class="op">=</span><span class="st">'Train'</span>) </span>
+<span id="cb95-10"><a href="#cb95-10"></a>    ax.plot(test.index, test[<span class="st">'Cash'</span>], label<span class="op">=</span><span class="st">'Test'</span>) </span>
+<span id="cb95-11"><a href="#cb95-11"></a>    ax.plot(test.index, forecast1, label<span class="op">=</span><span class="st">'Simple'</span>) </span>
+<span id="cb95-12"><a href="#cb95-12"></a>    ax.plot(test.index, forecast2, label<span class="op">=</span><span class="st">"Holt's Linear"</span>) </span>
+<span id="cb95-13"><a href="#cb95-13"></a>    ax.plot(test.index, forecast3, label<span class="op">=</span><span class="st">'Holt Winters'</span>) </span>
+<span id="cb95-14"><a href="#cb95-14"></a></span>
+<span id="cb95-15"><a href="#cb95-15"></a>    ax.set_title(title)</span>
+<span id="cb95-16"><a href="#cb95-16"></a>    ax.set_xlabel(<span class="st">'Date'</span>)</span>
+<span id="cb95-17"><a href="#cb95-17"></a>    ax.set_ylabel(<span class="st">'Cash Volume'</span>)</span>
+<span id="cb95-18"><a href="#cb95-18"></a>    ax.grid(<span class="va">True</span>) </span>
+<span id="cb95-19"><a href="#cb95-19"></a>    ax.legend(loc <span class="op">=</span> <span class="st">'upper left'</span>)</span>
+<span id="cb95-20"><a href="#cb95-20"></a></span>
+<span id="cb95-21"><a href="#cb95-21"></a>    plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 
 </main>
