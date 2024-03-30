@@ -1,0 +1,2307 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nick Climaco">
+<meta name="dcterms.date" content="2024-03-29">
+
+<title>Linear Regression</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="linear_regression_files/libs/clipboard/clipboard.min.js"></script>
+<script src="linear_regression_files/libs/quarto-html/quarto.js"></script>
+<script src="linear_regression_files/libs/quarto-html/popper.min.js"></script>
+<script src="linear_regression_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="linear_regression_files/libs/quarto-html/anchor.min.js"></script>
+<link href="linear_regression_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="linear_regression_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="linear_regression_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="linear_regression_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="linear_regression_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#kj-applied-predictive-modeling" id="toc-kj-applied-predictive-modeling" class="nav-link active" data-scroll-target="#kj-applied-predictive-modeling">KJ: Applied Predictive Modeling</a></li>
+  <li><a href="#linear-regression" id="toc-linear-regression" class="nav-link" data-scroll-target="#linear-regression">Linear Regression</a>
+  <ul class="collapse">
+  <li><a href="#exercise-6.2" id="toc-exercise-6.2" class="nav-link" data-scroll-target="#exercise-6.2">Exercise 6.2</a>
+  <ul class="collapse">
+  <li><a href="#a" id="toc-a" class="nav-link" data-scroll-target="#a">A</a></li>
+  <li><a href="#b" id="toc-b" class="nav-link" data-scroll-target="#b">B</a></li>
+  <li><a href="#c" id="toc-c" class="nav-link" data-scroll-target="#c">C</a></li>
+  <li><a href="#d" id="toc-d" class="nav-link" data-scroll-target="#d">D</a></li>
+  <li><a href="#e" id="toc-e" class="nav-link" data-scroll-target="#e">E</a></li>
+  <li><a href="#f" id="toc-f" class="nav-link" data-scroll-target="#f">F</a></li>
+  </ul></li>
+  <li><a href="#exercise-6.3" id="toc-exercise-6.3" class="nav-link" data-scroll-target="#exercise-6.3">Exercise 6.3</a>
+  <ul class="collapse">
+  <li><a href="#a-1" id="toc-a-1" class="nav-link" data-scroll-target="#a-1">A</a></li>
+  <li><a href="#b-1" id="toc-b-1" class="nav-link" data-scroll-target="#b-1">B</a></li>
+  <li><a href="#c-1" id="toc-c-1" class="nav-link" data-scroll-target="#c-1">C</a></li>
+  <li><a href="#d-1" id="toc-d-1" class="nav-link" data-scroll-target="#d-1">D</a></li>
+  <li><a href="#e-1" id="toc-e-1" class="nav-link" data-scroll-target="#e-1">E</a></li>
+  <li><a href="#f-1" id="toc-f-1" class="nav-link" data-scroll-target="#f-1">F</a></li>
+  </ul></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Linear Regression</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nick Climaco </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">March 29, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="kj-applied-predictive-modeling" class="level1">
+<h1>KJ: Applied Predictive Modeling</h1>
+</section>
+<section id="linear-regression" class="level1">
+<h1>Linear Regression</h1>
+<div id="cell-3" class="cell" data-execution_count="126">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load base libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exercise-6.2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.2">Exercise 6.2</h2>
+<p>Developing a model to predict permeability (see Sect. 1.4) could save significant resources for a pharmaceutical company, while at the same time more rapidly identifying molecules that have a sufficient permeability to become a drug:</p>
+<section id="a" class="level3">
+<h3 class="anchored" data-anchor-id="a">A</h3>
+<p>Start R and use these commands to load the data:</p>
+<blockquote class="blockquote">
+<p>library(AppliedPredictiveModeling)</p>
+<p>data(permeability)</p>
+</blockquote>
+<p>The matrix fingerprints contains the 1,107 binary molecular predictors for the 165 compounds, while permeability contains permeability response.</p>
+<div id="cell-6" class="cell" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># load data from AppliedPredictiveModeling</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>permeability <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/hw7/permeability_data.csv'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>fingerprints <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/hw7/fingerprints_data.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="128">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>permeability.shape, fingerprints.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="128">
+<pre><code>((165, 1), (165, 1107))</code></pre>
+</div>
+</div>
+<p>The <code>permeability</code> data has 165 observations and 1 target column.</p>
+<p>The <code>fingerprints</code> data has 165 oberservations and 1107 binary features.</p>
+<div id="cell-9" class="cell" data-execution_count="129">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>X <span class="op">=</span> fingerprints <span class="co"># features</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>y <span class="op">=</span> permeability <span class="co"># target</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="b" class="level3">
+<h3 class="anchored" data-anchor-id="b">B</h3>
+<p>The fingerprint predictors indicate the presence or absence of substructures of a molecule and are often sparse meaning that relatively few of the molecules contain each substructure. Filter out the predictors that have low frequencies using the nearZeroVar function from the caret package.</p>
+<p>How many predictors are left for modeling?</p>
+<p>Since python does not have the nearZeroVar() function, we found a feature selection function that is similar. Initially, the threshold value was not changed and found that we only remove 30 near-zero columns. So, with the updated threshold value of 0.1, we managed to reduce the number of predictors from 1 107 to 279.</p>
+<div id="cell-12" class="cell" data-execution_count="130">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> sklearn.feature_selection <span class="im">import</span> VarianceThreshold</span>
+<span id="cb6-2"><a href="#cb6-2"></a></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="kw">def</span> remove_near_zero_var(df, threshold <span class="op">=</span> <span class="fl">0.1</span>) :</span>
+<span id="cb6-4"><a href="#cb6-4"></a>     </span>
+<span id="cb6-5"><a href="#cb6-5"></a>     selector <span class="op">=</span> VarianceThreshold(threshold<span class="op">=</span>threshold)</span>
+<span id="cb6-6"><a href="#cb6-6"></a>     selector.fit(df)   </span>
+<span id="cb6-7"><a href="#cb6-7"></a>     high_variance_cols <span class="op">=</span> df.columns[selector.get_support()]</span>
+<span id="cb6-8"><a href="#cb6-8"></a>     <span class="cf">return</span> df[high_variance_cols] </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-13" class="cell" data-execution_count="131">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-14" class="cell" data-execution_count="132">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>X_filtered.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="132">
+<pre><code>(165, 279)</code></pre>
+</div>
+</div>
+</section>
+<section id="c" class="level3">
+<h3 class="anchored" data-anchor-id="c">C</h3>
+<p>Split the data into a training and a test set, pre-process the data, and tune a PLS model.</p>
+<p>How many latent variables are optimal and what is the corresponding resampled estimate of R2?</p>
+<div id="cell-16" class="cell" data-execution_count="133">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_filtered, y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">123</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-17" class="cell" data-execution_count="134">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># check for missingness</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>X_filtered.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="134">
+<pre><code>0</code></pre>
+</div>
+</div>
+<p>Due to the relatively small number of observation, the value of 5 folds seems approrpiate since having more folds will result in each fold having fewer data points for the model to learn from. Thus, it could lead to less accuarte predictions on the testing set.</p>
+<div id="cell-19" class="cell" data-execution_count="135">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> KFold</span>
+<span id="cb13-2"><a href="#cb13-2"></a>cv <span class="op">=</span> KFold(n_splits <span class="op">=</span> <span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state <span class="op">=</span> <span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-20" class="cell" data-execution_count="136">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> sklearn.cross_decomposition <span class="im">import</span> PLSRegression</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb14-4"><a href="#cb14-4"></a></span>
+<span id="cb14-5"><a href="#cb14-5"></a></span>
+<span id="cb14-6"><a href="#cb14-6"></a>pls <span class="op">=</span> PLSRegression()</span>
+<span id="cb14-7"><a href="#cb14-7"></a>param_grid <span class="op">=</span> {<span class="st">'n_components'</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">21</span>)} </span>
+<span id="cb14-8"><a href="#cb14-8"></a></span>
+<span id="cb14-9"><a href="#cb14-9"></a>pls_cv <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span><span class="st">'r2'</span>, cv<span class="op">=</span>cv)  </span>
+<span id="cb14-10"><a href="#cb14-10"></a>pls_cv.fit(X_train, y_train)</span>
+<span id="cb14-11"><a href="#cb14-11"></a></span>
+<span id="cb14-12"><a href="#cb14-12"></a></span>
+<span id="cb14-13"><a href="#cb14-13"></a>results <span class="op">=</span> pls_cv.cv_results_</span>
+<span id="cb14-14"><a href="#cb14-14"></a>optimal_n_components <span class="op">=</span> pls_cv.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb14-15"><a href="#cb14-15"></a>best_model <span class="op">=</span> pls_cv.best_estimator_</span>
+<span id="cb14-16"><a href="#cb14-16"></a><span class="co"># scree plot</span></span>
+<span id="cb14-17"><a href="#cb14-17"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb14-18"><a href="#cb14-18"></a>plt.plot(results[<span class="st">'param_n_components'</span>], results[<span class="st">'mean_test_score'</span>], marker <span class="op">=</span> <span class="st">'o'</span>)</span>
+<span id="cb14-19"><a href="#cb14-19"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
+<span id="cb14-20"><a href="#cb14-20"></a>plt.ylabel(<span class="st">'R2 (Cross-Validation)'</span>)</span>
+<span id="cb14-21"><a href="#cb14-21"></a>plt.title(<span class="ss">f"Training Set R-Squared at </span><span class="sc">{</span>optimal_n_components<span class="sc">}</span><span class="ss"> Components"</span>) </span>
+<span id="cb14-22"><a href="#cb14-22"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb14-23"><a href="#cb14-23"></a>plt.axvline(optimal_n_components, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb14-24"><a href="#cb14-24"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-21" class="cell" data-execution_count="137">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>best_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="137">
+<style>#sk-container-id-21 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-21 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-21 pre {
+  padding: 0;
+}
+
+#sk-container-id-21 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-21 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-21 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-21 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-21 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-21 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-21 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-21 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-21 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-21 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-21 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-21 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-21 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-21 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-21 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-21 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-21 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-21 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-21 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-21 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-21 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-21 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-21 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-21 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-21 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-21 div.sk-label label.sk-toggleable__label,
+#sk-container-id-21 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-21 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-21 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-21 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-21 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-21 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-21 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-21 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-21 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-21 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-21 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-21 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-21 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-21" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>PLSRegression(n_components=6)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-67" type="checkbox" checked=""><label for="sk-estimator-id-67" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;PLSRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.cross_decomposition.PLSRegression.html">?<span>Documentation for PLSRegression</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>PLSRegression(n_components=6)</pre></div> </div></div></div></div>
+</div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="138">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>pd.DataFrame(results)[[<span class="st">'param_n_components'</span>,<span class="st">'mean_test_score'</span>]].sort_values(by<span class="op">=</span><span class="st">'mean_test_score'</span>,ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="138">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">param_n_components</th>
+<th data-quarto-table-cell-role="th">mean_test_score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>0.518855</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>0.514759</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>0.511922</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>0.492998</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>0.483839</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The optimal number of components is 6 where it has the best relative fit on the data with a R-Squared of 0.518.</p>
+<p>Next, to determine if this holds true for a different metric such as the RMSE. Would the number of components be the same or would it differ?</p>
+<div id="cell-24" class="cell" data-execution_count="139">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">def</span> rmse_score(estimator, X, y):</span>
+<span id="cb17-2"><a href="#cb17-2"></a>    y_pred <span class="op">=</span> estimator.predict(X)</span>
+<span id="cb17-3"><a href="#cb17-3"></a>    <span class="cf">return</span> <span class="op">-</span>np.sqrt(mean_squared_error(y, y_pred)) <span class="co"># chagne sign since scoring in sklearn thinks that the higher the value the better</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-25" class="cell" data-execution_count="140">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2"></a>pls_cv <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span>rmse_score, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'RMSE'</span>)  <span class="co"># change scoring to from R2 to RMSE</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>pls_cv.fit(X_train, y_train)</span>
+<span id="cb18-4"><a href="#cb18-4"></a></span>
+<span id="cb18-5"><a href="#cb18-5"></a></span>
+<span id="cb18-6"><a href="#cb18-6"></a>results <span class="op">=</span> pls_cv.cv_results_</span>
+<span id="cb18-7"><a href="#cb18-7"></a>optimal_n_components <span class="op">=</span> pls_cv.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb18-8"><a href="#cb18-8"></a></span>
+<span id="cb18-9"><a href="#cb18-9"></a><span class="co"># scree plot</span></span>
+<span id="cb18-10"><a href="#cb18-10"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb18-11"><a href="#cb18-11"></a>plt.plot(results[<span class="st">'param_n_components'</span>], results[<span class="st">'mean_test_score'</span>], marker <span class="op">=</span> <span class="st">'o'</span>)</span>
+<span id="cb18-12"><a href="#cb18-12"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
+<span id="cb18-13"><a href="#cb18-13"></a>plt.ylabel(<span class="st">'RMSE (Cross-Validation)'</span>)</span>
+<span id="cb18-14"><a href="#cb18-14"></a>plt.title(<span class="ss">f"Training Set RSME Mimimized at </span><span class="sc">{</span>optimal_n_components<span class="sc">}</span><span class="ss"> Components"</span>) </span>
+<span id="cb18-15"><a href="#cb18-15"></a>plt.grid(<span class="va">True</span>)</span>
+<span id="cb18-16"><a href="#cb18-16"></a>plt.axvline(optimal_n_components, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb18-17"><a href="#cb18-17"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-16-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-26" class="cell" data-execution_count="141">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>pd.DataFrame(results)[[<span class="st">'param_n_components'</span>,<span class="st">'mean_test_score'</span>]].sort_values(by<span class="op">=</span><span class="st">'mean_test_score'</span>,ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="141">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">param_n_components</th>
+<th data-quarto-table-cell-role="th">mean_test_score</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>6</td>
+<td>-9.854153</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>7</td>
+<td>-9.883697</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>8</td>
+<td>-9.982038</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8</td>
+<td>9</td>
+<td>-10.191270</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>5</td>
+<td>-10.252059</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The optimal number of components of the PLSRegression in terms of the RMSE is minimized at 6 components. Thus, the optimal PLS model has 6 componentns which is based on the metrics of R-Squared and RMSE.</p>
+<p>In addition, the experimentation with scaled X_train using the StandardScaler() from sklearn demonstatration no significant impact on the test scores. So, leaving the X values unscaled for modeling.</p>
+</section>
+<section id="d" class="level3">
+<h3 class="anchored" data-anchor-id="d">D</h3>
+<p>Predict the response for the test set. What is the test set estimate of R2?</p>
+<p>From cross-validatio</p>
+<div id="cell-30" class="cell" data-execution_count="142">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a>plsr <span class="op">=</span> PLSRegression(n_components<span class="op">=</span><span class="dv">6</span>)</span>
+<span id="cb20-2"><a href="#cb20-2"></a>plsr.fit(X_train, y_train)</span>
+<span id="cb20-3"><a href="#cb20-3"></a>y_pred <span class="op">=</span> plsr.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-31" class="cell" data-execution_count="143">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> r2_score</span>
+<span id="cb21-2"><a href="#cb21-2"></a></span>
+<span id="cb21-3"><a href="#cb21-3"></a>plsr_r2 <span class="op">=</span> r2_score(y_test, y_pred)</span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="bu">print</span>(<span class="ss">f'R-squared of the test set: </span><span class="sc">{</span>plsr_r2<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R-squared of the test set: 0.22044523464989485</code></pre>
+</div>
+</div>
+</section>
+<section id="e" class="level3">
+<h3 class="anchored" data-anchor-id="e">E</h3>
+<p>Try building other models discussed in this chapter.</p>
+<p>Do any have better predictive performance?</p>
+<div id="cell-33" class="cell" data-execution_count="144">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># PCA Regression</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a><span class="co"># perform  PCA first then fit to LinearRegrssion model</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a></span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
+<span id="cb23-5"><a href="#cb23-5"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression</span>
+<span id="cb23-6"><a href="#cb23-6"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
+<span id="cb23-7"><a href="#cb23-7"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> make_scorer</span>
+<span id="cb23-8"><a href="#cb23-8"></a></span>
+<span id="cb23-9"><a href="#cb23-9"></a>pipe <span class="op">=</span> Pipeline([(<span class="st">'pca'</span>, PCA()), (<span class="st">'linear regression'</span>,  LinearRegression())])</span>
+<span id="cb23-10"><a href="#cb23-10"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb23-11"><a href="#cb23-11"></a>    <span class="st">'pca__n_components'</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">40</span>) </span>
+<span id="cb23-12"><a href="#cb23-12"></a>}</span>
+<span id="cb23-13"><a href="#cb23-13"></a>scoring <span class="op">=</span> make_scorer(mean_squared_error, greater_is_better<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb23-14"><a href="#cb23-14"></a></span>
+<span id="cb23-15"><a href="#cb23-15"></a>pca_cv <span class="op">=</span> GridSearchCV(pipe, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'mean_squared_error'</span>) </span>
+<span id="cb23-16"><a href="#cb23-16"></a>pca_cv.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="144">
+<style>#sk-container-id-22 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: black;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-22 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-22 pre {
+  padding: 0;
+}
+
+#sk-container-id-22 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-22 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-22 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-22 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-22 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-22 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-22 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-22 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-22 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-22 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-22 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-22 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-22 label.sk-toggleable__label {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#sk-container-id-22 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-22 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-22 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-22 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-22 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-22 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-22 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-22 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-22 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-22 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-22 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-22 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-22 div.sk-label label.sk-toggleable__label,
+#sk-container-id-22 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-22 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-22 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-22 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-22 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-22 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-22 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-22 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-22 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 1ex;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-22 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-22 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-22 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-22 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-22" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
+             estimator=Pipeline(steps=[('pca', PCA()),
+                                       ('linear regression',
+                                        LinearRegression())]),
+             param_grid={'pca__n_components': range(1, 40)},
+             refit='mean_squared_error',
+             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-68" type="checkbox"><label for="sk-estimator-id-68" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;GridSearchCV<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.model_selection.GridSearchCV.html">?<span>Documentation for GridSearchCV</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
+             estimator=Pipeline(steps=[('pca', PCA()),
+                                       ('linear regression',
+                                        LinearRegression())]),
+             param_grid={'pca__n_components': range(1, 40)},
+             refit='mean_squared_error',
+             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-69" type="checkbox"><label for="sk-estimator-id-69" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">estimator: Pipeline</label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[('pca', PCA()), ('linear regression', LinearRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-70" type="checkbox"><label for="sk-estimator-id-70" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;PCA<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a></label><div class="sk-toggleable__content fitted"><pre>PCA()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-71" type="checkbox"><label for="sk-estimator-id-71" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LinearRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a></label><div class="sk-toggleable__content fitted"><pre>LinearRegression()</pre></div> </div></div></div></div></div></div></div></div></div></div></div>
+</div>
+</div>
+<div id="cell-34" class="cell" data-execution_count="145">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a>optimal_n_components_pca <span class="op">=</span> pca_cv.best_params_[<span class="st">'pca__n_components'</span>]</span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="bu">print</span>(<span class="ss">f"Optimal Number of Components:</span><span class="sc">{</span>optimal_n_components_pca<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimal Number of Components:26</code></pre>
+</div>
+</div>
+<div id="cell-35" class="cell" data-execution_count="146">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>results_df <span class="op">=</span> pd.DataFrame(pca_cv.cv_results_)[[<span class="st">'param_pca__n_components'</span>, <span class="st">'mean_test_score'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-36" class="cell" data-execution_count="147">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb27-2"><a href="#cb27-2"></a>plt.plot(results_df.param_pca__n_components, np.sqrt(<span class="op">-</span>results_df.mean_test_score), marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb27-3"><a href="#cb27-3"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
+<span id="cb27-4"><a href="#cb27-4"></a>plt.ylabel(<span class="st">'RMSE (Cross-Validation)'</span>)</span>
+<span id="cb27-5"><a href="#cb27-5"></a>plt.title(<span class="ss">f"Training Set RMSE Minimized at </span><span class="sc">{</span>optimal_n_components_pca<span class="sc">}</span><span class="ss"> Components"</span>) </span>
+<span id="cb27-6"><a href="#cb27-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-23-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-37" class="cell" data-execution_count="148">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>pca <span class="op">=</span> PCA(n_components  <span class="op">=</span> <span class="dv">26</span>)</span>
+<span id="cb28-2"><a href="#cb28-2"></a></span>
+<span id="cb28-3"><a href="#cb28-3"></a>X_train_pca <span class="op">=</span> pca.fit_transform(X_train)</span>
+<span id="cb28-4"><a href="#cb28-4"></a>X_test_pca <span class="op">=</span> pca.transform(X_test)</span>
+<span id="cb28-5"><a href="#cb28-5"></a></span>
+<span id="cb28-6"><a href="#cb28-6"></a>lm <span class="op">=</span> LinearRegression()</span>
+<span id="cb28-7"><a href="#cb28-7"></a>lm.fit(X_train_pca, y_train)</span>
+<span id="cb28-8"><a href="#cb28-8"></a></span>
+<span id="cb28-9"><a href="#cb28-9"></a>y_pred <span class="op">=</span> lm.predict(X_test_pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-38" class="cell" data-execution_count="149">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a>pcr_r2<span class="op">=</span> r2_score(y_test, y_pred)</span>
+<span id="cb29-2"><a href="#cb29-2"></a><span class="bu">print</span>(<span class="ss">f'R-squared of the test set: </span><span class="sc">{</span>pcr_r2<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R-squared of the test set: 0.29587680000513394</code></pre>
+</div>
+</div>
+<div id="cell-39" class="cell" data-execution_count="150">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># Penalized Regressions</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge, Lasso, ElasticNet</span>
+<span id="cb31-3"><a href="#cb31-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
+<span id="cb31-4"><a href="#cb31-4"></a></span>
+<span id="cb31-5"><a href="#cb31-5"></a>param_grid <span class="op">=</span> {<span class="st">'alpha'</span>: <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">20</span>)}  <span class="co"># values of alpha to try. dont include 0 since that would make a regular linear regression i.e. the bias term is zero</span></span>
+<span id="cb31-6"><a href="#cb31-6"></a></span>
+<span id="cb31-7"><a href="#cb31-7"></a>ridge_model <span class="op">=</span> Ridge()</span>
+<span id="cb31-8"><a href="#cb31-8"></a></span>
+<span id="cb31-9"><a href="#cb31-9"></a>grid_search <span class="op">=</span> GridSearchCV(ridge_model, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb31-10"><a href="#cb31-10"></a>grid_search.fit(X_train, y_train) </span>
+<span id="cb31-11"><a href="#cb31-11"></a></span>
+<span id="cb31-12"><a href="#cb31-12"></a>best_alpha <span class="op">=</span> grid_search.best_params_[<span class="st">'alpha'</span>]</span>
+<span id="cb31-13"><a href="#cb31-13"></a><span class="bu">print</span>(<span class="st">"Best Alpha:"</span>, best_alpha) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best Alpha: 11</code></pre>
+</div>
+</div>
+<div id="cell-40" class="cell" data-execution_count="151">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># find the best parametere for lasso </span></span>
+<span id="cb33-2"><a href="#cb33-2"></a></span>
+<span id="cb33-3"><a href="#cb33-3"></a>lasso_model <span class="op">=</span> Lasso()</span>
+<span id="cb33-4"><a href="#cb33-4"></a>grid_search <span class="op">=</span> GridSearchCV(lasso_model, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb33-5"><a href="#cb33-5"></a>grid_search.fit(X_train, y_train) </span>
+<span id="cb33-6"><a href="#cb33-6"></a></span>
+<span id="cb33-7"><a href="#cb33-7"></a>best_alpha <span class="op">=</span> grid_search.best_params_[<span class="st">'alpha'</span>]</span>
+<span id="cb33-8"><a href="#cb33-8"></a><span class="bu">print</span>(<span class="st">"Best Alpha:"</span>, best_alpha) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best Alpha: 1</code></pre>
+</div>
+</div>
+<div id="cell-41" class="cell" data-execution_count="152">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>param_grid_elasticnet <span class="op">=</span> {<span class="st">'alpha'</span>: <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">20</span>)} </span>
+<span id="cb35-2"><a href="#cb35-2"></a>elasticnet_model <span class="op">=</span> ElasticNet()</span>
+<span id="cb35-3"><a href="#cb35-3"></a>grid_search <span class="op">=</span> GridSearchCV(elasticnet_model, param_grid_elasticnet, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb35-4"><a href="#cb35-4"></a>grid_search.fit(X_train, y_train) </span>
+<span id="cb35-5"><a href="#cb35-5"></a></span>
+<span id="cb35-6"><a href="#cb35-6"></a>best_alpha <span class="op">=</span> grid_search.best_params_[<span class="st">'alpha'</span>]</span>
+<span id="cb35-7"><a href="#cb35-7"></a></span>
+<span id="cb35-8"><a href="#cb35-8"></a><span class="bu">print</span>(<span class="st">"Best Alpha:"</span>, best_alpha)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best Alpha: 1</code></pre>
+</div>
+</div>
+<div id="cell-42" class="cell" data-message="false" data-execution_count="153">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>param_grid_l1 <span class="op">=</span> {<span class="st">'l1_ratio'</span> : np.arange(<span class="dv">0</span>,<span class="dv">1</span>,<span class="fl">0.1</span>)}</span>
+<span id="cb37-2"><a href="#cb37-2"></a>elasticnet_model <span class="op">=</span> ElasticNet(alpha<span class="op">=</span><span class="dv">1</span>) <span class="co"># set alpha to 1</span></span>
+<span id="cb37-3"><a href="#cb37-3"></a>grid_search <span class="op">=</span> GridSearchCV(elasticnet_model, param_grid_l1, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb37-4"><a href="#cb37-4"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb37-5"><a href="#cb37-5"></a></span>
+<span id="cb37-6"><a href="#cb37-6"></a>best_l1 <span class="op">=</span> grid_search.best_params_[<span class="st">'l1_ratio'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-43" class="cell" data-execution_count="154">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a></span>
+<span id="cb38-2"><a href="#cb38-2"></a><span class="bu">print</span>(<span class="st">"Best L1_ratio:"</span>, best_l1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Best L1_ratio: 0.0</code></pre>
+</div>
+</div>
+<div id="cell-44" class="cell" data-message="false" data-execution_count="157">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>ridge_model <span class="op">=</span> Ridge(alpha<span class="op">=</span><span class="dv">11</span>)</span>
+<span id="cb40-2"><a href="#cb40-2"></a>ridge_model.fit(X_train,y_train)</span>
+<span id="cb40-3"><a href="#cb40-3"></a>ridge_preds <span class="op">=</span> ridge_model.predict(X_test)</span>
+<span id="cb40-4"><a href="#cb40-4"></a></span>
+<span id="cb40-5"><a href="#cb40-5"></a>lasso_model <span class="op">=</span> Lasso(alpha<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb40-6"><a href="#cb40-6"></a>lasso_model.fit(X_train,y_train)</span>
+<span id="cb40-7"><a href="#cb40-7"></a>lasso_preds <span class="op">=</span> lasso_model.predict(X_test)</span>
+<span id="cb40-8"><a href="#cb40-8"></a></span>
+<span id="cb40-9"><a href="#cb40-9"></a>elastic_model <span class="op">=</span> ElasticNet(alpha<span class="op">=</span><span class="dv">1</span>, l1_ratio<span class="op">=</span><span class="dv">0</span>) <span class="co"># basically a ridge regression since l1_ratio is zero</span></span>
+<span id="cb40-10"><a href="#cb40-10"></a>elastic_model.fit(X_train,y_train)</span>
+<span id="cb40-11"><a href="#cb40-11"></a>elastic_preds <span class="op">=</span> elastic_model.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-45" class="cell" data-execution_count="156">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a><span class="bu">print</span>(<span class="ss">f'PLS Model R-squared: </span><span class="sc">{</span>plsr_r2<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb41-2"><a href="#cb41-2"></a><span class="bu">print</span>(<span class="ss">f'PCA Regression R-squared: </span><span class="sc">{</span>pcr_r2<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb41-3"><a href="#cb41-3"></a><span class="bu">print</span>(<span class="ss">f'Ridge Model R-squared : </span><span class="sc">{</span>r2_score(y_test, ridge_preds)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb41-4"><a href="#cb41-4"></a><span class="bu">print</span>(<span class="ss">f'Lasso Model R-squared : </span><span class="sc">{</span>r2_score(y_test, lasso_preds)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb41-5"><a href="#cb41-5"></a><span class="bu">print</span>(<span class="ss">f'Elastic Model R-squared : </span><span class="sc">{</span>r2_score(y_test, elastic_preds)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>PLS Model R-squared: 0.22044523464989485
+PCA Regression R-squared: 0.29587680000513394
+Ridge Model R-squared : 0.2188316862106522
+Lasso Model R-squared : 0.21291778419736995
+Elastic Model R-squared : 0.2031244000136866</code></pre>
+</div>
+</div>
+</section>
+<section id="f" class="level3">
+<h3 class="anchored" data-anchor-id="f">F</h3>
+<p>Would you recommend any of your models to replace the permeability laboratory experiment?</p>
+<p>The current models do not have the predictive power to accurately predict permeabilitly. THeire R-squared values of 0.2-0.3 indicate a weak fit of the data meaning that a lot of the characterisitics of the data remain uncaptured by the models.</p>
+<hr>
+</section>
+</section>
+<section id="exercise-6.3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6.3">Exercise 6.3</h2>
+<p>A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4.</p>
+<p>In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing.</p>
+<p>On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:</p>
+<section id="a-1" class="level3">
+<h3 class="anchored" data-anchor-id="a-1">A</h3>
+<p>Start R and use these commands to load the data:</p>
+<blockquote class="blockquote">
+<p>library(AppliedPredictiveModeling)</p>
+<p>data(chemicalManufacturing)</p>
+</blockquote>
+<p>The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. yield contains the percent yield for each run.</p>
+<div id="cell-52" class="cell" data-execution_count="162">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>chemical_df <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw7/chemical_data.csv'</span>).drop(<span class="st">'Unnamed: 0'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-53" class="cell" data-execution_count="163">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>chemical_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="163">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Yield</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial01</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial02</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial03</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial04</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial05</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial06</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial07</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial08</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial09</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess36</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess37</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess38</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess39</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess40</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess41</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess42</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess43</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess44</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess45</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>38.00</td>
+<td>6.25</td>
+<td>49.58</td>
+<td>56.97</td>
+<td>12.74</td>
+<td>19.51</td>
+<td>43.73</td>
+<td>100.0</td>
+<td>16.66</td>
+<td>11.44</td>
+<td>...</td>
+<td>0.019</td>
+<td>0.5</td>
+<td>3</td>
+<td>7.2</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>11.6</td>
+<td>3.0</td>
+<td>1.8</td>
+<td>2.4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>42.44</td>
+<td>8.01</td>
+<td>60.97</td>
+<td>67.48</td>
+<td>14.65</td>
+<td>19.36</td>
+<td>53.14</td>
+<td>100.0</td>
+<td>19.04</td>
+<td>12.55</td>
+<td>...</td>
+<td>0.019</td>
+<td>2.0</td>
+<td>2</td>
+<td>7.2</td>
+<td>0.1</td>
+<td>0.15</td>
+<td>11.1</td>
+<td>0.9</td>
+<td>1.9</td>
+<td>2.2</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>42.03</td>
+<td>8.01</td>
+<td>60.97</td>
+<td>67.48</td>
+<td>14.65</td>
+<td>19.36</td>
+<td>53.14</td>
+<td>100.0</td>
+<td>19.04</td>
+<td>12.55</td>
+<td>...</td>
+<td>0.018</td>
+<td>0.7</td>
+<td>2</td>
+<td>7.2</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>12.0</td>
+<td>1.0</td>
+<td>1.8</td>
+<td>2.3</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>41.42</td>
+<td>8.01</td>
+<td>60.97</td>
+<td>67.48</td>
+<td>14.65</td>
+<td>19.36</td>
+<td>53.14</td>
+<td>100.0</td>
+<td>19.04</td>
+<td>12.55</td>
+<td>...</td>
+<td>0.018</td>
+<td>1.2</td>
+<td>2</td>
+<td>7.2</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>10.6</td>
+<td>1.1</td>
+<td>1.8</td>
+<td>2.1</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>42.49</td>
+<td>7.47</td>
+<td>63.33</td>
+<td>72.25</td>
+<td>14.02</td>
+<td>17.91</td>
+<td>54.66</td>
+<td>100.0</td>
+<td>18.22</td>
+<td>12.80</td>
+<td>...</td>
+<td>0.017</td>
+<td>0.2</td>
+<td>2</td>
+<td>7.3</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>11.0</td>
+<td>1.1</td>
+<td>1.7</td>
+<td>2.1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">171</td>
+<td>39.66</td>
+<td>6.71</td>
+<td>56.32</td>
+<td>66.19</td>
+<td>12.35</td>
+<td>20.02</td>
+<td>50.26</td>
+<td>100.0</td>
+<td>17.54</td>
+<td>12.50</td>
+<td>...</td>
+<td>NaN</td>
+<td>2.3</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.6</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">172</td>
+<td>39.68</td>
+<td>6.87</td>
+<td>56.74</td>
+<td>66.61</td>
+<td>12.55</td>
+<td>20.18</td>
+<td>50.80</td>
+<td>100.0</td>
+<td>17.48</td>
+<td>12.41</td>
+<td>...</td>
+<td>NaN</td>
+<td>1.0</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.6</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">173</td>
+<td>42.23</td>
+<td>7.50</td>
+<td>58.41</td>
+<td>68.30</td>
+<td>13.33</td>
+<td>20.81</td>
+<td>52.96</td>
+<td>100.0</td>
+<td>17.23</td>
+<td>12.04</td>
+<td>...</td>
+<td>NaN</td>
+<td>1.3</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.6</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">174</td>
+<td>38.48</td>
+<td>7.53</td>
+<td>58.36</td>
+<td>69.25</td>
+<td>14.35</td>
+<td>20.57</td>
+<td>51.31</td>
+<td>100.0</td>
+<td>17.87</td>
+<td>12.77</td>
+<td>...</td>
+<td>NaN</td>
+<td>2.3</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.5</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">175</td>
+<td>39.49</td>
+<td>7.53</td>
+<td>58.36</td>
+<td>69.25</td>
+<td>14.35</td>
+<td>20.57</td>
+<td>51.31</td>
+<td>100.0</td>
+<td>17.87</td>
+<td>12.77</td>
+<td>...</td>
+<td>NaN</td>
+<td>0.9</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.00</td>
+<td>0.0</td>
+<td>0.6</td>
+<td>0.0</td>
+<td>0.0</td>
+</tr>
+</tbody>
+</table>
+
+<p>176 rows × 58 columns</p>
+</div>
+</div>
+</div>
+</section>
+<section id="b-1" class="level3">
+<h3 class="anchored" data-anchor-id="b-1">B</h3>
+<p>A small percentage of cells in the predictor set contain missing values.</p>
+<p>Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).</p>
+<div id="cell-55" class="cell" data-execution_count="164">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>X <span class="op">=</span> chemical_df.drop(<span class="st">'Yield'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb45-2"><a href="#cb45-2"></a>y <span class="op">=</span> chemical_df[[<span class="st">'Yield'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-56" class="cell" data-execution_count="165">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>X.shape, y.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="165">
+<pre><code>((176, 57), (176, 1))</code></pre>
+</div>
+</div>
+<div id="cell-57" class="cell" data-execution_count="175">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># check for missingnes</span></span>
+<span id="cb48-2"><a href="#cb48-2"></a>X.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="175">
+<pre><code>106</code></pre>
+</div>
+</div>
+<p>There are 106 missing values to impute with median. Using median is more robust than mean and preferred since it less impact of the distribution of the data.</p>
+<div id="cell-59" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>X.fillna(X.median(), inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="c-1" class="level3">
+<h3 class="anchored" data-anchor-id="c-1">C</h3>
+<p>Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.</p>
+<p>What is the optimal value of the performance metric?</p>
+<div id="cell-61" class="cell" data-execution_count="178">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>X.describe().T.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="178">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BiologicalMaterial01</td>
+<td>176.0</td>
+<td>6.411420</td>
+<td>0.713923</td>
+<td>4.58</td>
+<td>5.9775</td>
+<td>6.305</td>
+<td>6.8700</td>
+<td>8.81</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">BiologicalMaterial02</td>
+<td>176.0</td>
+<td>55.688750</td>
+<td>4.034581</td>
+<td>46.87</td>
+<td>52.6800</td>
+<td>55.090</td>
+<td>58.7375</td>
+<td>64.75</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BiologicalMaterial03</td>
+<td>176.0</td>
+<td>67.705000</td>
+<td>4.001064</td>
+<td>56.97</td>
+<td>64.9800</td>
+<td>67.220</td>
+<td>70.4275</td>
+<td>78.25</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">BiologicalMaterial04</td>
+<td>176.0</td>
+<td>12.349261</td>
+<td>1.774661</td>
+<td>9.38</td>
+<td>11.2450</td>
+<td>12.100</td>
+<td>13.2200</td>
+<td>23.09</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BiologicalMaterial05</td>
+<td>176.0</td>
+<td>18.598636</td>
+<td>1.844141</td>
+<td>13.24</td>
+<td>17.2350</td>
+<td>18.490</td>
+<td>19.9000</td>
+<td>24.85</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">BiologicalMaterial06</td>
+<td>176.0</td>
+<td>48.910398</td>
+<td>3.746072</td>
+<td>40.60</td>
+<td>46.0550</td>
+<td>48.460</td>
+<td>51.3450</td>
+<td>59.38</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BiologicalMaterial07</td>
+<td>176.0</td>
+<td>100.014148</td>
+<td>0.107742</td>
+<td>100.00</td>
+<td>100.0000</td>
+<td>100.000</td>
+<td>100.0000</td>
+<td>100.83</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">BiologicalMaterial08</td>
+<td>176.0</td>
+<td>17.494773</td>
+<td>0.676954</td>
+<td>15.88</td>
+<td>17.0600</td>
+<td>17.510</td>
+<td>17.8800</td>
+<td>19.14</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">BiologicalMaterial09</td>
+<td>176.0</td>
+<td>12.850057</td>
+<td>0.415176</td>
+<td>11.44</td>
+<td>12.6025</td>
+<td>12.835</td>
+<td>13.1300</td>
+<td>14.08</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">BiologicalMaterial10</td>
+<td>176.0</td>
+<td>2.800625</td>
+<td>0.599143</td>
+<td>1.77</td>
+<td>2.4600</td>
+<td>2.710</td>
+<td>2.9900</td>
+<td>6.87</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Since the each feature has on a unique scale, standard scaling is required.</p>
+<div id="cell-63" class="cell" data-execution_count="182">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X) <span class="co"># removes variance less than 0.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-65" class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span> <span class="fl">0.2</span>, shuffle <span class="op">=</span> <span class="va">True</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="d-1" class="level3">
+<h3 class="anchored" data-anchor-id="d-1">D</h3>
+<p>Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?</p>
+</section>
+<section id="e-1" class="level3">
+<h3 class="anchored" data-anchor-id="e-1">E</h3>
+<p>Which predictors are most important in the model you have trained?</p>
+<p>Do either the biological or process predictors dominate the list?</p>
+</section>
+<section id="f-1" class="level3">
+<h3 class="anchored" data-anchor-id="f-1">F</h3>
+<p>Explore the relationships between each of the top predictors and the response.</p>
+<p>How could this information be helpful in improving yield in future runs of the manufacturing process?</p>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
