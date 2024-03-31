@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-03-29">
+<meta name="dcterms.date" content="2024-03-31">
 
 <title>Linear Regression</title>
 <style>
@@ -130,7 +130,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 29, 2024</p>
+      <p class="date">March 31, 2024</p>
     </div>
   </div>
   
@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="linear-regression" class="level1">
 <h1>Linear Regression</h1>
-<div id="cell-3" class="cell" data-execution_count="126">
+<div id="cell-3" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load base libraries</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
@@ -164,20 +164,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>data(permeability)</p>
 </blockquote>
 <p>The matrix fingerprints contains the 1,107 binary molecular predictors for the 165 compounds, while permeability contains permeability response.</p>
-<div id="cell-6" class="cell" data-execution_count="127">
+<div id="cell-6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># load data from AppliedPredictiveModeling</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>permeability <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/hw7/permeability_data.csv'</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a>fingerprints <span class="op">=</span> pd.read_csv(<span class="st">'https://raw.githubusercontent.com/NickAMC/NickAMC.github.io/main/DATA_624_S24/hw7/fingerprints_data.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="128">
+<div id="cell-7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>permeability.shape, fingerprints.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="128">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>((165, 1), (165, 1107))</code></pre>
 </div>
 </div>
 <p>The <code>permeability</code> data has 165 observations and 1 target column.</p>
 <p>The <code>fingerprints</code> data has 165 oberservations and 1107 binary features.</p>
-<div id="cell-9" class="cell" data-execution_count="129">
+<div id="cell-9" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>X <span class="op">=</span> fingerprints <span class="co"># features</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>y <span class="op">=</span> permeability <span class="co"># target</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -187,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The fingerprint predictors indicate the presence or absence of substructures of a molecule and are often sparse meaning that relatively few of the molecules contain each substructure. Filter out the predictors that have low frequencies using the nearZeroVar function from the caret package.</p>
 <p>How many predictors are left for modeling?</p>
 <p>Since python does not have the nearZeroVar() function, we found a feature selection function that is similar. Initially, the threshold value was not changed and found that we only remove 30 near-zero columns. So, with the updated threshold value of 0.1, we managed to reduce the number of predictors from 1 107 to 279.</p>
-<div id="cell-12" class="cell" data-execution_count="130">
+<div id="cell-12" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> sklearn.feature_selection <span class="im">import</span> VarianceThreshold</span>
 <span id="cb6-2"><a href="#cb6-2"></a></span>
 <span id="cb6-3"><a href="#cb6-3"></a><span class="kw">def</span> remove_near_zero_var(df, threshold <span class="op">=</span> <span class="fl">0.1</span>) :</span>
@@ -197,12 +197,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-7"><a href="#cb6-7"></a>     high_variance_cols <span class="op">=</span> df.columns[selector.get_support()]</span>
 <span id="cb6-8"><a href="#cb6-8"></a>     <span class="cf">return</span> df[high_variance_cols] </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-13" class="cell" data-execution_count="131">
+<div id="cell-13" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-14" class="cell" data-execution_count="132">
+<div id="cell-14" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>X_filtered.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="132">
+<div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>(165, 279)</code></pre>
 </div>
 </div>
@@ -211,24 +211,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="c">C</h3>
 <p>Split the data into a training and a test set, pre-process the data, and tune a PLS model.</p>
 <p>How many latent variables are optimal and what is the corresponding resampled estimate of R2?</p>
-<div id="cell-16" class="cell" data-execution_count="133">
+<div id="cell-16" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb10-2"><a href="#cb10-2"></a></span>
 <span id="cb10-3"><a href="#cb10-3"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_filtered, y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">123</span>, shuffle<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-17" class="cell" data-execution_count="134">
+<div id="cell-17" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># check for missingness</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>X_filtered.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="134">
+<div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>0</code></pre>
 </div>
 </div>
 <p>Due to the relatively small number of observation, the value of 5 folds seems approrpiate since having more folds will result in each fold having fewer data points for the model to learn from. Thus, it could lead to less accuarte predictions on the testing set.</p>
-<div id="cell-19" class="cell" data-execution_count="135">
+<div id="cell-19" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> KFold</span>
 <span id="cb13-2"><a href="#cb13-2"></a>cv <span class="op">=</span> KFold(n_splits <span class="op">=</span> <span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state <span class="op">=</span> <span class="dv">123</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-20" class="cell" data-execution_count="136">
+<div id="cell-20" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> sklearn.cross_decomposition <span class="im">import</span> PLSRegression</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
 <span id="cb14-3"><a href="#cb14-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
@@ -261,10 +261,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-21" class="cell" data-execution_count="137">
+<div id="cell-21" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>best_model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="137">
-<style>#sk-container-id-21 {
+<div class="cell-output cell-output-display" data-execution_count="12">
+<style>#sk-container-id-1 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: black;
   --sklearn-color-line: gray;
@@ -294,15 +294,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }
 
-#sk-container-id-21 {
+#sk-container-id-1 {
   color: var(--sklearn-color-text);
 }
 
-#sk-container-id-21 pre {
+#sk-container-id-1 pre {
   padding: 0;
 }
 
-#sk-container-id-21 input.sk-hidden--visually {
+#sk-container-id-1 input.sk-hidden--visually {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px);
@@ -314,7 +314,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 1px;
 }
 
-#sk-container-id-21 div.sk-dashed-wrapped {
+#sk-container-id-1 div.sk-dashed-wrapped {
   border: 1px dashed var(--sklearn-color-line);
   margin: 0 0.4em 0.5em 0.4em;
   box-sizing: border-box;
@@ -322,7 +322,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   background-color: var(--sklearn-color-background);
 }
 
-#sk-container-id-21 div.sk-container {
+#sk-container-id-1 div.sk-container {
   /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
      but bootstrap.min.css set `[hidden] { display: none !important; }`
      so we also need the `!important` here to be able to override the
@@ -332,7 +332,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   position: relative;
 }
 
-#sk-container-id-21 div.sk-text-repr-fallback {
+#sk-container-id-1 div.sk-text-repr-fallback {
   display: none;
 }
 
@@ -348,14 +348,14 @@ div.sk-item {
 
 /* Parallel-specific style estimator block */
 
-#sk-container-id-21 div.sk-parallel-item::after {
+#sk-container-id-1 div.sk-parallel-item::after {
   content: "";
   width: 100%;
   border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
   flex-grow: 1;
 }
 
-#sk-container-id-21 div.sk-parallel {
+#sk-container-id-1 div.sk-parallel {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -363,28 +363,28 @@ div.sk-item {
   position: relative;
 }
 
-#sk-container-id-21 div.sk-parallel-item {
+#sk-container-id-1 div.sk-parallel-item {
   display: flex;
   flex-direction: column;
 }
 
-#sk-container-id-21 div.sk-parallel-item:first-child::after {
+#sk-container-id-1 div.sk-parallel-item:first-child::after {
   align-self: flex-end;
   width: 50%;
 }
 
-#sk-container-id-21 div.sk-parallel-item:last-child::after {
+#sk-container-id-1 div.sk-parallel-item:last-child::after {
   align-self: flex-start;
   width: 50%;
 }
 
-#sk-container-id-21 div.sk-parallel-item:only-child::after {
+#sk-container-id-1 div.sk-parallel-item:only-child::after {
   width: 0;
 }
 
 /* Serial-specific style estimator block */
 
-#sk-container-id-21 div.sk-serial {
+#sk-container-id-1 div.sk-serial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -402,14 +402,14 @@ clickable and can be expanded/collapsed.
 
 /* Pipeline and ColumnTransformer style (default) */
 
-#sk-container-id-21 div.sk-toggleable {
+#sk-container-id-1 div.sk-toggleable {
   /* Default theme specific background. It is overwritten whether we have a
   specific estimator or a Pipeline/ColumnTransformer */
   background-color: var(--sklearn-color-background);
 }
 
 /* Toggleable label */
-#sk-container-id-21 label.sk-toggleable__label {
+#sk-container-id-1 label.sk-toggleable__label {
   cursor: pointer;
   display: block;
   width: 100%;
@@ -419,7 +419,7 @@ clickable and can be expanded/collapsed.
   text-align: center;
 }
 
-#sk-container-id-21 label.sk-toggleable__label-arrow:before {
+#sk-container-id-1 label.sk-toggleable__label-arrow:before {
   /* Arrow on the left of the label */
   content: "▸";
   float: left;
@@ -427,13 +427,13 @@ clickable and can be expanded/collapsed.
   color: var(--sklearn-color-icon);
 }
 
-#sk-container-id-21 label.sk-toggleable__label-arrow:hover:before {
+#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
   color: var(--sklearn-color-text);
 }
 
 /* Toggleable content - dropdown */
 
-#sk-container-id-21 div.sk-toggleable__content {
+#sk-container-id-1 div.sk-toggleable__content {
   max-height: 0;
   max-width: 0;
   overflow: hidden;
@@ -442,12 +442,12 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-21 div.sk-toggleable__content.fitted {
+#sk-container-id-1 div.sk-toggleable__content.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-21 div.sk-toggleable__content pre {
+#sk-container-id-1 div.sk-toggleable__content pre {
   margin: 0.2em;
   border-radius: 0.25em;
   color: var(--sklearn-color-text);
@@ -455,79 +455,79 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-21 div.sk-toggleable__content.fitted pre {
+#sk-container-id-1 div.sk-toggleable__content.fitted pre {
   /* unfitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-21 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
   max-height: 200px;
   max-width: 100%;
   overflow: auto;
 }
 
-#sk-container-id-21 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
   content: "▾";
 }
 
 /* Pipeline/ColumnTransformer-specific style */
 
-#sk-container-id-21 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-21 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator-specific style */
 
 /* Colorize estimator box */
-#sk-container-id-21 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-21 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
-#sk-container-id-21 div.sk-label label.sk-toggleable__label,
-#sk-container-id-21 div.sk-label label {
+#sk-container-id-1 div.sk-label label.sk-toggleable__label,
+#sk-container-id-1 div.sk-label label {
   /* The background is the default theme color */
   color: var(--sklearn-color-text-on-default-background);
 }
 
 /* On hover, darken the color of the background */
-#sk-container-id-21 div.sk-label:hover label.sk-toggleable__label {
+#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
 /* Label box, darken color on hover, fitted */
-#sk-container-id-21 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator label */
 
-#sk-container-id-21 div.sk-label label {
+#sk-container-id-1 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
   display: inline-block;
   line-height: 1.2em;
 }
 
-#sk-container-id-21 div.sk-label-container {
+#sk-container-id-1 div.sk-label-container {
   text-align: center;
 }
 
 /* Estimator-specific */
-#sk-container-id-21 div.sk-estimator {
+#sk-container-id-1 div.sk-estimator {
   font-family: monospace;
   border: 1px dotted var(--sklearn-color-border-box);
   border-radius: 0.25em;
@@ -537,18 +537,18 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-21 div.sk-estimator.fitted {
+#sk-container-id-1 div.sk-estimator.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
 /* on hover */
-#sk-container-id-21 div.sk-estimator:hover {
+#sk-container-id-1 div.sk-estimator:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-21 div.sk-estimator.fitted:hover {
+#sk-container-id-1 div.sk-estimator.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
@@ -635,7 +635,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 /* "?"-specific style due to the `<a>` HTML tag */
 
-#sk-container-id-21 a.estimator_doc_link {
+#sk-container-id-1 a.estimator_doc_link {
   float: right;
   font-size: 1rem;
   line-height: 1em;
@@ -650,30 +650,30 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   border: var(--sklearn-color-unfitted-level-1) 1pt solid;
 }
 
-#sk-container-id-21 a.estimator_doc_link.fitted {
+#sk-container-id-1 a.estimator_doc_link.fitted {
   /* fitted */
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
 
 /* On hover */
-#sk-container-id-21 a.estimator_doc_link:hover {
+#sk-container-id-1 a.estimator_doc_link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
   color: var(--sklearn-color-background);
   text-decoration: none;
 }
 
-#sk-container-id-21 a.estimator_doc_link.fitted:hover {
+#sk-container-id-1 a.estimator_doc_link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-21" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>PLSRegression(n_components=6)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-67" type="checkbox" checked=""><label for="sk-estimator-id-67" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;PLSRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.cross_decomposition.PLSRegression.html">?<span>Documentation for PLSRegression</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>PLSRegression(n_components=6)</pre></div> </div></div></div></div>
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>PLSRegression(n_components=6)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked=""><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;PLSRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.cross_decomposition.PLSRegression.html">?<span>Documentation for PLSRegression</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>PLSRegression(n_components=6)</pre></div> </div></div></div></div>
 </div>
 </div>
-<div id="cell-22" class="cell" data-execution_count="138">
+<div id="cell-22" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>pd.DataFrame(results)[[<span class="st">'param_n_components'</span>,<span class="st">'mean_test_score'</span>]].sort_values(by<span class="op">=</span><span class="st">'mean_test_score'</span>,ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="138">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <div>
 
 
@@ -719,12 +719,12 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 <p>The optimal number of components is 6 where it has the best relative fit on the data with a R-Squared of 0.518.</p>
 <p>Next, to determine if this holds true for a different metric such as the RMSE. Would the number of components be the same or would it differ?</p>
-<div id="cell-24" class="cell" data-execution_count="139">
+<div id="cell-24" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="kw">def</span> rmse_score(estimator, X, y):</span>
 <span id="cb17-2"><a href="#cb17-2"></a>    y_pred <span class="op">=</span> estimator.predict(X)</span>
 <span id="cb17-3"><a href="#cb17-3"></a>    <span class="cf">return</span> <span class="op">-</span>np.sqrt(mean_squared_error(y, y_pred)) <span class="co"># chagne sign since scoring in sklearn thinks that the higher the value the better</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-25" class="cell" data-execution_count="140">
+<div id="cell-25" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1"></a></span>
 <span id="cb18-2"><a href="#cb18-2"></a>pls_cv <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span>rmse_score, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'RMSE'</span>)  <span class="co"># change scoring to from R2 to RMSE</span></span>
 <span id="cb18-3"><a href="#cb18-3"></a>pls_cv.fit(X_train, y_train)</span>
@@ -750,9 +750,9 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 </div>
 </div>
-<div id="cell-26" class="cell" data-execution_count="141">
+<div id="cell-26" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>pd.DataFrame(results)[[<span class="st">'param_n_components'</span>,<span class="st">'mean_test_score'</span>]].sort_values(by<span class="op">=</span><span class="st">'mean_test_score'</span>,ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="141">
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
 
@@ -802,13 +802,13 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <section id="d" class="level3">
 <h3 class="anchored" data-anchor-id="d">D</h3>
 <p>Predict the response for the test set. What is the test set estimate of R2?</p>
-<p>From cross-validatio</p>
-<div id="cell-30" class="cell" data-execution_count="142">
+<p>From cross-validation, 6 components provide the best performance metrics.</p>
+<div id="cell-30" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a>plsr <span class="op">=</span> PLSRegression(n_components<span class="op">=</span><span class="dv">6</span>)</span>
 <span id="cb20-2"><a href="#cb20-2"></a>plsr.fit(X_train, y_train)</span>
 <span id="cb20-3"><a href="#cb20-3"></a>y_pred <span class="op">=</span> plsr.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-31" class="cell" data-execution_count="143">
+<div id="cell-31" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> r2_score</span>
 <span id="cb21-2"><a href="#cb21-2"></a></span>
 <span id="cb21-3"><a href="#cb21-3"></a>plsr_r2 <span class="op">=</span> r2_score(y_test, y_pred)</span>
@@ -822,7 +822,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <h3 class="anchored" data-anchor-id="e">E</h3>
 <p>Try building other models discussed in this chapter.</p>
 <p>Do any have better predictive performance?</p>
-<div id="cell-33" class="cell" data-execution_count="144">
+<div id="cell-33" class="cell" data-execution_count="19">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># PCA Regression</span></span>
 <span id="cb23-2"><a href="#cb23-2"></a><span class="co"># perform  PCA first then fit to LinearRegrssion model</span></span>
 <span id="cb23-3"><a href="#cb23-3"></a></span>
@@ -839,8 +839,8 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <span id="cb23-14"><a href="#cb23-14"></a></span>
 <span id="cb23-15"><a href="#cb23-15"></a>pca_cv <span class="op">=</span> GridSearchCV(pipe, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'mean_squared_error'</span>) </span>
 <span id="cb23-16"><a href="#cb23-16"></a>pca_cv.fit(X_train, y_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="144">
-<style>#sk-container-id-22 {
+<div class="cell-output cell-output-display" data-execution_count="19">
+<style>#sk-container-id-2 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: black;
   --sklearn-color-line: gray;
@@ -870,15 +870,15 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   }
 }
 
-#sk-container-id-22 {
+#sk-container-id-2 {
   color: var(--sklearn-color-text);
 }
 
-#sk-container-id-22 pre {
+#sk-container-id-2 pre {
   padding: 0;
 }
 
-#sk-container-id-22 input.sk-hidden--visually {
+#sk-container-id-2 input.sk-hidden--visually {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px);
@@ -890,7 +890,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   width: 1px;
 }
 
-#sk-container-id-22 div.sk-dashed-wrapped {
+#sk-container-id-2 div.sk-dashed-wrapped {
   border: 1px dashed var(--sklearn-color-line);
   margin: 0 0.4em 0.5em 0.4em;
   box-sizing: border-box;
@@ -898,7 +898,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   background-color: var(--sklearn-color-background);
 }
 
-#sk-container-id-22 div.sk-container {
+#sk-container-id-2 div.sk-container {
   /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
      but bootstrap.min.css set `[hidden] { display: none !important; }`
      so we also need the `!important` here to be able to override the
@@ -908,7 +908,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   position: relative;
 }
 
-#sk-container-id-22 div.sk-text-repr-fallback {
+#sk-container-id-2 div.sk-text-repr-fallback {
   display: none;
 }
 
@@ -924,14 +924,14 @@ div.sk-item {
 
 /* Parallel-specific style estimator block */
 
-#sk-container-id-22 div.sk-parallel-item::after {
+#sk-container-id-2 div.sk-parallel-item::after {
   content: "";
   width: 100%;
   border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
   flex-grow: 1;
 }
 
-#sk-container-id-22 div.sk-parallel {
+#sk-container-id-2 div.sk-parallel {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -939,28 +939,28 @@ div.sk-item {
   position: relative;
 }
 
-#sk-container-id-22 div.sk-parallel-item {
+#sk-container-id-2 div.sk-parallel-item {
   display: flex;
   flex-direction: column;
 }
 
-#sk-container-id-22 div.sk-parallel-item:first-child::after {
+#sk-container-id-2 div.sk-parallel-item:first-child::after {
   align-self: flex-end;
   width: 50%;
 }
 
-#sk-container-id-22 div.sk-parallel-item:last-child::after {
+#sk-container-id-2 div.sk-parallel-item:last-child::after {
   align-self: flex-start;
   width: 50%;
 }
 
-#sk-container-id-22 div.sk-parallel-item:only-child::after {
+#sk-container-id-2 div.sk-parallel-item:only-child::after {
   width: 0;
 }
 
 /* Serial-specific style estimator block */
 
-#sk-container-id-22 div.sk-serial {
+#sk-container-id-2 div.sk-serial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -978,14 +978,14 @@ clickable and can be expanded/collapsed.
 
 /* Pipeline and ColumnTransformer style (default) */
 
-#sk-container-id-22 div.sk-toggleable {
+#sk-container-id-2 div.sk-toggleable {
   /* Default theme specific background. It is overwritten whether we have a
   specific estimator or a Pipeline/ColumnTransformer */
   background-color: var(--sklearn-color-background);
 }
 
 /* Toggleable label */
-#sk-container-id-22 label.sk-toggleable__label {
+#sk-container-id-2 label.sk-toggleable__label {
   cursor: pointer;
   display: block;
   width: 100%;
@@ -995,7 +995,7 @@ clickable and can be expanded/collapsed.
   text-align: center;
 }
 
-#sk-container-id-22 label.sk-toggleable__label-arrow:before {
+#sk-container-id-2 label.sk-toggleable__label-arrow:before {
   /* Arrow on the left of the label */
   content: "▸";
   float: left;
@@ -1003,13 +1003,13 @@ clickable and can be expanded/collapsed.
   color: var(--sklearn-color-icon);
 }
 
-#sk-container-id-22 label.sk-toggleable__label-arrow:hover:before {
+#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {
   color: var(--sklearn-color-text);
 }
 
 /* Toggleable content - dropdown */
 
-#sk-container-id-22 div.sk-toggleable__content {
+#sk-container-id-2 div.sk-toggleable__content {
   max-height: 0;
   max-width: 0;
   overflow: hidden;
@@ -1018,12 +1018,12 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-22 div.sk-toggleable__content.fitted {
+#sk-container-id-2 div.sk-toggleable__content.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-22 div.sk-toggleable__content pre {
+#sk-container-id-2 div.sk-toggleable__content pre {
   margin: 0.2em;
   border-radius: 0.25em;
   color: var(--sklearn-color-text);
@@ -1031,79 +1031,79 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-22 div.sk-toggleable__content.fitted pre {
+#sk-container-id-2 div.sk-toggleable__content.fitted pre {
   /* unfitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-22 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
   max-height: 200px;
   max-width: 100%;
   overflow: auto;
 }
 
-#sk-container-id-22 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
   content: "▾";
 }
 
 /* Pipeline/ColumnTransformer-specific style */
 
-#sk-container-id-22 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-22 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-2 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator-specific style */
 
 /* Colorize estimator box */
-#sk-container-id-22 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-22 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-2 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
-#sk-container-id-22 div.sk-label label.sk-toggleable__label,
-#sk-container-id-22 div.sk-label label {
+#sk-container-id-2 div.sk-label label.sk-toggleable__label,
+#sk-container-id-2 div.sk-label label {
   /* The background is the default theme color */
   color: var(--sklearn-color-text-on-default-background);
 }
 
 /* On hover, darken the color of the background */
-#sk-container-id-22 div.sk-label:hover label.sk-toggleable__label {
+#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
 /* Label box, darken color on hover, fitted */
-#sk-container-id-22 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+#sk-container-id-2 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator label */
 
-#sk-container-id-22 div.sk-label label {
+#sk-container-id-2 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
   display: inline-block;
   line-height: 1.2em;
 }
 
-#sk-container-id-22 div.sk-label-container {
+#sk-container-id-2 div.sk-label-container {
   text-align: center;
 }
 
 /* Estimator-specific */
-#sk-container-id-22 div.sk-estimator {
+#sk-container-id-2 div.sk-estimator {
   font-family: monospace;
   border: 1px dotted var(--sklearn-color-border-box);
   border-radius: 0.25em;
@@ -1113,18 +1113,18 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-22 div.sk-estimator.fitted {
+#sk-container-id-2 div.sk-estimator.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
 /* on hover */
-#sk-container-id-22 div.sk-estimator:hover {
+#sk-container-id-2 div.sk-estimator:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-22 div.sk-estimator.fitted:hover {
+#sk-container-id-2 div.sk-estimator.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
@@ -1211,7 +1211,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 /* "?"-specific style due to the `<a>` HTML tag */
 
-#sk-container-id-22 a.estimator_doc_link {
+#sk-container-id-2 a.estimator_doc_link {
   float: right;
   font-size: 1rem;
   line-height: 1em;
@@ -1226,50 +1226,50 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   border: var(--sklearn-color-unfitted-level-1) 1pt solid;
 }
 
-#sk-container-id-22 a.estimator_doc_link.fitted {
+#sk-container-id-2 a.estimator_doc_link.fitted {
   /* fitted */
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
 
 /* On hover */
-#sk-container-id-22 a.estimator_doc_link:hover {
+#sk-container-id-2 a.estimator_doc_link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
   color: var(--sklearn-color-background);
   text-decoration: none;
 }
 
-#sk-container-id-22 a.estimator_doc_link.fitted:hover {
+#sk-container-id-2 a.estimator_doc_link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-22" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
+</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
              estimator=Pipeline(steps=[('pca', PCA()),
                                        ('linear regression',
                                         LinearRegression())]),
              param_grid={'pca__n_components': range(1, 40)},
              refit='mean_squared_error',
-             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-68" type="checkbox"><label for="sk-estimator-id-68" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;GridSearchCV<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.model_selection.GridSearchCV.html">?<span>Documentation for GridSearchCV</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
+             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br>On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden=""><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox"><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;GridSearchCV<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.model_selection.GridSearchCV.html">?<span>Documentation for GridSearchCV</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>GridSearchCV(cv=KFold(n_splits=5, random_state=123, shuffle=True),
              estimator=Pipeline(steps=[('pca', PCA()),
                                        ('linear regression',
                                         LinearRegression())]),
              param_grid={'pca__n_components': range(1, 40)},
              refit='mean_squared_error',
-             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-69" type="checkbox"><label for="sk-estimator-id-69" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">estimator: Pipeline</label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[('pca', PCA()), ('linear regression', LinearRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-70" type="checkbox"><label for="sk-estimator-id-70" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;PCA<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a></label><div class="sk-toggleable__content fitted"><pre>PCA()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-71" type="checkbox"><label for="sk-estimator-id-71" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LinearRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a></label><div class="sk-toggleable__content fitted"><pre>LinearRegression()</pre></div> </div></div></div></div></div></div></div></div></div></div></div>
+             scoring=make_scorer(mean_squared_error, greater_is_better=False, response_method='predict'))</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox"><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">estimator: Pipeline</label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[('pca', PCA()), ('linear regression', LinearRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox"><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;PCA<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a></label><div class="sk-toggleable__content fitted"><pre>PCA()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox"><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LinearRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.4/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a></label><div class="sk-toggleable__content fitted"><pre>LinearRegression()</pre></div> </div></div></div></div></div></div></div></div></div></div></div>
 </div>
 </div>
-<div id="cell-34" class="cell" data-execution_count="145">
+<div id="cell-34" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a>optimal_n_components_pca <span class="op">=</span> pca_cv.best_params_[<span class="st">'pca__n_components'</span>]</span>
 <span id="cb24-2"><a href="#cb24-2"></a><span class="bu">print</span>(<span class="ss">f"Optimal Number of Components:</span><span class="sc">{</span>optimal_n_components_pca<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Optimal Number of Components:26</code></pre>
 </div>
 </div>
-<div id="cell-35" class="cell" data-execution_count="146">
+<div id="cell-35" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>results_df <span class="op">=</span> pd.DataFrame(pca_cv.cv_results_)[[<span class="st">'param_pca__n_components'</span>, <span class="st">'mean_test_score'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-36" class="cell" data-execution_count="147">
+<div id="cell-36" class="cell" data-execution_count="22">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
 <span id="cb27-2"><a href="#cb27-2"></a>plt.plot(results_df.param_pca__n_components, np.sqrt(<span class="op">-</span>results_df.mean_test_score), marker<span class="op">=</span><span class="st">'o'</span>)</span>
 <span id="cb27-3"><a href="#cb27-3"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
@@ -1284,7 +1284,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 </div>
 </div>
-<div id="cell-37" class="cell" data-execution_count="148">
+<div id="cell-37" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>pca <span class="op">=</span> PCA(n_components  <span class="op">=</span> <span class="dv">26</span>)</span>
 <span id="cb28-2"><a href="#cb28-2"></a></span>
 <span id="cb28-3"><a href="#cb28-3"></a>X_train_pca <span class="op">=</span> pca.fit_transform(X_train)</span>
@@ -1295,14 +1295,14 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <span id="cb28-8"><a href="#cb28-8"></a></span>
 <span id="cb28-9"><a href="#cb28-9"></a>y_pred <span class="op">=</span> lm.predict(X_test_pca)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-38" class="cell" data-execution_count="149">
+<div id="cell-38" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a>pcr_r2<span class="op">=</span> r2_score(y_test, y_pred)</span>
 <span id="cb29-2"><a href="#cb29-2"></a><span class="bu">print</span>(<span class="ss">f'R-squared of the test set: </span><span class="sc">{</span>pcr_r2<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>R-squared of the test set: 0.29587680000513394</code></pre>
 </div>
 </div>
-<div id="cell-39" class="cell" data-execution_count="150">
+<div id="cell-39" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># Penalized Regressions</span></span>
 <span id="cb31-2"><a href="#cb31-2"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> Ridge, Lasso, ElasticNet</span>
 <span id="cb31-3"><a href="#cb31-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
@@ -1320,7 +1320,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <pre><code>Best Alpha: 11</code></pre>
 </div>
 </div>
-<div id="cell-40" class="cell" data-execution_count="151">
+<div id="cell-40" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># find the best parametere for lasso </span></span>
 <span id="cb33-2"><a href="#cb33-2"></a></span>
 <span id="cb33-3"><a href="#cb33-3"></a>lasso_model <span class="op">=</span> Lasso()</span>
@@ -1333,7 +1333,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <pre><code>Best Alpha: 1</code></pre>
 </div>
 </div>
-<div id="cell-41" class="cell" data-execution_count="152">
+<div id="cell-41" class="cell" data-execution_count="27">
 <div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>param_grid_elasticnet <span class="op">=</span> {<span class="st">'alpha'</span>: <span class="bu">range</span>(<span class="dv">1</span>,<span class="dv">20</span>)} </span>
 <span id="cb35-2"><a href="#cb35-2"></a>elasticnet_model <span class="op">=</span> ElasticNet()</span>
 <span id="cb35-3"><a href="#cb35-3"></a>grid_search <span class="op">=</span> GridSearchCV(elasticnet_model, param_grid_elasticnet, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
@@ -1346,7 +1346,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <pre><code>Best Alpha: 1</code></pre>
 </div>
 </div>
-<div id="cell-42" class="cell" data-message="false" data-execution_count="153">
+<div id="cell-42" class="cell" data-message="false" data-execution_count="28">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>param_grid_l1 <span class="op">=</span> {<span class="st">'l1_ratio'</span> : np.arange(<span class="dv">0</span>,<span class="dv">1</span>,<span class="fl">0.1</span>)}</span>
 <span id="cb37-2"><a href="#cb37-2"></a>elasticnet_model <span class="op">=</span> ElasticNet(alpha<span class="op">=</span><span class="dv">1</span>) <span class="co"># set alpha to 1</span></span>
 <span id="cb37-3"><a href="#cb37-3"></a>grid_search <span class="op">=</span> GridSearchCV(elasticnet_model, param_grid_l1, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
@@ -1354,14 +1354,14 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <span id="cb37-5"><a href="#cb37-5"></a></span>
 <span id="cb37-6"><a href="#cb37-6"></a>best_l1 <span class="op">=</span> grid_search.best_params_[<span class="st">'l1_ratio'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-43" class="cell" data-execution_count="154">
+<div id="cell-43" class="cell" data-execution_count="29">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a></span>
 <span id="cb38-2"><a href="#cb38-2"></a><span class="bu">print</span>(<span class="st">"Best L1_ratio:"</span>, best_l1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Best L1_ratio: 0.0</code></pre>
 </div>
 </div>
-<div id="cell-44" class="cell" data-message="false" data-execution_count="157">
+<div id="cell-44" class="cell" data-message="false" data-execution_count="30">
 <div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>ridge_model <span class="op">=</span> Ridge(alpha<span class="op">=</span><span class="dv">11</span>)</span>
 <span id="cb40-2"><a href="#cb40-2"></a>ridge_model.fit(X_train,y_train)</span>
 <span id="cb40-3"><a href="#cb40-3"></a>ridge_preds <span class="op">=</span> ridge_model.predict(X_test)</span>
@@ -1374,7 +1374,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <span id="cb40-10"><a href="#cb40-10"></a>elastic_model.fit(X_train,y_train)</span>
 <span id="cb40-11"><a href="#cb40-11"></a>elastic_preds <span class="op">=</span> elastic_model.predict(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-45" class="cell" data-execution_count="156">
+<div id="cell-45" class="cell" data-execution_count="31">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a><span class="bu">print</span>(<span class="ss">f'PLS Model R-squared: </span><span class="sc">{</span>plsr_r2<span class="sc">}</span><span class="ss">'</span>)</span>
 <span id="cb41-2"><a href="#cb41-2"></a><span class="bu">print</span>(<span class="ss">f'PCA Regression R-squared: </span><span class="sc">{</span>pcr_r2<span class="sc">}</span><span class="ss">'</span>)</span>
 <span id="cb41-3"><a href="#cb41-3"></a><span class="bu">print</span>(<span class="ss">f'Ridge Model R-squared : </span><span class="sc">{</span>r2_score(y_test, ridge_preds)<span class="sc">}</span><span class="ss">'</span>)</span>
@@ -1409,12 +1409,12 @@ Elastic Model R-squared : 0.2031244000136866</code></pre>
 <p>data(chemicalManufacturing)</p>
 </blockquote>
 <p>The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. yield contains the percent yield for each run.</p>
-<div id="cell-52" class="cell" data-execution_count="162">
+<div id="cell-52" class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>chemical_df <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw7/chemical_data.csv'</span>).drop(<span class="st">'Unnamed: 0'</span>,axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-53" class="cell" data-execution_count="163">
+<div id="cell-53" class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>chemical_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="163">
+<div class="cell-output cell-output-display" data-execution_count="33">
 <div>
 
 
@@ -1722,25 +1722,25 @@ Elastic Model R-squared : 0.2031244000136866</code></pre>
 <h3 class="anchored" data-anchor-id="b-1">B</h3>
 <p>A small percentage of cells in the predictor set contain missing values.</p>
 <p>Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).</p>
-<div id="cell-55" class="cell" data-execution_count="164">
+<div id="cell-55" class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>X <span class="op">=</span> chemical_df.drop(<span class="st">'Yield'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb45-2"><a href="#cb45-2"></a>y <span class="op">=</span> chemical_df[[<span class="st">'Yield'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-56" class="cell" data-execution_count="165">
+<div id="cell-56" class="cell" data-execution_count="35">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>X.shape, y.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="165">
+<div class="cell-output cell-output-display" data-execution_count="35">
 <pre><code>((176, 57), (176, 1))</code></pre>
 </div>
 </div>
-<div id="cell-57" class="cell" data-execution_count="175">
+<div id="cell-57" class="cell" data-execution_count="36">
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># check for missingnes</span></span>
 <span id="cb48-2"><a href="#cb48-2"></a>X.isna().<span class="bu">sum</span>().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="175">
+<div class="cell-output cell-output-display" data-execution_count="36">
 <pre><code>106</code></pre>
 </div>
 </div>
 <p>There are 106 missing values to impute with median. Using median is more robust than mean and preferred since it less impact of the distribution of the data.</p>
-<div id="cell-59" class="cell">
+<div id="cell-59" class="cell" data-execution_count="37">
 <div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>X.fillna(X.median(), inplace<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -1748,164 +1748,170 @@ Elastic Model R-squared : 0.2031244000136866</code></pre>
 <h3 class="anchored" data-anchor-id="c-1">C</h3>
 <p>Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.</p>
 <p>What is the optimal value of the performance metric?</p>
-<div id="cell-61" class="cell" data-execution_count="178">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>X.describe().T.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="178">
+<p>Since the each feature has on a unique scale, standard scaling is required to ensure that features equallycontribute to the model leading to a unbiased model.</p>
+<div id="cell-62" class="cell" data-execution_count="70">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X, threshold<span class="op">=</span><span class="fl">0.2</span>) <span class="co"># removes variance less than 0.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-63" class="cell" data-execution_count="130">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb52-2"><a href="#cb52-2"></a>scaler  <span class="op">=</span> StandardScaler()</span>
+<span id="cb52-3"><a href="#cb52-3"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X_filtered)</span>
+<span id="cb52-4"><a href="#cb52-4"></a>X_scaled_df <span class="op">=</span> pd.DataFrame(X_scaled, columns <span class="op">=</span> X_filtered.columns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-64" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a><span class="co"># mean should be around 0 and std to be 1</span></span>
+<span id="cb53-2"><a href="#cb53-2"></a>np.mean(X_scaled), np.std(X_scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="89">
+<pre><code>(-1.0092936587501423e-16, 1.0)</code></pre>
+</div>
+</div>
+<div id="cell-65" class="cell" data-execution_count="126">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_scaled_df, y, test_size <span class="op">=</span> <span class="fl">0.2</span>, shuffle <span class="op">=</span> <span class="va">True</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-66" class="cell" data-execution_count="131">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>X_scaled_df.shape, X_pca_scaled.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="131">
+<pre><code>((176, 47), (176, 47))</code></pre>
+</div>
+</div>
+<div id="cell-67" class="cell" data-execution_count="127">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>pls <span class="op">=</span> PLSRegression()</span>
+<span id="cb58-2"><a href="#cb58-2"></a></span>
+<span id="cb58-3"><a href="#cb58-3"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb58-4"><a href="#cb58-4"></a>    <span class="st">'n_components'</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">20</span>)  </span>
+<span id="cb58-5"><a href="#cb58-5"></a>}</span>
+<span id="cb58-6"><a href="#cb58-6"></a></span>
+<span id="cb58-7"><a href="#cb58-7"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span><span class="st">'r2'</span>, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'mean_squared_error'</span>)</span>
+<span id="cb58-8"><a href="#cb58-8"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb58-9"><a href="#cb58-9"></a></span>
+<span id="cb58-10"><a href="#cb58-10"></a>results <span class="op">=</span> grid_search.cv_results_</span>
+<span id="cb58-11"><a href="#cb58-11"></a>optimal_n_components <span class="op">=</span> pls_cv.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb58-12"><a href="#cb58-12"></a></span>
+<span id="cb58-13"><a href="#cb58-13"></a></span>
+<span id="cb58-14"><a href="#cb58-14"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb58-15"><a href="#cb58-15"></a>best_r2 <span class="op">=</span> grid_search.best_score_</span>
+<span id="cb58-16"><a href="#cb58-16"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
+<span id="cb58-17"><a href="#cb58-17"></a><span class="bu">print</span>(<span class="st">"Best R2:"</span>, best_r2)</span>
+<span id="cb58-18"><a href="#cb58-18"></a>results_df <span class="op">=</span> pd.DataFrame(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimal Number of Components: 4
+Best R2: 0.4107344665711775</code></pre>
+</div>
+</div>
+<div id="cell-68" class="cell" data-execution_count="128">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb60-2"><a href="#cb60-2"></a>plt.plot(results_df.param_n_components, results_df.mean_test_score, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb60-3"><a href="#cb60-3"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
+<span id="cb60-4"><a href="#cb60-4"></a>plt.ylabel(<span class="st">'R2 (Cross-Validation)'</span>)</span>
+<span id="cb60-5"><a href="#cb60-5"></a>plt.title(<span class="ss">f"Best Training Set R2 at </span><span class="sc">{</span>best_n_components<span class="sc">}</span><span class="ss"> Components"</span>)</span>
+<span id="cb60-6"><a href="#cb60-6"></a>plt.axvline(best_n_components, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>) </span>
+<span id="cb60-7"><a href="#cb60-7"></a>plt.grid()</span>
+<span id="cb60-8"><a href="#cb60-8"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
 <div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">count</th>
-<th data-quarto-table-cell-role="th">mean</th>
-<th data-quarto-table-cell-role="th">std</th>
-<th data-quarto-table-cell-role="th">min</th>
-<th data-quarto-table-cell-role="th">25%</th>
-<th data-quarto-table-cell-role="th">50%</th>
-<th data-quarto-table-cell-role="th">75%</th>
-<th data-quarto-table-cell-role="th">max</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">BiologicalMaterial01</td>
-<td>176.0</td>
-<td>6.411420</td>
-<td>0.713923</td>
-<td>4.58</td>
-<td>5.9775</td>
-<td>6.305</td>
-<td>6.8700</td>
-<td>8.81</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">BiologicalMaterial02</td>
-<td>176.0</td>
-<td>55.688750</td>
-<td>4.034581</td>
-<td>46.87</td>
-<td>52.6800</td>
-<td>55.090</td>
-<td>58.7375</td>
-<td>64.75</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">BiologicalMaterial03</td>
-<td>176.0</td>
-<td>67.705000</td>
-<td>4.001064</td>
-<td>56.97</td>
-<td>64.9800</td>
-<td>67.220</td>
-<td>70.4275</td>
-<td>78.25</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">BiologicalMaterial04</td>
-<td>176.0</td>
-<td>12.349261</td>
-<td>1.774661</td>
-<td>9.38</td>
-<td>11.2450</td>
-<td>12.100</td>
-<td>13.2200</td>
-<td>23.09</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">BiologicalMaterial05</td>
-<td>176.0</td>
-<td>18.598636</td>
-<td>1.844141</td>
-<td>13.24</td>
-<td>17.2350</td>
-<td>18.490</td>
-<td>19.9000</td>
-<td>24.85</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">BiologicalMaterial06</td>
-<td>176.0</td>
-<td>48.910398</td>
-<td>3.746072</td>
-<td>40.60</td>
-<td>46.0550</td>
-<td>48.460</td>
-<td>51.3450</td>
-<td>59.38</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">BiologicalMaterial07</td>
-<td>176.0</td>
-<td>100.014148</td>
-<td>0.107742</td>
-<td>100.00</td>
-<td>100.0000</td>
-<td>100.000</td>
-<td>100.0000</td>
-<td>100.83</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">BiologicalMaterial08</td>
-<td>176.0</td>
-<td>17.494773</td>
-<td>0.676954</td>
-<td>15.88</td>
-<td>17.0600</td>
-<td>17.510</td>
-<td>17.8800</td>
-<td>19.14</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">BiologicalMaterial09</td>
-<td>176.0</td>
-<td>12.850057</td>
-<td>0.415176</td>
-<td>11.44</td>
-<td>12.6025</td>
-<td>12.835</td>
-<td>13.1300</td>
-<td>14.08</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">BiologicalMaterial10</td>
-<td>176.0</td>
-<td>2.800625</td>
-<td>0.599143</td>
-<td>1.77</td>
-<td>2.4600</td>
-<td>2.710</td>
-<td>2.9900</td>
-<td>6.87</td>
-</tr>
-</tbody>
-</table>
-
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+</figure>
 </div>
 </div>
 </div>
-<p>Since the each feature has on a unique scale, standard scaling is required.</p>
-<div id="cell-63" class="cell" data-execution_count="182">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X) <span class="co"># removes variance less than 0.1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-69" class="cell" data-execution_count="142">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)  </span>
+<span id="cb61-2"><a href="#cb61-2"></a>grid_search.fit(X_train, y_train) </span>
+<span id="cb61-3"><a href="#cb61-3"></a></span>
+<span id="cb61-4"><a href="#cb61-4"></a>results <span class="op">=</span> pd.DataFrame(grid_search.cv_results_)</span>
+<span id="cb61-5"><a href="#cb61-5"></a></span>
+<span id="cb61-6"><a href="#cb61-6"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb61-7"><a href="#cb61-7"></a>best_rmse <span class="op">=</span> np.sqrt(<span class="op">-</span>grid_search.best_score_) <span class="co"># dont forget to convert back to RMSE</span></span>
+<span id="cb61-8"><a href="#cb61-8"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
+<span id="cb61-9"><a href="#cb61-9"></a><span class="bu">print</span>(<span class="st">"Best RMSE:"</span>, best_rmse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Optimal Number of Components: 4
+Best RMSE: 1.3248062816568802</code></pre>
 </div>
-<div id="cell-65" class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span> <span class="fl">0.2</span>, shuffle <span class="op">=</span> <span class="va">True</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="d-1" class="level3">
 <h3 class="anchored" data-anchor-id="d-1">D</h3>
 <p>Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?</p>
+<div id="cell-71" class="cell" data-execution_count="195">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a>pls_model <span class="op">=</span> PLSRegression(n_components<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb63-2"><a href="#cb63-2"></a></span>
+<span id="cb63-3"><a href="#cb63-3"></a>pls_model.fit(X_train,y_train)</span>
+<span id="cb63-4"><a href="#cb63-4"></a>y_pred <span class="op">=</span> pls_model.predict(X_test)</span>
+<span id="cb63-5"><a href="#cb63-5"></a></span>
+<span id="cb63-6"><a href="#cb63-6"></a><span class="bu">print</span>(<span class="ss">f'RMSE: </span><span class="sc">{</span>mean_squared_error(y_test,y_pred)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>RMSE: 1.547730653575556</code></pre>
+</div>
+</div>
+<p>Comparing the RMSE from cross validation set is not too different from the RMSE on the test set. Suggests that the model learned the underlying patterns beyond the folds during cross validation.</p>
+<p>Guess, this particular company has fine-tuned its manufacturing process so much that the quality of the biological material has less impact of the yield of the product.</p>
 </section>
 <section id="e-1" class="level3">
 <h3 class="anchored" data-anchor-id="e-1">E</h3>
 <p>Which predictors are most important in the model you have trained?</p>
 <p>Do either the biological or process predictors dominate the list?</p>
+<div id="cell-74" class="cell" data-execution_count="196">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a>coef_df <span class="op">=</span> pd.DataFrame(pls_model.coef_, columns <span class="op">=</span> X_train.columns).T</span>
+<span id="cb65-2"><a href="#cb65-2"></a>coef_df.columns <span class="op">=</span> [<span class="st">'Importance'</span>]</span>
+<span id="cb65-3"><a href="#cb65-3"></a>coef_df <span class="op">=</span> coef_df.sort_values(<span class="st">'Importance'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-75" class="cell" data-execution_count="197">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>coef_df.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="197">
+<pre><code>Index(['index', 'Importance'], dtype='object')</code></pre>
+</div>
+</div>
+<div id="cell-76" class="cell" data-execution_count="198">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a>plt.barh(coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>), coef_df[<span class="st">'Importance'</span>].head(<span class="dv">10</span>)) </span>
+<span id="cb68-2"><a href="#cb68-2"></a>plt.xlabel(<span class="st">'Importance'</span>)</span>
+<span id="cb68-3"><a href="#cb68-3"></a>plt.title(<span class="st">'Top 10 Feature Importances'</span>)</span>
+<span id="cb68-4"><a href="#cb68-4"></a>plt.gca().invert_yaxis()</span>
+<span id="cb68-5"><a href="#cb68-5"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-50-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The manufacturing process is mainly responsible to the amount of product yield this chemical company produces. Meaning that improving product yield can be done by optimizing the manufacturing process rather than the quantity of the biological materials.</p>
 </section>
 <section id="f-1" class="level3">
 <h3 class="anchored" data-anchor-id="f-1">F</h3>
 <p>Explore the relationships between each of the top predictors and the response.</p>
 <p>How could this information be helpful in improving yield in future runs of the manufacturing process?</p>
+<div id="cell-79" class="cell" data-execution_count="199">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a>feature_names <span class="op">=</span> coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>).tolist()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-80" class="cell" data-execution_count="200">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a>num_plots <span class="op">=</span> <span class="bu">len</span>(feature_names)</span>
+<span id="cb70-2"><a href="#cb70-2"></a>rows <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb70-3"><a href="#cb70-3"></a>cols <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb70-4"><a href="#cb70-4"></a></span>
+<span id="cb70-5"><a href="#cb70-5"></a>fig, axes <span class="op">=</span> plt.subplots(rows, cols, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
+<span id="cb70-6"><a href="#cb70-6"></a></span>
+<span id="cb70-7"><a href="#cb70-7"></a><span class="cf">for</span> i, feature <span class="kw">in</span> <span class="bu">enumerate</span>(feature_names):</span>
+<span id="cb70-8"><a href="#cb70-8"></a>    row <span class="op">=</span> i <span class="op">//</span> cols</span>
+<span id="cb70-9"><a href="#cb70-9"></a>    col <span class="op">=</span> i <span class="op">%</span> cols</span>
+<span id="cb70-10"><a href="#cb70-10"></a>    axes[row, col].scatter(X[feature], y[<span class="st">'Yield'</span>])</span>
+<span id="cb70-11"><a href="#cb70-11"></a>    axes[row, col].set_xlabel(feature)</span>
+<span id="cb70-12"><a href="#cb70-12"></a>    axes[row, col].set_ylabel(<span class="st">'response'</span>)</span>
+<span id="cb70-13"><a href="#cb70-13"></a>    axes[row, col].set_title(<span class="ss">f'</span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> and Response'</span>)</span>
+<span id="cb70-14"><a href="#cb70-14"></a></span>
+<span id="cb70-15"><a href="#cb70-15"></a>plt.tight_layout()</span>
+<span id="cb70-16"><a href="#cb70-16"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="linear_regression_files/figure-html/cell-52-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This information can be helpful in improving yield in future by finding out which manufacturing process and biological process impacts the value of the yield the most. Some of processes such as MP32 and MP3 have a positive correlation with out target variable which suggests that improving those specific preocesses will in turn improve yields. Furthermore, taking a look at MP39 and MP 42 its seems that their values has high variability for the same input.</p>
 </section>
 </section>
 </section>
