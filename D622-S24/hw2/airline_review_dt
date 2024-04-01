@@ -1,0 +1,25 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname="helvetica"] ;
+edge [fontname="helvetica"] ;
+0 [label="Value For Money <= 3.5\ngini = 0.468\nsamples = 1391\nvalue = [871.0, 520.0]\nclass = Not Recommend", fillcolor="#f5ccaf"] ;
+1 [label="Value For Money <= 2.5\ngini = 0.212\nsamples = 952\nvalue = [837, 115]\nclass = Not Recommend", fillcolor="#e99254"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+2 [label="Ground Service <= 2.5\ngini = 0.034\nsamples = 685\nvalue = [673.0, 12.0]\nclass = Not Recommend", fillcolor="#e5833d"] ;
+1 -> 2 ;
+3 [label="gini = 0.009\nsamples = 433\nvalue = [431, 2]\nclass = Not Recommend", fillcolor="#e5823a"] ;
+2 -> 3 ;
+4 [label="gini = 0.076\nsamples = 252\nvalue = [242, 10]\nclass = Not Recommend", fillcolor="#e68641"] ;
+2 -> 4 ;
+5 [label="gini = 0.474\nsamples = 267\nvalue = [164.0, 103.0]\nclass = Not Recommend", fillcolor="#f5d0b5"] ;
+1 -> 5 ;
+6 [label="Cabin Staff Service <= 4.5\ngini = 0.143\nsamples = 439\nvalue = [34, 405]\nclass = Recommend", fillcolor="#4aa5e7"] ;
+0 -> 6 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+7 [label="gini = 0.307\nsamples = 148\nvalue = [28, 120]\nclass = Recommend", fillcolor="#67b4eb"] ;
+6 -> 7 ;
+8 [label="Seat Comfort <= 4.5\ngini = 0.04\nsamples = 291\nvalue = [6, 285]\nclass = Recommend", fillcolor="#3d9fe6"] ;
+6 -> 8 ;
+9 [label="gini = 0.077\nsamples = 149\nvalue = [6, 143]\nclass = Recommend", fillcolor="#41a1e6"] ;
+8 -> 9 ;
+10 [label="gini = 0.0\nsamples = 142\nvalue = [0, 142]\nclass = Recommend", fillcolor="#399de5"] ;
+8 -> 10 ;
+}
