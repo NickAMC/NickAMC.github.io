@@ -1,0 +1,269 @@
+---
+title: "Non-Linear Regression"
+author: "Nick Climaco"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: pygments
+    theme: cerulean
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# KJ : Applied Predictive Modeling
+
+```{r, echo = FALSE, message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(mlbench)
+library(caret)
+library(earth)
+library(vip)
+library(pdp) 
+```
+
+## Load Data
+
+```{r}
+set.seed(1998)
+
+trainingData <- mlbench.friedman1(200, sd = 1)
+
+trainingData$x <- data.frame(trainingData$x)
+
+featurePlot(trainingData$x, trainingData$y)
+```
+
+```{r}
+testData <- mlbench.friedman1(5000,sd=1)
+
+testData$x <- data.frame(testData$x)
+```
+
+## Exercise 7.2 
+
+Friedman (1991) introduced several benchmark data sets create by simulation.
+One of these simulations used the following nonlinear equation to
+create data:
+
+$$
+y = 10 sin(πx_1x_2) + 20(x_3 − 0.5)^2 + 10x_4 + 5x_5 + N(0, σ^2)
+$$
+where the x values are random variables uniformly distributed between [0, 1]
+(there are also 5 other non-informative variables also created in the simulation).
+
+Which models appear to give the best performance? 
+
+Does MARS select the informative predictors (those named X1–X5)?
+
+### Solution
+
+#### MARS Model
+
+```{r}
+set.seed(1998)
+mars_cv = expand.grid(degree=1:3,nprune = seq(2,50, by = 2))
+mars_model = train(x = trainingData$x, 
+                   y = trainingData$y,
+                   method = 'earth',
+                   preProc = c('center', 'scale'),
+                   tuneGrid = mars_cv,
+                   trControl = trainControl(method = 'cv')
+                   )
+
+mars_predicts <- predict(mars_model, newsdata=testData$x)
+```
+
+```{r}
+ggplot(mars_model)
+```
+
+```{r}
+postResample(pred = mars_predicts, obs = testData$y)
+```
+
+```{r}
+varImp(mars_model)
+```
+
+The MARS models does only select X1-X5 features as the informative predictors where it return X4 as the most important/informative. The best model has 2 degrees and 20 Terms.
+
+#### SVM Model
+
+```{r}
+set.seed(1998)
+
+svm_model <- train(x=trainingData$x, y=trainingData$y,
+                   method = 'svmRadial',
+                   preProc = c('center', 'scale'),
+                   tuneLength = 10,
+                   trControl = trainControl(method = 'cv'))
+
+```
+
+```{r}
+svm_preds<- predict(svm_model, newdata = testData$x)
+```
+
+
+```{r}
+postResample(pred = svm_preds, obs = testData$y)
+```
+The best performing model is SMV Radial with the lowest RMSE and MAE, and the best fit of the data. 
+
+## Exercise 7.5
+
+Exercise 6.3 describes data for a chemical manufacturing process. Use
+the same data imputation, data splitting, and pre-processing steps as before
+and train several nonlinear regression models.
+
+### Solution
+
+```{r}
+library(AppliedPredictiveModeling)
+data(ChemicalManufacturingProcess)
+```
+
+```{r}
+X <- ChemicalManufacturingProcess |> select(-Yield)
+y <- ChemicalManufacturingProcess |> select(Yield)
+```
+
+```{r}
+trainIndex <- createDataPartition(y = y$Yield,
+                                  p = 0.7,
+                                  list = FALSE)
+X_train <- X[trainIndex,]
+y_train <- y[trainIndex,]
+
+X_test <- X[-trainIndex,]
+y_test <- y[-trainIndex,]
+```
+
+```{r}
+# preprocess the data with transformation, scaling and imputations
+preprocessing <- preProcess(X_train, method = c('BoxCox', 'center','scale','medianImpute'))
+
+X_train_pp <- predict(preprocessing, X_train)
+X_test_pp <- predict(preprocessing, X_test)
+
+```
+
+```{r}
+# remove near zero variance columns
+nearZero <- nearZeroVar(X_train_pp)
+X_train_pp <- X_train_pp[-nearZero]
+X_test_pp <- X_test_pp[-nearZero]
+```
+```{r}
+# reduce multicollinearity
+trainCorr <- cor(X_train_pp)
+highCorr <- findCorrelation(trainCorr)
+X_train_pp <- X_train_pp[-highCorr]
+X_test_pp <- X_test_pp[-highCorr]
+```
+
+```{r}
+# MARS Model 
+set.seed(1998)
+
+mars_cv = expand.grid(degree=1:2,nprune = seq(2,10, by = 1))
+mars_chem_model = train(x = X_train_pp, 
+                   y = y_train,
+                   method = 'earth',
+                   tuneGrid = mars_cv,
+                   trControl = trainControl(method = 'cv')
+                   )
+
+mars_chem_predicts <- predict(mars_chem_model, newdata=X_test_pp)
+
+```
+
+```{r}
+mars_chem_model
+```
+
+```{r}
+postResample(mars_chem_predicts, obs = y_test)
+```
+```{r}
+# SVM Model
+
+set.seed(1998)
+
+svm_chem_model <- train(x=X_train_pp, y=y_train,
+                   method = 'svmRadial',
+                   tuneLength = 10,
+                   trControl = trainControl(method = 'cv'))
+svm_chem_predict <- predict(svm_chem_model, newdata = X_test_pp)
+```
+
+```{r}
+svm_chem_model
+```
+
+```{r}
+postResample(svm_chem_predict, obs = y_test)
+```
+
+Part A 
+
+Which nonlinear regression model gives the optimal resampling and test
+set performance?
+
+```{r}
+ggplot(mars_chem_model)
+```
+```{r}
+ggplot(svm_chem_model)
+```
+
+The SVM model performs slightly better in the cross-validation and on the test set.
+
+Part B
+
+Which predictors are most important in the optimal nonlinear regression
+model? Do either the biological or process variables dominate the
+list? How do the top ten important predictors compare to the top ten
+predictors from the optimal linear model?
+
+The most informative features are mainly manufacturing processes mainly dominating the feature importance for the model. MP32 and MP09 were selected in both models as informative but with the SVM model identifies additional features that improve its predictive abilities. Overall, many of the manufacturing process features are identified as top importance list.
+
+```{r}
+varImp(mars_chem_model)
+```
+
+```{r}
+varImp(svm_chem_model)
+```
+
+Part C
+
+Explore the relationships between the top predictors and the response for
+the predictors that are unique to the optimal nonlinear regression model.
+Do these plots reveal intuition about the biological or process predictors
+and their relationship with yield?
+
+The top 3 unique predictors all indicate a postiive correlation with the response variable which could suggest that a linear model is sufficient for this dataset. 
+
+```{r}
+ggplot(ChemicalManufacturingProcess, aes(x=ManufacturingProcess09, y=Yield)) + geom_point()
+```
+
+```{r}
+ggplot(ChemicalManufacturingProcess, aes(x=ManufacturingProcess06, y=Yield)) + geom_point()
+```
+
+```{r}
+ggplot(ChemicalManufacturingProcess, aes(x=ManufacturingProcess33, y=Yield)) + geom_point()
+```
+
+
+
+# Resources
+
+https://bradleyboehmke.github.io/HOML/mars.html#mars-features
