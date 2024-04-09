@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-04-08">
+<meta name="dcterms.date" content="2024-04-09">
 
 <title>Tree-Based Models</title>
 <style>
@@ -73,49 +73,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
-  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
-  <script>document.addEventListener("DOMContentLoaded", function () {
- var mathElements = document.getElementsByClassName("math");
- var macros = [];
- for (var i = 0; i < mathElements.length; i++) {
-  var texText = mathElements[i].firstChild;
-  if (mathElements[i].tagName == "SPAN") {
-   katex.render(texText.data, mathElements[i], {
-    displayMode: mathElements[i].classList.contains('display'),
-    throwOnError: false,
-    macros: macros,
-    fleqn: false
-   });
-}}});
-  </script>
-  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 </head>
 
@@ -175,7 +132,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 8, 2024</p>
+      <p class="date">April 9, 2024</p>
     </div>
   </div>
   
@@ -192,7 +149,7 @@ window.Quarto = {
 </section>
 <section id="regression-trees-and-rule-based-models" class="level1">
 <h1>Regression Trees and Rule-Based Models</h1>
-<div id="cell-2" class="cell" data-execution_count="1">
+<div id="cell-2" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
@@ -209,90 +166,48 @@ window.Quarto = {
 <p>simulated &lt;- as.data.frame(simulated)</p>
 <p>colnames(simulated)[ncol(simulated)] &lt;- “y”</p>
 </blockquote>
-<div id="cell-4" class="cell" data-execution_count="6">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>train <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw8/trainingData.csv'</span>).drop(<span class="st">'Unnamed: 0'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a>test <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw8/testData.csv'</span>).drop(<span class="st">'Unnamed: 0'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-4" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>simulated <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw9/simulated.csv'</span>).drop(<span class="st">'Unnamed: 0'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-5" class="cell" data-execution_count="9">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>X_train <span class="op">=</span> train.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb3-2"><a href="#cb3-2"></a>y_train <span class="op">=</span> train[[<span class="st">'y'</span>]]</span>
-<span id="cb3-3"><a href="#cb3-3"></a></span>
-<span id="cb3-4"><a href="#cb3-4"></a>X_test <span class="op">=</span> test.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
-<span id="cb3-5"><a href="#cb3-5"></a>y_test <span class="op">=</span> test[[<span class="st">'y'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div id="cell-6" class="cell" data-execution_count="12">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>y_test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="12">
-<div>
-
-
-<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">y</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>15.091341</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>20.204395</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>12.574558</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>14.988289</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>15.837433</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">...</td>
-<td>...</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4995</td>
-<td>13.174471</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">4996</td>
-<td>4.307751</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4997</td>
-<td>21.623065</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">4998</td>
-<td>17.681984</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4999</td>
-<td>10.403340</td>
-</tr>
-</tbody>
-</table>
-
-<p>5000 rows × 1 columns</p>
-</div>
+<div id="cell-5" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>X <span class="op">=</span> simulated.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>y <span class="op">=</span> simulated[[<span class="st">'y'</span>]]</span>
+<span id="cb3-3"><a href="#cb3-3"></a>X.shape, y.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>((200, 10), (200, 1))</code></pre>
 </div>
 </div>
 <section id="part-a" class="level3">
 <h3 class="anchored" data-anchor-id="part-a">Part A</h3>
 <section id="did-the-random-forest-model-significantly-use-the-uninformative-predictors-v6-v10" class="level4">
 <h4 class="anchored" data-anchor-id="did-the-random-forest-model-significantly-use-the-uninformative-predictors-v6-v10">Did the random forest model significantly use the uninformative predictors (V6 – V10)?</h4>
-<div id="cell-8" class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-7" class="cell" data-message="false" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestRegressor</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>rf <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span><span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a>rf.fit(X,y)</span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a>feature_importances <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb5-8"><a href="#cb5-8"></a>    {<span class="st">'feature'</span>: X.columns, <span class="st">'importance'</span>: rf.feature_importances_}</span>
+<span id="cb5-9"><a href="#cb5-9"></a>)</span>
+<span id="cb5-10"><a href="#cb5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="bu">print</span>(feature_importances.sort_values(by<span class="op">=</span><span class="st">'importance'</span>,ascending<span class="op">=</span><span class="va">False</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  feature  importance
+0      V1    0.297278
+3      V4    0.260237
+1      V2    0.232932
+4      V5    0.082086
+2      V3    0.036849
+5      V6    0.023129
+6      V7    0.021162
+9     V10    0.019674
+7      V8    0.013849
+8      V9    0.012803</code></pre>
 </div>
+</div>
+<p>This random forest model identified that V6-V10 were the least informative features and at most weighted it a value of 0.02. On the other hand, V1,V4 and V2 were the most informative.</p>
 </section>
 </section>
 <section id="part-b" class="level3">
@@ -303,30 +218,300 @@ window.Quarto = {
 <section id="for-example" class="level4">
 <h4 class="anchored" data-anchor-id="for-example">For example:</h4>
 <blockquote class="blockquote">
-<p>simulated<span class="math inline">duplicate1 &lt;- simulated</span>V1 + rnorm(200) * .1</p>
-<p>cor(simulated<span class="math inline">duplicate1, simulated</span>V1)</p>
+<p>simulated$duplicate1 &lt;- simulated$V1 + rnorm(200) * .1</p>
+<p>cor(simulated$duplicate1, simulated$V1)</p>
 </blockquote>
+<div id="cell-10" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>simulated[<span class="st">'V1_updated'</span>] <span class="op">=</span> simulated[<span class="st">'V1'</span>] <span class="op">+</span> np.random.rand(<span class="dv">200</span>) <span class="op">*</span> <span class="fl">0.1</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a></span>
+<span id="cb7-3"><a href="#cb7-3"></a>X <span class="op">=</span> simulated.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>y <span class="op">=</span> simulated[[<span class="st">'y'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-11" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>simulated[[<span class="st">'V1_updated'</span>, <span class="st">'V1'</span>]].corr()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">V1_updated</th>
+<th data-quarto-table-cell-role="th">V1</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">V1_updated</td>
+<td>1.00000</td>
+<td>0.99461</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">V1</td>
+<td>0.99461</td>
+<td>1.00000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 <section id="fit-another-random-forest-model-to-these-data.-did-the-importance-score-for-v1-change-what-happens-when-you-add-another-predictor-that-is-also-highly-correlated-with-v1" class="level4">
 <h4 class="anchored" data-anchor-id="fit-another-random-forest-model-to-these-data.-did-the-importance-score-for-v1-change-what-happens-when-you-add-another-predictor-that-is-also-highly-correlated-with-v1">Fit another random forest model to these data. Did the importance score for V1 change? What happens when you add another predictor that is also highly correlated with V1?</h4>
+<div id="cell-13" class="cell" data-message="false" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>X <span class="op">=</span> simulated.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>y <span class="op">=</span> simulated[[<span class="st">'y'</span>]]</span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a>rf2 <span class="op">=</span> RandomForestRegressor(n_estimators<span class="op">=</span> <span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a>rf2.fit(X,y)</span>
+<span id="cb9-7"><a href="#cb9-7"></a></span>
+<span id="cb9-8"><a href="#cb9-8"></a>feature_importances <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb9-9"><a href="#cb9-9"></a>    {<span class="st">'feature'</span>: X.columns, <span class="st">'importance'</span>: rf2.feature_importances_}</span>
+<span id="cb9-10"><a href="#cb9-10"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11"></a></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="bu">print</span>(feature_importances.sort_values(by<span class="op">=</span><span class="st">'importance'</span>,ascending<span class="op">=</span><span class="va">False</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       feature  importance
+3           V4    0.259969
+1           V2    0.224981
+0           V1    0.165627
+10  V1_updated    0.143029
+4           V5    0.080966
+2           V3    0.036694
+5           V6    0.023296
+6           V7    0.021303
+9          V10    0.019003
+7           V8    0.012997
+8           V9    0.012136</code></pre>
+</div>
+</div>
+<p>The importance score for V1 decreases from 0.29 to 0.18. this indicates the affect of multicollinearity where the model cant isolated the effect of individual features.</p>
 </section>
 </section>
 <section id="part-c" class="level3">
 <h3 class="anchored" data-anchor-id="part-c">Part C</h3>
 <section id="use-the-cforest-function-in-the-party-package-to-fit-a-random-forest-model-using-conditional-inference-trees.-the-party-package-function-varimp-can-calculate-predictor-importance.-the-conditional-argument-of-that-function-toggles-between-the-traditional-importance-measure-and-the-modified-version-described-in-strobl-et-al.-2007.-do-these-importances-show-the-same-pattern-as-the-traditional-random-forest-model" class="level4">
 <h4 class="anchored" data-anchor-id="use-the-cforest-function-in-the-party-package-to-fit-a-random-forest-model-using-conditional-inference-trees.-the-party-package-function-varimp-can-calculate-predictor-importance.-the-conditional-argument-of-that-function-toggles-between-the-traditional-importance-measure-and-the-modified-version-described-in-strobl-et-al.-2007.-do-these-importances-show-the-same-pattern-as-the-traditional-random-forest-model">Use the cforest function in the party package to fit a random forest model using conditional inference trees. The party package function varimp can calculate predictor importance. The conditional argument of that function toggles between the traditional importance measure and the modified version described in Strobl et al.&nbsp;(2007). Do these importances show the same pattern as the traditional random forest model?</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-16-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-17-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-18-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-19-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
+<p>The features importance value for the conditional random forest have a similar pattern to the tradition randomforest models because V1-V5 as the most informative and while V6-V10 are the least informative features. After adding the highly correlated variable, it suggests signficant effect since it dropped V1 from the most informatve to the third most informatve feature.</p>
 </section>
 </section>
 <section id="part-d" class="level3">
 <h3 class="anchored" data-anchor-id="part-d">Part D</h3>
 <section id="repeat-this-process-with-different-tree-models-such-as-boosted-trees-and-cubist.-does-the-same-pattern-occur" class="level4">
 <h4 class="anchored" data-anchor-id="repeat-this-process-with-different-tree-models-such-as-boosted-trees-and-cubist.-does-the-same-pattern-occur">Repeat this process with different tree models, such as boosted trees and Cubist. Does the same pattern occur?</h4>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="notebook_files/figure-html/cell-13-1-image.png" class="img-fluid figure-img"></p>
-<figcaption>image.png</figcaption>
-</figure>
+<div id="cell-22" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Bagging decision trees model</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeRegressor</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> BaggingRegressor</span>
+<span id="cb11-4"><a href="#cb11-4"></a></span>
+<span id="cb11-5"><a href="#cb11-5"></a>dt <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7"></a>dt.fit(X,y)</span>
+<span id="cb11-8"><a href="#cb11-8"></a>br <span class="op">=</span> BaggingRegressor(estimator<span class="op">=</span>dt, n_estimators<span class="op">=</span><span class="dv">1000</span>,random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb11-9"><a href="#cb11-9"></a></span>
+<span id="cb11-10"><a href="#cb11-10"></a>br.fit(X,y)</span>
+<span id="cb11-11"><a href="#cb11-11"></a></span>
+<span id="cb11-12"><a href="#cb11-12"></a>importances <span class="op">=</span> [dt.feature_importances_ <span class="cf">for</span> estimator <span class="kw">in</span> br.estimators_]</span>
+<span id="cb11-13"><a href="#cb11-13"></a>average_importances <span class="op">=</span> np.mean(importances, axis<span class="op">=</span><span class="dv">0</span>) </span>
+<span id="cb11-14"><a href="#cb11-14"></a>feature_importances_df <span class="op">=</span> pd.DataFrame({<span class="st">'feature'</span>: X.columns, <span class="st">'importance'</span>: average_importances})</span>
+<span id="cb11-15"><a href="#cb11-15"></a>feature_importances_df.sort_values(by<span class="op">=</span><span class="st">'importance'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\.venv\Lib\site-packages\sklearn\ensemble\_bagging.py:505: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  return column_or_1d(y, warn=True)</code></pre>
 </div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">feature</th>
+<th data-quarto-table-cell-role="th">importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>V1_updated</td>
+<td>0.275596</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>V4</td>
+<td>0.248447</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>V2</td>
+<td>0.240733</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>V5</td>
+<td>0.069642</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>V1</td>
+<td>0.048848</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>V10</td>
+<td>0.039886</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>V6</td>
+<td>0.023386</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">6</td>
+<td>V7</td>
+<td>0.021123</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>V3</td>
+<td>0.015977</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8</td>
+<td>V9</td>
+<td>0.009019</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">7</td>
+<td>V8</td>
+<td>0.007345</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># AdaBoost with DT as the base estimator </span></span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> AdaBoostRegressor</span>
+<span id="cb13-3"><a href="#cb13-3"></a>dt2 <span class="op">=</span> DecisionTreeRegressor(max_depth<span class="op">=</span><span class="dv">4</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb13-4"><a href="#cb13-4"></a>dt2.fit(X,y)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>ada <span class="op">=</span> AdaBoostRegressor(estimator<span class="op">=</span>dt2, n_estimators<span class="op">=</span><span class="dv">1000</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb13-6"><a href="#cb13-6"></a>ada.fit(X,y)</span>
+<span id="cb13-7"><a href="#cb13-7"></a></span>
+<span id="cb13-8"><a href="#cb13-8"></a>importances <span class="op">=</span> [dt2.feature_importances_ <span class="cf">for</span> estimator <span class="kw">in</span> ada.estimators_]</span>
+<span id="cb13-9"><a href="#cb13-9"></a>average_importances <span class="op">=</span> np.mean(importances, axis<span class="op">=</span><span class="dv">0</span>) </span>
+<span id="cb13-10"><a href="#cb13-10"></a>feature_importances_df <span class="op">=</span> pd.DataFrame({<span class="st">'feature'</span>: X.columns, <span class="st">'importance'</span>: average_importances})</span>
+<span id="cb13-11"><a href="#cb13-11"></a>feature_importances_df.sort_values(by<span class="op">=</span><span class="st">'importance'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>c:\Users\nickc\DataScience\.venv\Lib\site-packages\sklearn\utils\validation.py:1300: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  y = column_or_1d(y, warn=True)</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">feature</th>
+<th data-quarto-table-cell-role="th">importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">10</td>
+<td>V1_updated</td>
+<td>0.349834</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>V2</td>
+<td>0.273790</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3</td>
+<td>V4</td>
+<td>0.266334</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>V5</td>
+<td>0.045145</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>V1</td>
+<td>0.032161</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>V10</td>
+<td>0.025197</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">5</td>
+<td>V6</td>
+<td>0.007539</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>V3</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>V7</td>
+<td>0.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>V8</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>V9</td>
+<td>0.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>The Bagged and Boosted Trees does follow a similar patten but differ in the sense these models identified V1_updated to the most informative feature and significantly reduce the importance of V1. This indicates that V1_updated might prvide more information that were not present in V1.</p>
 <hr>
 </section>
 </section>
@@ -335,8 +520,110 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="exercise-8.2">Exercise 8.2</h2>
 <section id="use-a-simulation-to-show-tree-bias-with-different-granularities." class="level4">
 <h4 class="anchored" data-anchor-id="use-a-simulation-to-show-tree-bias-with-different-granularities.">Use a simulation to show tree bias with different granularities.</h4>
-<div id="cell-17" class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-27" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a>n_samples <span class="op">=</span> <span class="dv">500</span></span>
+<span id="cb15-4"><a href="#cb15-4"></a>V1 <span class="op">=</span> np.random.randn(n_samples) <span class="op">*</span> <span class="dv">10</span> </span>
+<span id="cb15-5"><a href="#cb15-5"></a>V2 <span class="op">=</span> V1 <span class="op">/</span> <span class="dv">10</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>V3 <span class="op">=</span> V2 <span class="op">/</span> <span class="dv">100</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a></span>
+<span id="cb15-8"><a href="#cb15-8"></a>y <span class="op">=</span> V1 <span class="op">+</span> V2 <span class="op">+</span> V3 <span class="op">+</span> np.random.randn(n_samples) </span>
+<span id="cb15-9"><a href="#cb15-9"></a></span>
+<span id="cb15-10"><a href="#cb15-10"></a>data <span class="op">=</span> pd.DataFrame({<span class="st">'V1'</span>: V1, <span class="st">'V2'</span>: V2, <span class="st">'V3'</span>: V3, <span class="st">'y'</span>: y})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-28" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a></span>
+<span id="cb16-2"><a href="#cb16-2"></a>X <span class="op">=</span> data.drop(<span class="st">'y'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb16-3"><a href="#cb16-3"></a>y <span class="op">=</span> data[<span class="st">'y'</span>]</span>
+<span id="cb16-4"><a href="#cb16-4"></a></span>
+<span id="cb16-5"><a href="#cb16-5"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb16-6"><a href="#cb16-6"></a></span>
+<span id="cb16-7"><a href="#cb16-7"></a>dt <span class="op">=</span> DecisionTreeRegressor(max_depth <span class="op">=</span> <span class="dv">3</span>,random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb16-8"><a href="#cb16-8"></a></span>
+<span id="cb16-9"><a href="#cb16-9"></a>dt.fit(X_train, y_train)</span>
+<span id="cb16-10"><a href="#cb16-10"></a></span>
+<span id="cb16-11"><a href="#cb16-11"></a>feature_importances_df <span class="op">=</span> pd.DataFrame({<span class="st">'feature'</span>: X_train.columns, <span class="st">'importance'</span>: dt.feature_importances_})</span>
+<span id="cb16-12"><a href="#cb16-12"></a>feature_importances_df.sort_values(by<span class="op">=</span><span class="st">'importance'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb16-13"><a href="#cb16-13"></a></span>
+<span id="cb16-14"><a href="#cb16-14"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="25">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">feature</th>
+<th data-quarto-table-cell-role="th">importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>V3</td>
+<td>0.663708</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">0</td>
+<td>V1</td>
+<td>0.312036</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>V2</td>
+<td>0.024256</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-29" class="cell" data-message="false" data-execution_count="26">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> plot_tree</span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a>plot_tree(dt, max_depth <span class="op">=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="26">
+<pre><code>[Text(0.5, 0.875, 'x[2] &lt;= -0.001\nsquared_error = 120.081\nsamples = 400\nvalue = 0.412'),
+ Text(0.25, 0.625, 'x[0] &lt;= -9.494\nsquared_error = 34.673\nsamples = 181\nvalue = -9.216'),
+ Text(0.125, 0.375, 'x[0] &lt;= -14.85\nsquared_error = 20.878\nsamples = 63\nvalue = -15.592'),
+ Text(0.0625, 0.125, 'squared_error = 18.199\nsamples = 22\nvalue = -20.394'),
+ Text(0.1875, 0.125, 'squared_error = 3.306\nsamples = 41\nvalue = -13.016'),
+ Text(0.375, 0.375, 'x[0] &lt;= -5.23\nsquared_error = 8.743\nsamples = 118\nvalue = -5.812'),
+ Text(0.3125, 0.125, 'squared_error = 2.777\nsamples = 61\nvalue = -8.2'),
+ Text(0.4375, 0.125, 'squared_error = 2.498\nsamples = 57\nvalue = -3.257'),
+ Text(0.75, 0.625, 'x[0] &lt;= 9.919\nsquared_error = 50.718\nsamples = 219\nvalue = 8.37'),
+ Text(0.625, 0.375, 'x[0] &lt;= 5.135\nsquared_error = 10.544\nsamples = 150\nvalue = 4.312'),
+ Text(0.5625, 0.125, 'squared_error = 2.999\nsamples = 92\nvalue = 2.122'),
+ Text(0.6875, 0.125, 'squared_error = 2.827\nsamples = 58\nvalue = 7.787'),
+ Text(0.875, 0.375, 'x[1] &lt;= 1.762\nsquared_error = 24.432\nsamples = 69\nvalue = 17.192'),
+ Text(0.8125, 0.125, 'squared_error = 6.741\nsamples = 50\nvalue = 14.708'),
+ Text(0.9375, 0.125, 'squared_error = 12.034\nsamples = 19\nvalue = 23.728')]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-13-output-2.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-30" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>fig,(ax1,ax2,ax3) <span class="op">=</span> plt.subplots(<span class="dv">3</span>,<span class="dv">1</span>)</span>
+<span id="cb19-2"><a href="#cb19-2"></a>sns.scatterplot(x <span class="op">=</span> <span class="st">'V1'</span>, y <span class="op">=</span> <span class="st">'y'</span>, data<span class="op">=</span>data, ax <span class="op">=</span> ax1)</span>
+<span id="cb19-3"><a href="#cb19-3"></a>sns.scatterplot(x <span class="op">=</span> <span class="st">'V2'</span>, y <span class="op">=</span> <span class="st">'y'</span>, data<span class="op">=</span>data, ax<span class="op">=</span>ax2)</span>
+<span id="cb19-4"><a href="#cb19-4"></a>sns.scatterplot(x <span class="op">=</span> <span class="st">'V3'</span>, y <span class="op">=</span> <span class="st">'y'</span>, data<span class="op">=</span>data, ax<span class="op">=</span>ax3)</span>
+<span id="cb19-5"><a href="#cb19-5"></a>plt.tight_layout()</span>
+<span id="cb19-6"><a href="#cb19-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
 </div>
 <hr>
 </section>
@@ -348,6 +635,12 @@ window.Quarto = {
 </section>
 <section id="although-the-optimal-values-of-these-parameters-should-be-obtained-through-the-tuning-process-it-is-helpful-to-understand-how-the-magnitudes-of-these-parameters-affect-magnitudes-of-variable-importance." class="level4">
 <h4 class="anchored" data-anchor-id="although-the-optimal-values-of-these-parameters-should-be-obtained-through-the-tuning-process-it-is-helpful-to-understand-how-the-magnitudes-of-these-parameters-affect-magnitudes-of-variable-importance.">Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance.</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-32-1-image.png" class="img-fluid figure-img"></p>
+<figcaption>image.png</figcaption>
+</figure>
+</div>
 </section>
 <section id="figure-8.24-provides-the-variable-importance-plots-for-boosting-using-two-extreme-values-for-the-bagging-fraction-0.1-and-0.9-and-the-learning-rate-0.1-and-0.9-for-the-solubility-data.-the-left-hand-plot-has-both-parameters-set-to-0.1-and-the-right-hand-plot-has-both-set-to-0.9" class="level4">
 <h4 class="anchored" data-anchor-id="figure-8.24-provides-the-variable-importance-plots-for-boosting-using-two-extreme-values-for-the-bagging-fraction-0.1-and-0.9-and-the-learning-rate-0.1-and-0.9-for-the-solubility-data.-the-left-hand-plot-has-both-parameters-set-to-0.1-and-the-right-hand-plot-has-both-set-to-0.9">Figure 8.24 provides the variable importance plots for boosting using two extreme values for the bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data. The left-hand plot has both parameters set to 0.1, and the right-hand plot has both set to 0.9:</h4>
@@ -356,18 +649,21 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="part-a-1">Part A</h3>
 <section id="why-does-the-model-on-the-right-focus-its-importance-on-just-the-first-few-of-predictors-whereas-the-model-on-the-left-spreads-importance-across-more-predictors" class="level4">
 <h4 class="anchored" data-anchor-id="why-does-the-model-on-the-right-focus-its-importance-on-just-the-first-few-of-predictors-whereas-the-model-on-the-left-spreads-importance-across-more-predictors">Why does the model on the right focus its importance on just the first few of predictors, whereas the model on the left spreads importance across more predictors?</h4>
+<p>As the bagging fraction and learning rate approaches 1, the model more complex and thus becomes able to identify the more informative features related to the target variable. Especially as the baggin fraction allows more data to used for each stage in the boosting process.</p>
 </section>
 </section>
 <section id="part-b-1" class="level3">
 <h3 class="anchored" data-anchor-id="part-b-1">Part B</h3>
 <section id="which-model-do-you-think-would-be-more-predictive-of-other-samples" class="level4">
 <h4 class="anchored" data-anchor-id="which-model-do-you-think-would-be-more-predictive-of-other-samples">Which model do you think would be more predictive of other samples?</h4>
+<p>The model with bagging fraction and learning rate set to 0.9 results in depending on only a few features and runs the risk of overfitting the data with extreme values of the paraments. For the prior model, although its values are on the other extreme which in this case is 0.1. The left model depends on more predictors than the right which leads the model to being more robust since it does weight most of its explanatory powers on 1-2 features.</p>
 </section>
 </section>
 <section id="part-c-1" class="level3">
 <h3 class="anchored" data-anchor-id="part-c-1">Part C</h3>
 <section id="how-would-increasing-interaction-depth-affect-the-slope-of-predictor-importance-for-either-model-in-fig.-8.24" class="level4">
 <h4 class="anchored" data-anchor-id="how-would-increasing-interaction-depth-affect-the-slope-of-predictor-importance-for-either-model-in-fig.-8.24">How would increasing interaction depth affect the slope of predictor importance for either model in Fig. 8.24?</h4>
+<p>As interaction depth increases, the model can capture the more complex relations between features which would lead for the feature importnace to be more spread over the features. This runs the risk of overfitting the data where a less important feature might gain importance as the model tries to capture the noise.</p>
 <hr>
 </section>
 </section>
@@ -381,18 +677,327 @@ window.Quarto = {
 <h3 class="anchored" data-anchor-id="part-a-2">Part A</h3>
 <section id="which-tree-based-regression-model-gives-the-optimal-resampling-and-testset-performance" class="level4">
 <h4 class="anchored" data-anchor-id="which-tree-based-regression-model-gives-the-optimal-resampling-and-testset-performance">Which tree-based regression model gives the optimal resampling and testset performance?</h4>
+<div id="cell-42" class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># load the preprocessed data from hw 7</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a>chem_man <span class="op">=</span> pd.read_csv(<span class="st">'c:/Users/nickc/DataScience/NickAMC.github.io/DATA_624_S24/hw7/chem_man_pp_data.csv'</span>)</span>
+<span id="cb20-3"><a href="#cb20-3"></a>chem_man.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="34">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial01</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial02</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial03</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial04</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial05</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial06</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial08</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial10</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial11</th>
+<th data-quarto-table-cell-role="th">BiologicalMaterial12</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess30</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess31</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess32</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess33</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess35</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess38</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess39</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess42</th>
+<th data-quarto-table-cell-role="th">ManufacturingProcess43</th>
+<th data-quarto-table-cell-role="th">Yield</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>-0.226749</td>
+<td>-1.518418</td>
+<td>-2.690691</td>
+<td>0.220805</td>
+<td>0.495604</td>
+<td>-1.386833</td>
+<td>-1.236650</td>
+<td>1.103670</td>
+<td>-1.843901</td>
+<td>-1.775975</td>
+<td>...</td>
+<td>0.771707</td>
+<td>-0.201836</td>
+<td>-0.458186</td>
+<td>1.000541</td>
+<td>-0.900831</td>
+<td>0.719520</td>
+<td>0.232388</td>
+<td>0.203374</td>
+<td>2.412511</td>
+<td>38.00</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2.245538</td>
+<td>1.312731</td>
+<td>-0.056395</td>
+<td>1.300137</td>
+<td>0.414033</td>
+<td>1.132298</td>
+<td>2.289132</td>
+<td>1.103670</td>
+<td>1.397370</td>
+<td>1.102121</td>
+<td>...</td>
+<td>0.771707</td>
+<td>-0.275080</td>
+<td>1.957322</td>
+<td>1.000541</td>
+<td>1.167981</td>
+<td>-0.824815</td>
+<td>0.232388</td>
+<td>-0.054879</td>
+<td>-0.013786</td>
+<td>42.44</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2.245538</td>
+<td>1.312731</td>
+<td>-0.056395</td>
+<td>1.300137</td>
+<td>0.414033</td>
+<td>1.132298</td>
+<td>2.289132</td>
+<td>1.103670</td>
+<td>1.397370</td>
+<td>1.102121</td>
+<td>...</td>
+<td>0.250524</td>
+<td>-0.165215</td>
+<td>2.700555</td>
+<td>1.000541</td>
+<td>1.262018</td>
+<td>-0.824815</td>
+<td>0.232388</td>
+<td>0.409977</td>
+<td>0.101752</td>
+<td>42.03</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2.245538</td>
+<td>1.312731</td>
+<td>-0.056395</td>
+<td>1.300137</td>
+<td>0.414033</td>
+<td>1.132298</td>
+<td>2.289132</td>
+<td>1.103670</td>
+<td>1.397370</td>
+<td>1.102121</td>
+<td>...</td>
+<td>0.250524</td>
+<td>-0.165215</td>
+<td>2.328938</td>
+<td>1.819589</td>
+<td>0.039538</td>
+<td>-0.824815</td>
+<td>0.232388</td>
+<td>-0.313132</td>
+<td>0.217290</td>
+<td>41.42</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1.486996</td>
+<td>1.899343</td>
+<td>1.139189</td>
+<td>0.944127</td>
+<td>-0.374484</td>
+<td>1.539214</td>
+<td>1.074367</td>
+<td>0.417407</td>
+<td>0.136645</td>
+<td>1.102121</td>
+<td>...</td>
+<td>-0.166423</td>
+<td>-0.146904</td>
+<td>2.328938</td>
+<td>2.638637</td>
+<td>-2.593495</td>
+<td>-0.824815</td>
+<td>0.299001</td>
+<td>-0.106529</td>
+<td>0.217290</td>
+<td>42.49</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 48 columns</p>
+</div>
+</div>
+</div>
+<div id="cell-43" class="cell" data-execution_count="44">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a>chem_man.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="44">
+<pre><code>(176, 48)</code></pre>
+</div>
+</div>
+<div id="cell-44" class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a>X <span class="op">=</span> chem_man.drop(<span class="st">'Yield'</span>, axis <span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb23-2"><a href="#cb23-2"></a>y <span class="op">=</span> chem_man[[<span class="st">'Yield'</span>]].values.ravel()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-45" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> GradientBoostingRegressor</span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
+<span id="cb24-4"><a href="#cb24-4"></a></span>
+<span id="cb24-5"><a href="#cb24-5"></a><span class="co"># split seed from hw7 was 1234</span></span>
+<span id="cb24-6"><a href="#cb24-6"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X, y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">1234</span>, shuffle <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb24-7"><a href="#cb24-7"></a></span>
+<span id="cb24-8"><a href="#cb24-8"></a>model1 <span class="op">=</span> DecisionTreeRegressor(random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb24-9"><a href="#cb24-9"></a>model2 <span class="op">=</span> RandomForestRegressor(random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb24-10"><a href="#cb24-10"></a>model3 <span class="op">=</span> GradientBoostingRegressor(random_state<span class="op">=</span><span class="dv">1998</span>)</span>
+<span id="cb24-11"><a href="#cb24-11"></a></span>
+<span id="cb24-12"><a href="#cb24-12"></a></span>
+<span id="cb24-13"><a href="#cb24-13"></a>model1.fit(X_train, y_train)</span>
+<span id="cb24-14"><a href="#cb24-14"></a>model2.fit(X_train, y_train)</span>
+<span id="cb24-15"><a href="#cb24-15"></a>model3.fit(X_train, y_train)</span>
+<span id="cb24-16"><a href="#cb24-16"></a></span>
+<span id="cb24-17"><a href="#cb24-17"></a>cv_scores_model1 <span class="op">=</span> cross_val_score(model1, X_train, y_train, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb24-18"><a href="#cb24-18"></a>cv_scores_model2 <span class="op">=</span> cross_val_score(model2, X_train, y_train, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb24-19"><a href="#cb24-19"></a>cv_scores_model3 <span class="op">=</span> cross_val_score(model3, X_train, y_train, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)</span>
+<span id="cb24-20"><a href="#cb24-20"></a></span>
+<span id="cb24-21"><a href="#cb24-21"></a><span class="co"># dont forget to add the negative sign</span></span>
+<span id="cb24-22"><a href="#cb24-22"></a>mean_cv_score_model1 <span class="op">=</span> <span class="op">-</span>cv_scores_model1.mean()</span>
+<span id="cb24-23"><a href="#cb24-23"></a>mean_cv_score_model2 <span class="op">=</span> <span class="op">-</span>cv_scores_model2.mean()</span>
+<span id="cb24-24"><a href="#cb24-24"></a>mean_cv_score_model3 <span class="op">=</span> <span class="op">-</span>cv_scores_model3.mean()</span>
+<span id="cb24-25"><a href="#cb24-25"></a></span>
+<span id="cb24-26"><a href="#cb24-26"></a>y_pred_model1 <span class="op">=</span> model1.predict(X_test)</span>
+<span id="cb24-27"><a href="#cb24-27"></a>y_pred_model2 <span class="op">=</span> model2.predict(X_test)</span>
+<span id="cb24-28"><a href="#cb24-28"></a>y_pred_model3 <span class="op">=</span> model3.predict(X_test)</span>
+<span id="cb24-29"><a href="#cb24-29"></a></span>
+<span id="cb24-30"><a href="#cb24-30"></a><span class="bu">print</span>(<span class="st">"Resampling performance:"</span>)</span>
+<span id="cb24-31"><a href="#cb24-31"></a><span class="bu">print</span>(<span class="ss">f"Model DT: RMSE = </span><span class="sc">{</span>mean_cv_score_model1<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-32"><a href="#cb24-32"></a><span class="bu">print</span>(<span class="ss">f"Model RF: RMSE = </span><span class="sc">{</span>mean_cv_score_model2<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-33"><a href="#cb24-33"></a><span class="bu">print</span>(<span class="ss">f"Model GBR: RMSE = </span><span class="sc">{</span>mean_cv_score_model3<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-34"><a href="#cb24-34"></a><span class="bu">print</span>(<span class="st">""</span>)</span>
+<span id="cb24-35"><a href="#cb24-35"></a></span>
+<span id="cb24-36"><a href="#cb24-36"></a><span class="bu">print</span>(<span class="st">"Test set performance:"</span>)</span>
+<span id="cb24-37"><a href="#cb24-37"></a><span class="bu">print</span>(<span class="ss">f"Model DT: RMSE = </span><span class="sc">{</span> mean_squared_error(y_test, y_pred_model1) <span class="op">**</span> <span class="fl">0.5</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-38"><a href="#cb24-38"></a><span class="bu">print</span>(<span class="ss">f"Model RF: RMSE =</span><span class="sc">{</span> mean_squared_error(y_test, y_pred_model2) <span class="op">**</span> <span class="fl">0.5</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-39"><a href="#cb24-39"></a><span class="bu">print</span>(<span class="ss">f"Model GBR: RMSE =</span><span class="sc">{</span> mean_squared_error(y_test, y_pred_model3) <span class="op">**</span> <span class="fl">0.5</span><span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Resampling performance:
+Model DT: RMSE = 2.2582635714285724
+Model RF: RMSE = 1.2148655536428556
+Model GBR: RMSE = 1.2598661628488834
+
+Test set performance:
+Model DT: RMSE = 1.840452088180752
+Model RF: RMSE =1.481248670697954
+Model GBR: RMSE =1.4591742169849724</code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="part-b-2" class="level3">
 <h3 class="anchored" data-anchor-id="part-b-2">Part B</h3>
 <section id="which-predictors-are-most-important-in-the-optimal-tree-based-regressionmodel-do-either-the-biological-or-process-variables-dominate-the-list-how-do-the-top-10-important-predictors-compare-to-the-top-10-predictors-from-the-optimal-linear-and-nonlinear-models" class="level4">
 <h4 class="anchored" data-anchor-id="which-predictors-are-most-important-in-the-optimal-tree-based-regressionmodel-do-either-the-biological-or-process-variables-dominate-the-list-how-do-the-top-10-important-predictors-compare-to-the-top-10-predictors-from-the-optimal-linear-and-nonlinear-models">Which predictors are most important in the optimal tree-based regressionmodel? Do either the biological or process variables dominate the list? How do the top 10 important predictors compare to the top 10 predictors from the optimal linear and nonlinear models?</h4>
+<div id="cell-47" class="cell" data-execution_count="46">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a>feature_importances_df <span class="op">=</span> pd.DataFrame({<span class="st">'feature'</span>: X.columns, <span class="st">'importance'</span>: model3.feature_importances_})</span>
+<span id="cb26-2"><a href="#cb26-2"></a>feature_importances_df.sort_values(by<span class="op">=</span><span class="st">'importance'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="46">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">feature</th>
+<th data-quarto-table-cell-role="th">importance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">40</td>
+<td>ManufacturingProcess32</td>
+<td>0.496453</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>BiologicalMaterial12</td>
+<td>0.047714</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">33</td>
+<td>ManufacturingProcess25</td>
+<td>0.032051</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>BiologicalMaterial03</td>
+<td>0.031798</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">17</td>
+<td>ManufacturingProcess09</td>
+<td>0.029282</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">4</td>
+<td>BiologicalMaterial05</td>
+<td>0.028059</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">14</td>
+<td>ManufacturingProcess06</td>
+<td>0.025452</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">25</td>
+<td>ManufacturingProcess17</td>
+<td>0.024980</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>BiologicalMaterial02</td>
+<td>0.021369</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">39</td>
+<td>ManufacturingProcess31</td>
+<td>0.020247</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 </section>
 <section id="part-c-2" class="level3">
 <h3 class="anchored" data-anchor-id="part-c-2">Part C</h3>
 <section id="plot-the-optimal-single-tree-with-the-distribution-of-yield-in-the-terminal-nodes.-does-this-view-of-the-data-provide-additional-knowledge-about-the-biological-or-process-predictors-and-their-relationship-with-yield" class="level4">
 <h4 class="anchored" data-anchor-id="plot-the-optimal-single-tree-with-the-distribution-of-yield-in-the-terminal-nodes.-does-this-view-of-the-data-provide-additional-knowledge-about-the-biological-or-process-predictors-and-their-relationship-with-yield">Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?</h4>
+<div id="cell-49" class="cell" data-execution_count="47">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb27-2"><a href="#cb27-2"></a>plot_tree(model1, filled<span class="op">=</span><span class="va">True</span>, feature_names<span class="op">=</span>X_train.columns)</span>
+<span id="cb27-3"><a href="#cb27-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-20-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 <hr>
 </section>
 </section>
