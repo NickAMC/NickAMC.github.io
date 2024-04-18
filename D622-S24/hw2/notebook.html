@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-03-31">
+<meta name="dcterms.date" content="2024-04-16">
 
 <title>Decision Trees and Random Forest</title>
 <style>
@@ -118,7 +118,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 31, 2024</p>
+      <p class="date">April 16, 2024</p>
     </div>
   </div>
   
@@ -760,80 +760,83 @@ dtype: int64</code></pre>
 <pre><code>((1739, 15), (1739, 1))</code></pre>
 </div>
 </div>
+<div id="cell-31" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>airline_df_pp <span class="op">=</span> pd.concat([X,y], axis <span class="op">=</span><span class="dv">1</span>, ignore_index<span class="op">=</span>)</span>
+<span id="cb28-2"><a href="#cb28-2"></a>airline_df_pp.to_csv(<span class="st">'airline_df_pp.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="model-building" class="level1">
 <h1>Model Building</h1>
 <p>Now that we have cleaned, encoding, and assigned sentiment to the data. We can train and test our Decion Tree model.</p>
-<div id="cell-33" class="cell" data-execution_count="22">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeClassifier</span>
-<span id="cb28-2"><a href="#cb28-2"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
-<span id="cb28-3"><a href="#cb28-3"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
-<span id="cb28-4"><a href="#cb28-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb28-5"><a href="#cb28-5"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-34" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="im">from</span> sklearn.tree <span class="im">import</span> DecisionTreeClassifier</span>
+<span id="cb29-2"><a href="#cb29-2"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
+<span id="cb29-3"><a href="#cb29-3"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
+<span id="cb29-4"><a href="#cb29-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb29-5"><a href="#cb29-5"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-34" class="cell" data-execution_count="23">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a>SEED <span class="op">=</span> <span class="dv">123</span> </span>
-<span id="cb29-2"><a href="#cb29-2"></a></span>
-<span id="cb29-3"><a href="#cb29-3"></a>X_train,X_test,y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span> SEED, stratify<span class="op">=</span>y )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-35" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a>SEED <span class="op">=</span> <span class="dv">123</span> </span>
+<span id="cb30-2"><a href="#cb30-2"></a></span>
+<span id="cb30-3"><a href="#cb30-3"></a>X_train,X_test,y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span> SEED, stratify<span class="op">=</span>y )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="decisiontree-model-1-normal" class="level2">
 <h2 class="anchored" data-anchor-id="decisiontree-model-1-normal">DecisionTree Model 1 : Normal</h2>
-<div id="cell-36" class="cell" data-execution_count="24">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="co">#  grid search to find the optimal parameters</span></span>
-<span id="cb30-2"><a href="#cb30-2"></a></span>
-<span id="cb30-3"><a href="#cb30-3"></a>param_grid <span class="op">=</span> {</span>
-<span id="cb30-4"><a href="#cb30-4"></a>    <span class="st">'criterion'</span>: [<span class="st">'gini'</span>, <span class="st">'entropy'</span>],</span>
-<span id="cb30-5"><a href="#cb30-5"></a>    <span class="st">'max_depth'</span>: <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">10</span>),</span>
-<span id="cb30-6"><a href="#cb30-6"></a>    <span class="st">'min_samples_leaf'</span>: [<span class="fl">0.1</span>, <span class="fl">0.15</span>,<span class="fl">0.2</span>, <span class="fl">0.25</span>]  </span>
-<span id="cb30-7"><a href="#cb30-7"></a> }</span>
-<span id="cb30-8"><a href="#cb30-8"></a></span>
-<span id="cb30-9"><a href="#cb30-9"></a>dt <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span>SEED) </span>
-<span id="cb30-10"><a href="#cb30-10"></a>grid_search <span class="op">=</span> GridSearchCV(dt, param_grid, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)  </span>
-<span id="cb30-11"><a href="#cb30-11"></a>grid_search.fit(X_train, y_train)</span>
-<span id="cb30-12"><a href="#cb30-12"></a></span>
-<span id="cb30-13"><a href="#cb30-13"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
-<span id="cb30-14"><a href="#cb30-14"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-37" class="cell" data-execution_count="24">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a><span class="co">#  grid search to find the optimal parameters</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a></span>
+<span id="cb31-3"><a href="#cb31-3"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb31-4"><a href="#cb31-4"></a>    <span class="st">'criterion'</span>: [<span class="st">'gini'</span>, <span class="st">'entropy'</span>],</span>
+<span id="cb31-5"><a href="#cb31-5"></a>    <span class="st">'max_depth'</span>: <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">10</span>),</span>
+<span id="cb31-6"><a href="#cb31-6"></a>    <span class="st">'min_samples_leaf'</span>: [<span class="fl">0.1</span>, <span class="fl">0.15</span>,<span class="fl">0.2</span>, <span class="fl">0.25</span>]  </span>
+<span id="cb31-7"><a href="#cb31-7"></a> }</span>
+<span id="cb31-8"><a href="#cb31-8"></a></span>
+<span id="cb31-9"><a href="#cb31-9"></a>dt <span class="op">=</span> DecisionTreeClassifier(random_state<span class="op">=</span>SEED) </span>
+<span id="cb31-10"><a href="#cb31-10"></a>grid_search <span class="op">=</span> GridSearchCV(dt, param_grid, cv<span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)  </span>
+<span id="cb31-11"><a href="#cb31-11"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb31-12"><a href="#cb31-12"></a></span>
+<span id="cb31-13"><a href="#cb31-13"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
+<span id="cb31-14"><a href="#cb31-14"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{'criterion': 'gini', 'max_depth': 3, 'min_samples_leaf': 0.1}</code></pre>
 </div>
 </div>
-<div id="cell-37" class="cell" data-execution_count="52">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a>dt1 <span class="op">=</span> DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span><span class="dv">3</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span>SEED)</span>
-<span id="cb32-2"><a href="#cb32-2"></a></span>
-<span id="cb32-3"><a href="#cb32-3"></a>dt1.fit(X_train, y_train)</span>
-<span id="cb32-4"><a href="#cb32-4"></a></span>
-<span id="cb32-5"><a href="#cb32-5"></a>y_pred  <span class="op">=</span> dt1.predict(X_test)</span>
-<span id="cb32-6"><a href="#cb32-6"></a><span class="bu">print</span>(<span class="ss">f'DT Model 1 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-38" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a>dt1 <span class="op">=</span> DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span><span class="dv">3</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span>SEED)</span>
+<span id="cb33-2"><a href="#cb33-2"></a></span>
+<span id="cb33-3"><a href="#cb33-3"></a>dt1.fit(X_train, y_train)</span>
+<span id="cb33-4"><a href="#cb33-4"></a></span>
+<span id="cb33-5"><a href="#cb33-5"></a>y_pred  <span class="op">=</span> dt1.predict(X_test)</span>
+<span id="cb33-6"><a href="#cb33-6"></a><span class="bu">print</span>(<span class="ss">f'DT Model 1 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DT Model 1 Accuracy: 90.805%</code></pre>
 </div>
 </div>
-<div id="cell-38" class="cell" data-execution_count="26">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a><span class="im">from</span> sklearn <span class="im">import</span> tree</span>
-<span id="cb34-2"><a href="#cb34-2"></a></span>
-<span id="cb34-3"><a href="#cb34-3"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb34-4"><a href="#cb34-4"></a>tree.plot_tree(dt, feature_names<span class="op">=</span>X_train.columns, class_names<span class="op">=</span>[<span class="st">'Not Recommend'</span>, <span class="st">'Recommend'</span>], filled<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb34-5"><a href="#cb34-5"></a>plt.title(<span class="st">'Decision Tree Model 1'</span>)</span>
-<span id="cb34-6"><a href="#cb34-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="notebook_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="cell-39" class="cell" data-execution_count="27">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a>importance_dt <span class="op">=</span> pd.Series(dt.feature_importances_, index <span class="op">=</span> X_train.columns)</span>
+<div id="cell-39" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a><span class="im">from</span> sklearn <span class="im">import</span> tree</span>
 <span id="cb35-2"><a href="#cb35-2"></a></span>
-<span id="cb35-3"><a href="#cb35-3"></a>importance_sorted_dt <span class="op">=</span> importance_dt.sort_values()</span>
-<span id="cb35-4"><a href="#cb35-4"></a></span>
-<span id="cb35-5"><a href="#cb35-5"></a>importance_sorted_dt.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
+<span id="cb35-3"><a href="#cb35-3"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb35-4"><a href="#cb35-4"></a>tree.plot_tree(dt, feature_names<span class="op">=</span>X_train.columns, class_names<span class="op">=</span>[<span class="st">'Not Recommend'</span>, <span class="st">'Recommend'</span>], filled<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb35-5"><a href="#cb35-5"></a>plt.title(<span class="st">'Decision Tree Model 1'</span>)</span>
 <span id="cb35-6"><a href="#cb35-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>NotFittedError: This DecisionTreeClassifier instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 1200x800 with 0 Axes&gt;</code></pre>
+</div>
+</div>
+<div id="cell-40" class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a>importance_dt <span class="op">=</span> pd.Series(dt.feature_importances_, index <span class="op">=</span> X_train.columns)</span>
+<span id="cb38-2"><a href="#cb38-2"></a></span>
+<span id="cb38-3"><a href="#cb38-3"></a>importance_sorted_dt <span class="op">=</span> importance_dt.sort_values()</span>
+<span id="cb38-4"><a href="#cb38-4"></a></span>
+<span id="cb38-5"><a href="#cb38-5"></a>importance_sorted_dt.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
+<span id="cb38-6"><a href="#cb38-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="notebook_files/figure-html/cell-28-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="notebook_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -843,46 +846,46 @@ dtype: int64</code></pre>
 <section id="decisiontree-model-2-forced-split" class="level2">
 <h2 class="anchored" data-anchor-id="decisiontree-model-2-forced-split">DecisionTree Model 2 : Forced Split</h2>
 <p>Purposely removing the initial splitting feature of the decision tree will result in a structurally different model. This was achieved by preventing the previously top-ranked feature from being used in the first split of the firstmodel.</p>
-<div id="cell-42" class="cell" data-execution_count="28">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a>X_train_2 <span class="op">=</span> X_train.drop(<span class="st">'Value For Money'</span>, axis <span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb36-2"><a href="#cb36-2"></a>X_test_2 <span class="op">=</span> X_test.drop(<span class="st">'Value For Money'</span>, axis <span class="op">=</span><span class="dv">1</span>) <span class="co"># almost forgot about X_test :)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-43" class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>X_train_2 <span class="op">=</span> X_train.drop(<span class="st">'Value For Money'</span>, axis <span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb39-2"><a href="#cb39-2"></a>X_test_2 <span class="op">=</span> X_test.drop(<span class="st">'Value For Money'</span>, axis <span class="op">=</span><span class="dv">1</span>) <span class="co"># almost forgot about X_test :)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then, we create another model without <code>Value for Money</code> and see it if its predictive power changes significantly. We could run the GridSearchCV() again to see the best parameters for the truncated X_train. For now, lets stick to the parameters from the first DT model.</p>
-<div id="cell-44" class="cell" data-execution_count="74">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>dt2 <span class="op">=</span> DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span><span class="dv">3</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span>SEED)</span>
-<span id="cb37-2"><a href="#cb37-2"></a></span>
-<span id="cb37-3"><a href="#cb37-3"></a>dt2.fit(X_train_2, y_train)</span>
-<span id="cb37-4"><a href="#cb37-4"></a></span>
-<span id="cb37-5"><a href="#cb37-5"></a>y_pred2  <span class="op">=</span> dt2.predict(X_test_2)</span>
-<span id="cb37-6"><a href="#cb37-6"></a><span class="bu">print</span>(<span class="ss">f'DT Model 2 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred2)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-45" class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>dt2 <span class="op">=</span> DecisionTreeClassifier(criterion<span class="op">=</span><span class="st">'gini'</span>, max_depth<span class="op">=</span><span class="dv">3</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.1</span>, random_state<span class="op">=</span>SEED)</span>
+<span id="cb40-2"><a href="#cb40-2"></a></span>
+<span id="cb40-3"><a href="#cb40-3"></a>dt2.fit(X_train_2, y_train)</span>
+<span id="cb40-4"><a href="#cb40-4"></a></span>
+<span id="cb40-5"><a href="#cb40-5"></a>y_pred2  <span class="op">=</span> dt2.predict(X_test_2)</span>
+<span id="cb40-6"><a href="#cb40-6"></a><span class="bu">print</span>(<span class="ss">f'DT Model 2 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred2)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DT Model 2 Accuracy: 87.356%</code></pre>
 </div>
 </div>
-<div id="cell-45" class="cell" data-execution_count="30">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb39-2"><a href="#cb39-2"></a>tree.plot_tree(dt2, feature_names<span class="op">=</span>X_train_2.columns, class_names<span class="op">=</span>[<span class="st">'Not Recommend'</span>, <span class="st">'Recommend'</span>], filled<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb39-3"><a href="#cb39-3"></a>plt.title(<span class="st">'Decision Tree Model 2'</span>)</span>
-<span id="cb39-4"><a href="#cb39-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="notebook_files/figure-html/cell-31-output-1.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
-</div>
-<div id="cell-46" class="cell" data-execution_count="43">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a>importance_dt <span class="op">=</span> pd.Series(dt2.feature_importances_, index <span class="op">=</span> X_train_2.columns)</span>
-<span id="cb40-2"><a href="#cb40-2"></a></span>
-<span id="cb40-3"><a href="#cb40-3"></a>importance_sorted_dt <span class="op">=</span> importance_dt.sort_values()</span>
-<span id="cb40-4"><a href="#cb40-4"></a></span>
-<span id="cb40-5"><a href="#cb40-5"></a>importance_sorted_dt.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
-<span id="cb40-6"><a href="#cb40-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-46" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb42-2"><a href="#cb42-2"></a>tree.plot_tree(dt2, feature_names<span class="op">=</span>X_train_2.columns, class_names<span class="op">=</span>[<span class="st">'Not Recommend'</span>, <span class="st">'Recommend'</span>], filled<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb42-3"><a href="#cb42-3"></a>plt.title(<span class="st">'Decision Tree Model 2'</span>)</span>
+<span id="cb42-4"><a href="#cb42-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="notebook_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="cell-47" class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>importance_dt <span class="op">=</span> pd.Series(dt2.feature_importances_, index <span class="op">=</span> X_train_2.columns)</span>
+<span id="cb43-2"><a href="#cb43-2"></a></span>
+<span id="cb43-3"><a href="#cb43-3"></a>importance_sorted_dt <span class="op">=</span> importance_dt.sort_values()</span>
+<span id="cb43-4"><a href="#cb43-4"></a></span>
+<span id="cb43-5"><a href="#cb43-5"></a>importance_sorted_dt.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
+<span id="cb43-6"><a href="#cb43-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="notebook_files/figure-html/cell-33-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -892,47 +895,47 @@ dtype: int64</code></pre>
 <section id="random-forest-model" class="level2">
 <h2 class="anchored" data-anchor-id="random-forest-model">Random Forest Model</h2>
 <p>Utilized Grid Search and cross validation to find the optimal paramaters to use for the Random Forest model.</p>
-<div id="cell-50" class="cell" data-message="false" data-execution_count="32">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a>param_grid_rf <span class="op">=</span> {</span>
-<span id="cb41-2"><a href="#cb41-2"></a>     <span class="st">'n_estimators'</span>: [<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">400</span>, <span class="dv">500</span>],</span>
-<span id="cb41-3"><a href="#cb41-3"></a>    <span class="st">'criterion'</span>: [<span class="st">'gini'</span>, <span class="st">'entropy'</span>],</span>
-<span id="cb41-4"><a href="#cb41-4"></a>    <span class="st">'max_depth'</span>: <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">10</span>),</span>
-<span id="cb41-5"><a href="#cb41-5"></a>    <span class="st">'min_samples_leaf'</span>: [<span class="fl">0.05</span>, <span class="fl">0.1</span>,<span class="fl">0.15</span>, <span class="fl">0.18</span>]  </span>
-<span id="cb41-6"><a href="#cb41-6"></a> }</span>
-<span id="cb41-7"><a href="#cb41-7"></a></span>
-<span id="cb41-8"><a href="#cb41-8"></a>rf <span class="op">=</span> RandomForestClassifier(random_state<span class="op">=</span>SEED)</span>
-<span id="cb41-9"><a href="#cb41-9"></a></span>
-<span id="cb41-10"><a href="#cb41-10"></a>gs_rf <span class="op">=</span> GridSearchCV(rf, param_grid<span class="op">=</span>param_grid_rf, cv<span class="op">=</span><span class="dv">5</span>, scoring <span class="op">=</span> <span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb41-11"><a href="#cb41-11"></a>gs_rf.fit(X_train, y_train)</span>
-<span id="cb41-12"><a href="#cb41-12"></a></span>
-<span id="cb41-13"><a href="#cb41-13"></a>best_params <span class="op">=</span> gs_rf.best_params_</span>
-<span id="cb41-14"><a href="#cb41-14"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-51" class="cell" data-message="false">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1"></a>param_grid_rf <span class="op">=</span> {</span>
+<span id="cb44-2"><a href="#cb44-2"></a>     <span class="st">'n_estimators'</span>: [<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">200</span>, <span class="dv">400</span>, <span class="dv">500</span>],</span>
+<span id="cb44-3"><a href="#cb44-3"></a>    <span class="st">'criterion'</span>: [<span class="st">'gini'</span>, <span class="st">'entropy'</span>],</span>
+<span id="cb44-4"><a href="#cb44-4"></a>    <span class="st">'max_depth'</span>: <span class="bu">range</span>(<span class="dv">3</span>,<span class="dv">10</span>),</span>
+<span id="cb44-5"><a href="#cb44-5"></a>    <span class="st">'min_samples_leaf'</span>: [<span class="fl">0.05</span>, <span class="fl">0.1</span>,<span class="fl">0.15</span>, <span class="fl">0.18</span>]  </span>
+<span id="cb44-6"><a href="#cb44-6"></a> }</span>
+<span id="cb44-7"><a href="#cb44-7"></a></span>
+<span id="cb44-8"><a href="#cb44-8"></a>rf <span class="op">=</span> RandomForestClassifier(random_state<span class="op">=</span>SEED)</span>
+<span id="cb44-9"><a href="#cb44-9"></a></span>
+<span id="cb44-10"><a href="#cb44-10"></a>gs_rf <span class="op">=</span> GridSearchCV(rf, param_grid<span class="op">=</span>param_grid_rf, cv<span class="op">=</span><span class="dv">5</span>, scoring <span class="op">=</span> <span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb44-11"><a href="#cb44-11"></a>gs_rf.fit(X_train, y_train)</span>
+<span id="cb44-12"><a href="#cb44-12"></a></span>
+<span id="cb44-13"><a href="#cb44-13"></a>best_params <span class="op">=</span> gs_rf.best_params_</span>
+<span id="cb44-14"><a href="#cb44-14"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{'criterion': 'entropy', 'max_depth': 4, 'min_samples_leaf': 0.05, 'n_estimators': 400}</code></pre>
 </div>
 </div>
-<div id="cell-51" class="cell" data-message="false" data-execution_count="34">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>rf <span class="op">=</span> RandomForestClassifier(n_estimators <span class="op">=</span> <span class="dv">400</span>, criterion<span class="op">=</span><span class="st">'entropy'</span>,max_depth<span class="op">=</span><span class="dv">4</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.05</span>)</span>
-<span id="cb43-2"><a href="#cb43-2"></a>rf.fit(X_train,y_train)</span>
-<span id="cb43-3"><a href="#cb43-3"></a></span>
-<span id="cb43-4"><a href="#cb43-4"></a>y_pred_rf <span class="op">=</span> rf.predict(X_test)</span>
-<span id="cb43-5"><a href="#cb43-5"></a></span>
-<span id="cb43-6"><a href="#cb43-6"></a><span class="bu">print</span>(<span class="ss">f'RandomForestClassifier Model Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred_rf)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-52" class="cell" data-message="false">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a>rf <span class="op">=</span> RandomForestClassifier(n_estimators <span class="op">=</span> <span class="dv">400</span>, criterion<span class="op">=</span><span class="st">'entropy'</span>,max_depth<span class="op">=</span><span class="dv">4</span>, min_samples_leaf<span class="op">=</span><span class="fl">0.05</span>)</span>
+<span id="cb46-2"><a href="#cb46-2"></a>rf.fit(X_train,y_train)</span>
+<span id="cb46-3"><a href="#cb46-3"></a></span>
+<span id="cb46-4"><a href="#cb46-4"></a>y_pred_rf <span class="op">=</span> rf.predict(X_test)</span>
+<span id="cb46-5"><a href="#cb46-5"></a></span>
+<span id="cb46-6"><a href="#cb46-6"></a><span class="bu">print</span>(<span class="ss">f'RandomForestClassifier Model Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred_rf)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RandomForestClassifier Model Accuracy: 92.816%</code></pre>
 </div>
 </div>
-<div id="cell-52" class="cell" data-execution_count="42">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1"></a>importance_rf <span class="op">=</span> pd.Series(rf.feature_importances_, index <span class="op">=</span> X_train.columns)</span>
-<span id="cb45-2"><a href="#cb45-2"></a></span>
-<span id="cb45-3"><a href="#cb45-3"></a>importance_sorted_rf <span class="op">=</span> importance_rf.sort_values()</span>
-<span id="cb45-4"><a href="#cb45-4"></a></span>
-<span id="cb45-5"><a href="#cb45-5"></a>importance_sorted_rf.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
-<span id="cb45-6"><a href="#cb45-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-53" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1"></a>importance_rf <span class="op">=</span> pd.Series(rf.feature_importances_, index <span class="op">=</span> X_train.columns)</span>
+<span id="cb48-2"><a href="#cb48-2"></a></span>
+<span id="cb48-3"><a href="#cb48-3"></a>importance_sorted_rf <span class="op">=</span> importance_rf.sort_values()</span>
+<span id="cb48-4"><a href="#cb48-4"></a></span>
+<span id="cb48-5"><a href="#cb48-5"></a>importance_sorted_rf.plot(kind<span class="op">=</span><span class="st">'barh'</span>, color <span class="op">=</span> <span class="st">'blue'</span>)</span>
+<span id="cb48-6"><a href="#cb48-6"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="notebook_files/figure-html/cell-35-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="notebook_files/figure-html/cell-36-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -941,32 +944,32 @@ dtype: int64</code></pre>
 </section>
 <section id="model-variance-analysis" class="level1">
 <h1>Model Variance Analysis</h1>
-<div id="cell-54" class="cell" data-execution_count="44">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-55" class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> cross_val_score</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-55" class="cell" data-execution_count="62">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1"></a>cross_val_score(dt1,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-56" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1"></a>cross_val_score(dt1,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="62">
 <pre><code>array([0.84285714, 0.89208633, 0.90647482, 0.89208633, 0.88489209,
        0.9352518 , 0.89928058, 0.8705036 , 0.90647482, 0.89928058])</code></pre>
 </div>
 </div>
-<div id="cell-56" class="cell" data-execution_count="71">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1"></a><span class="co"># DT Model 1 </span></span>
-<span id="cb49-2"><a href="#cb49-2"></a>acc_CV_scores <span class="op">=</span> cross_val_score(dt1,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb49-3"><a href="#cb49-3"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
-<span id="cb49-4"><a href="#cb49-4"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for DT Model 1: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
-<span id="cb49-5"><a href="#cb49-5"></a></span>
-<span id="cb49-6"><a href="#cb49-6"></a><span class="co"># DT Model 2</span></span>
-<span id="cb49-7"><a href="#cb49-7"></a>acc_CV_scores <span class="op">=</span> cross_val_score(dt2,X_train_2,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb49-8"><a href="#cb49-8"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
-<span id="cb49-9"><a href="#cb49-9"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for DT Model 2: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
-<span id="cb49-10"><a href="#cb49-10"></a></span>
-<span id="cb49-11"><a href="#cb49-11"></a></span>
-<span id="cb49-12"><a href="#cb49-12"></a><span class="co"># RandomForest</span></span>
-<span id="cb49-13"><a href="#cb49-13"></a>acc_CV_scores <span class="op">=</span> cross_val_score(rf,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
-<span id="cb49-14"><a href="#cb49-14"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
-<span id="cb49-15"><a href="#cb49-15"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for RF Model: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-57" class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a><span class="co"># DT Model 1 </span></span>
+<span id="cb52-2"><a href="#cb52-2"></a>acc_CV_scores <span class="op">=</span> cross_val_score(dt1,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb52-3"><a href="#cb52-3"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
+<span id="cb52-4"><a href="#cb52-4"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for DT Model 1: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
+<span id="cb52-5"><a href="#cb52-5"></a></span>
+<span id="cb52-6"><a href="#cb52-6"></a><span class="co"># DT Model 2</span></span>
+<span id="cb52-7"><a href="#cb52-7"></a>acc_CV_scores <span class="op">=</span> cross_val_score(dt2,X_train_2,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb52-8"><a href="#cb52-8"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
+<span id="cb52-9"><a href="#cb52-9"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for DT Model 2: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
+<span id="cb52-10"><a href="#cb52-10"></a></span>
+<span id="cb52-11"><a href="#cb52-11"></a></span>
+<span id="cb52-12"><a href="#cb52-12"></a><span class="co"># RandomForest</span></span>
+<span id="cb52-13"><a href="#cb52-13"></a>acc_CV_scores <span class="op">=</span> cross_val_score(rf,X_train,y_train, cv<span class="op">=</span><span class="dv">10</span>, scoring <span class="op">=</span><span class="st">'accuracy'</span>, n_jobs<span class="op">=-</span><span class="dv">1</span>)</span>
+<span id="cb52-14"><a href="#cb52-14"></a>mean_cv <span class="op">=</span> acc_CV_scores.mean()</span>
+<span id="cb52-15"><a href="#cb52-15"></a><span class="bu">print</span>(<span class="ss">f'CV Mean Accuracy for RF Model: </span><span class="sc">{</span>mean_cv<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>CV Mean Accuracy for DT Model 1: 89.292%
 CV Mean Accuracy for DT Model 2: 85.044%
@@ -974,10 +977,10 @@ CV Mean Accuracy for RF Model: 92.672%</code></pre>
 </div>
 </div>
 <p>Recall, Accuracy from training set:</p>
-<div id="cell-58" class="cell" data-execution_count="75">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a><span class="bu">print</span>(<span class="ss">f'DT Model 1 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
-<span id="cb51-2"><a href="#cb51-2"></a><span class="bu">print</span>(<span class="ss">f'DT Model 2 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred2)<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
-<span id="cb51-3"><a href="#cb51-3"></a><span class="bu">print</span>(<span class="ss">f'RandomForestClassifier Model Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred_rf)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-59" class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a><span class="bu">print</span>(<span class="ss">f'DT Model 1 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
+<span id="cb54-2"><a href="#cb54-2"></a><span class="bu">print</span>(<span class="ss">f'DT Model 2 Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred2)<span class="sc">:.3%}</span><span class="ss">'</span>)</span>
+<span id="cb54-3"><a href="#cb54-3"></a><span class="bu">print</span>(<span class="ss">f'RandomForestClassifier Model Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred_rf)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>DT Model 1 Accuracy: 90.805%
 DT Model 2 Accuracy: 87.356%
