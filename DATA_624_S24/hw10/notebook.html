@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-04-18">
+<meta name="dcterms.date" content="2024-04-24">
 
 <title>Market Basket Analysis</title>
 <style>
@@ -113,7 +113,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 18, 2024</p>
+      <p class="date">April 24, 2024</p>
     </div>
   </div>
   
@@ -142,10 +142,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="read-data" class="level2">
 <h2 class="anchored" data-anchor-id="read-data">Read Data</h2>
 <p>The raw data is in a format where each row is a list of items. In order to perform a market basket analysis, we need to transform the data where each item is a column and each row is represent a transaction with boolean values(True/False or 0/1) that way we use the apriori() and association_rules() from <a href="https://rasbt.github.io/mlxtend/user_guide/preprocessing/TransactionEncoder/">mlxtend library</a>.</p>
-<div id="cell-6" class="cell" data-execution_count="50">
+<div id="cell-6" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>data <span class="op">=</span> pd.read_csv(<span class="st">"GroceryDataSet.csv"</span>,header<span class="op">=</span><span class="va">None</span>)</span>
 <span id="cb2-2"><a href="#cb2-2"></a>data.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="50">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -424,13 +424,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="16">
+<div id="cell-7" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>transactions <span class="op">=</span> data.values.tolist()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-8" class="cell" data-execution_count="20">
+<div id="cell-8" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>transactions <span class="op">=</span> [[item <span class="cf">for</span> item <span class="kw">in</span> transaction <span class="cf">if</span> pd.notna(item)] <span class="cf">for</span> transaction <span class="kw">in</span> transactions]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-9" class="cell" data-execution_count="115">
+<div id="cell-9" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> mlxtend.preprocessing <span class="im">import</span> TransactionEncoder</span>
 <span id="cb5-2"><a href="#cb5-2"></a></span>
 <span id="cb5-3"><a href="#cb5-3"></a>te <span class="op">=</span> TransactionEncoder()</span>
@@ -439,7 +439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-6"><a href="#cb5-6"></a></span>
 <span id="cb5-7"><a href="#cb5-7"></a>df <span class="op">=</span> pd.DataFrame(te_data, columns<span class="op">=</span>te.columns_)</span>
 <span id="cb5-8"><a href="#cb5-8"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="115">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <div>
 
 
@@ -742,7 +742,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-10" class="cell" data-execution_count="155">
+<div id="cell-10" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> mlxtend.frequent_patterns <span class="im">import</span> apriori</span>
 <span id="cb6-2"><a href="#cb6-2"></a><span class="im">from</span> mlxtend.frequent_patterns <span class="im">import</span> association_rules</span>
 <span id="cb6-3"><a href="#cb6-3"></a></span>
@@ -751,7 +751,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-6"><a href="#cb6-6"></a>rules <span class="op">=</span> association_rules(frequent_itemsets, metric<span class="op">=</span><span class="st">'lift'</span>)  </span>
 <span id="cb6-7"><a href="#cb6-7"></a></span>
 <span id="cb6-8"><a href="#cb6-8"></a>rules.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="155">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <div>
 
 
@@ -774,19 +774,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>(bottled water)</td>
-<td>(whole milk)</td>
-<td>0.110524</td>
-<td>0.255516</td>
-<td>0.034367</td>
-<td>0.310948</td>
-<td>1.216940</td>
-<td>0.006126</td>
-<td>1.080446</td>
-<td>0.200417</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
 <td>(whole milk)</td>
 <td>(bottled water)</td>
 <td>0.255516</td>
@@ -798,21 +785,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>1.027703</td>
 <td>0.239450</td>
 </tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>(bottled water)</td>
+<td>(whole milk)</td>
+<td>0.110524</td>
+<td>0.255516</td>
+<td>0.034367</td>
+<td>0.310948</td>
+<td>1.216940</td>
+<td>0.006126</td>
+<td>1.080446</td>
+<td>0.200417</td>
+</tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>(whole milk)</td>
-<td>(citrus fruit)</td>
-<td>0.255516</td>
-<td>0.082766</td>
-<td>0.030503</td>
-<td>0.119379</td>
-<td>1.442377</td>
-<td>0.009355</td>
-<td>1.041577</td>
-<td>0.411963</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
 <td>(citrus fruit)</td>
 <td>(whole milk)</td>
 <td>0.082766</td>
@@ -823,6 +810,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>0.009355</td>
 <td>1.179008</td>
 <td>0.334375</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>(whole milk)</td>
+<td>(citrus fruit)</td>
+<td>0.255516</td>
+<td>0.082766</td>
+<td>0.030503</td>
+<td>0.119379</td>
+<td>1.442377</td>
+<td>0.009355</td>
+<td>1.041577</td>
+<td>0.411963</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
@@ -843,13 +843,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-11" class="cell" data-execution_count="156">
+<div id="cell-11" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>rules_sorted <span class="op">=</span> rules.sort_values(by <span class="op">=</span> <span class="st">'lift'</span>,axis <span class="op">=</span> <span class="dv">0</span>, ascending <span class="op">=</span> <span class="va">False</span>).head(<span class="dv">20</span>)[[<span class="st">'antecedents'</span>,<span class="st">'consequents'</span>,<span class="st">'support'</span>,<span class="st">'confidence'</span>,<span class="st">'lift'</span>]]</span>
 <span id="cb7-2"><a href="#cb7-2"></a></span>
 <span id="cb7-3"><a href="#cb7-3"></a>top_10_rules <span class="op">=</span> rules_sorted[::<span class="dv">2</span>].reset_index().drop(<span class="st">'index'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
 <span id="cb7-4"><a href="#cb7-4"></a></span>
 <span id="cb7-5"><a href="#cb7-5"></a>top_10_rules</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="156">
+<div class="cell-output cell-output-display" data-execution_count="7">
 <div>
 
 
@@ -953,6 +953,111 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Overall, customers who purchase vegetables are 2.25 times more likely to add root vegetables into their baskets. Another combination is customer who add sausages in their basket are 1.77 times more likely to also add roll/buns.</p>
 <p>These association rules suggests that the store’s layout designer should consider moving these items in close proximity or at least make it easier for the customers to find these items on their way to checkout.</p>
+<p>In terms of support, whole milk and other vegetables are bought together in 7% of all the transactions followed by whole milk and yogurt.</p>
+<div id="cell-14" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>rules_sorted.sort_values(<span class="st">'support'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>).reset_index().drop(<span class="st">'index'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">antecedents</th>
+<th data-quarto-table-cell-role="th">consequents</th>
+<th data-quarto-table-cell-role="th">support</th>
+<th data-quarto-table-cell-role="th">confidence</th>
+<th data-quarto-table-cell-role="th">lift</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>(whole milk)</td>
+<td>(other vegetables)</td>
+<td>0.074835</td>
+<td>0.292877</td>
+<td>1.513634</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>(other vegetables)</td>
+<td>(whole milk)</td>
+<td>0.074835</td>
+<td>0.386758</td>
+<td>1.513634</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>(whole milk)</td>
+<td>(yogurt)</td>
+<td>0.056024</td>
+<td>0.219260</td>
+<td>1.571735</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>(yogurt)</td>
+<td>(whole milk)</td>
+<td>0.056024</td>
+<td>0.401603</td>
+<td>1.571735</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>(whole milk)</td>
+<td>(root vegetables)</td>
+<td>0.048907</td>
+<td>0.191405</td>
+<td>1.756031</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>(root vegetables)</td>
+<td>(whole milk)</td>
+<td>0.048907</td>
+<td>0.448694</td>
+<td>1.756031</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>(root vegetables)</td>
+<td>(other vegetables)</td>
+<td>0.047382</td>
+<td>0.434701</td>
+<td>2.246605</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>(other vegetables)</td>
+<td>(root vegetables)</td>
+<td>0.047382</td>
+<td>0.244877</td>
+<td>2.246605</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>(other vegetables)</td>
+<td>(yogurt)</td>
+<td>0.043416</td>
+<td>0.224383</td>
+<td>1.608457</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>(yogurt)</td>
+<td>(other vegetables)</td>
+<td>0.043416</td>
+<td>0.311224</td>
+<td>1.608457</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
 </section>
 </section>
 
