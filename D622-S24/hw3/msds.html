@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Nick Climaco">
+<meta name="dcterms.date" content="2024-04-30">
+
+<title>SVM Classifier</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="msds_files/libs/clipboard/clipboard.min.js"></script>
+<script src="msds_files/libs/quarto-html/quarto.js"></script>
+<script src="msds_files/libs/quarto-html/popper.min.js"></script>
+<script src="msds_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="msds_files/libs/quarto-html/anchor.min.js"></script>
+<link href="msds_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="msds_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="msds_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="msds_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="msds_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link active" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#correlation-matrix-of-features" id="toc-correlation-matrix-of-features" class="nav-link" data-scroll-target="#correlation-matrix-of-features">Correlation Matrix of Features</a></li>
+  </ul></li>
+  <li><a href="#support-vector-model" id="toc-support-vector-model" class="nav-link" data-scroll-target="#support-vector-model">Support Vector Model</a></li>
+  <li><a href="#comparison-of-decision-tree-random-forest-and-support-vector-machine-for-classification" id="toc-comparison-of-decision-tree-random-forest-and-support-vector-machine-for-classification" class="nav-link" data-scroll-target="#comparison-of-decision-tree-random-forest-and-support-vector-machine-for-classification">Comparison of Decision Tree, Random Forest and Support Vector Machine for Classification</a></li>
+  <li><a href="#comparative-analysis" id="toc-comparative-analysis" class="nav-link" data-scroll-target="#comparative-analysis">Comparative Analysis</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SVM Classifier</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Nick Climaco </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 30, 2024</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Perform an analysis of the dataset(s) used in Homework #2 using the SVM algorithm. Compare the results with the results from previous homework.</p>
+<p>Homework #3 Read the following articles: https://www.hindawi.com/journals/complexity/2021/5550344/ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8137961/ Search for academic content (at least 3 articles) that compare the use of decision trees vs SVMs in your current area of expertise. Perform an analysis of the dataset used in Homework #2 using the SVM algorithm. Compare the results with the results from previous homework. Answer questions, such as: Which algorithm is recommended to get more accurate results? Is it better for classification or regression scenarios? Do you agree with the recommendations? Why? Format Essay (minimum 500 word document) Write a short essay explaining your selection of algorithms and how they relate to the data and what you are trying to do Analysis using R or Python (submit code + errors + analysis as notebook or copy/paste to document) Include analysis R (or Python) code.</p>
+<p>Pre-work:</p>
+<ol type="1">
+<li><p>Read the following articles: A) https://www.hindawi.com/journals/complexity/2021/5550344/ B) https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8137961/</p></li>
+<li><p>Search for academic content (at least 3 articles) that compare the use of decision trees vs SVMs in your current area of expertise.</p></li>
+</ol>
+<p>Discuss the articles provided (1 A &amp; B, above), the 3 you chose, and how they relate to your your area of interest</p>
+<p>Deliverable</p>
+<ol type="1">
+<li><p>Perform an analysis of the dataset used in Homework #2 using the SVM algorithm.</p></li>
+<li><p>Compare the results with the results from previous homework.</p>
+<ul>
+<li><p>Answer questions, such as:</p></li>
+<li><p>Which algorithm is recommended to get more accurate results?</p></li>
+<li><p>Is it better for classification or regression scenarios?</p></li>
+<li><p>Do you agree with the recommendations?</p></li>
+<li><p>Why?</p></li>
+</ul></li>
+</ol>
+<div id="cell-3" class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a>plt.rcParams[<span class="st">'figure.figsize'</span>] <span class="op">=</span> (<span class="dv">10</span>, <span class="dv">6</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<div id="cell-6" class="cell" data-execution_count="52">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>data.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="52">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Seat Comfort</th>
+<th data-quarto-table-cell-role="th">Cabin Staff Service</th>
+<th data-quarto-table-cell-role="th">Ground Service</th>
+<th data-quarto-table-cell-role="th">Food &amp; Beverages</th>
+<th data-quarto-table-cell-role="th">Inflight Entertainment</th>
+<th data-quarto-table-cell-role="th">Value For Money</th>
+<th data-quarto-table-cell-role="th">Review Sentiment</th>
+<th data-quarto-table-cell-role="th">Seat_Types_Business Class</th>
+<th data-quarto-table-cell-role="th">Seat_Types_Economy Class</th>
+<th data-quarto-table-cell-role="th">Seat_Types_First Class</th>
+<th data-quarto-table-cell-role="th">Seat_Types_Premium Economy</th>
+<th data-quarto-table-cell-role="th">Type_of_Travellers_Business</th>
+<th data-quarto-table-cell-role="th">Type_of_Travellers_Couple Leisure</th>
+<th data-quarto-table-cell-role="th">Type_of_Travellers_Family Leisure</th>
+<th data-quarto-table-cell-role="th">Type_of_Travellers_Solo Leisure</th>
+<th data-quarto-table-cell-role="th">Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>1</td>
+<td>1</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>1</td>
+<td>0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1</td>
+<td>0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>no</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>3.0</td>
+<td>3</td>
+<td>0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>no</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2.0</td>
+<td>2.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>3.0</td>
+<td>1</td>
+<td>0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>no</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="cell-7" class="cell" data-execution_count="53">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>X <span class="op">=</span> data.drop(<span class="st">'Recommended'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>y <span class="op">=</span> data[<span class="st">'Recommended'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-8" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>data.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 1739 entries, 0 to 1738
+Data columns (total 16 columns):
+ #   Column                             Non-Null Count  Dtype  
+---  ------                             --------------  -----  
+ 0   Seat Comfort                       1739 non-null   float64
+ 1   Cabin Staff Service                1739 non-null   float64
+ 2   Ground Service                     1739 non-null   float64
+ 3   Food &amp; Beverages                   1739 non-null   float64
+ 4   Inflight Entertainment             1739 non-null   float64
+ 5   Value For Money                    1739 non-null   int64  
+ 6   Review Sentiment                   1739 non-null   int64  
+ 7   Seat_Types_Business Class          1739 non-null   float64
+ 8   Seat_Types_Economy Class           1739 non-null   float64
+ 9   Seat_Types_First Class             1739 non-null   float64
+ 10  Seat_Types_Premium Economy         1739 non-null   float64
+ 11  Type_of_Travellers_Business        1739 non-null   float64
+ 12  Type_of_Travellers_Couple Leisure  1739 non-null   float64
+ 13  Type_of_Travellers_Family Leisure  1739 non-null   float64
+ 14  Type_of_Travellers_Solo Leisure    1739 non-null   float64
+ 15  Recommended                        1739 non-null   object 
+dtypes: float64(13), int64(2), object(1)
+memory usage: 217.5+ KB</code></pre>
+</div>
+</div>
+<div id="cell-9" class="cell" data-execution_count="83">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="bu">print</span>(<span class="ss">f'This dataset has </span><span class="sc">{</span>data<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> rows and </span><span class="sc">{</span>data<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columns!!!'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>This dataset has 1739 rows and 16 columns!!!</code></pre>
+</div>
+</div>
+<section id="boxplots-for-each-attribute-of-the-airline" class="level4">
+<h4 class="anchored" data-anchor-id="boxplots-for-each-attribute-of-the-airline">Boxplots for each Attribute of the Airline</h4>
+<div id="cell-11" class="cell" data-execution_count="54">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>sns.boxplot(data.iloc[:,:<span class="dv">6</span>], orient<span class="op">=</span><span class="st">'h'</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="msds_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="distribution-of-the-attributes" class="level4">
+<h4 class="anchored" data-anchor-id="distribution-of-the-attributes">Distribution of the Attributes</h4>
+<div id="cell-13" class="cell" data-execution_count="86">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>data.describe().T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="86">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">count</th>
+<th data-quarto-table-cell-role="th">mean</th>
+<th data-quarto-table-cell-role="th">std</th>
+<th data-quarto-table-cell-role="th">min</th>
+<th data-quarto-table-cell-role="th">25%</th>
+<th data-quarto-table-cell-role="th">50%</th>
+<th data-quarto-table-cell-role="th">75%</th>
+<th data-quarto-table-cell-role="th">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Seat Comfort</td>
+<td>1739.0</td>
+<td>2.824037</td>
+<td>1.371281</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>3.0</td>
+<td>4.0</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Cabin Staff Service</td>
+<td>1739.0</td>
+<td>3.209316</td>
+<td>1.471988</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>3.0</td>
+<td>5.0</td>
+<td>5.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Ground Service</td>
+<td>1739.0</td>
+<td>2.917769</td>
+<td>1.418122</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>4.0</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Food &amp; Beverages</td>
+<td>1739.0</td>
+<td>2.615871</td>
+<td>1.427456</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>2.0</td>
+<td>4.0</td>
+<td>5.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Inflight Entertainment</td>
+<td>1739.0</td>
+<td>2.658424</td>
+<td>1.378176</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>4.0</td>
+<td>5.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Value For Money</td>
+<td>1739.0</td>
+<td>2.642898</td>
+<td>1.428229</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>3.0</td>
+<td>4.0</td>
+<td>5.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Review Sentiment</td>
+<td>1739.0</td>
+<td>0.561242</td>
+<td>0.496378</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Seat_Types_Business Class</td>
+<td>1739.0</td>
+<td>0.304773</td>
+<td>0.460444</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Seat_Types_Economy Class</td>
+<td>1739.0</td>
+<td>0.478436</td>
+<td>0.499678</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Seat_Types_First Class</td>
+<td>1739.0</td>
+<td>0.079931</td>
+<td>0.271264</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Seat_Types_Premium Economy</td>
+<td>1739.0</td>
+<td>0.136860</td>
+<td>0.343799</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Type_of_Travellers_Business</td>
+<td>1739.0</td>
+<td>0.214491</td>
+<td>0.410587</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Type_of_Travellers_Couple Leisure</td>
+<td>1739.0</td>
+<td>0.343876</td>
+<td>0.475137</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Type_of_Travellers_Family Leisure</td>
+<td>1739.0</td>
+<td>0.143761</td>
+<td>0.350948</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Type_of_Travellers_Solo Leisure</td>
+<td>1739.0</td>
+<td>0.297872</td>
+<td>0.457455</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>There are 7 rated features of each review ranging from 1-5.</p>
+<p>For seat types are there are 4 unique classes: Economy, Business, First Class, and Premium Economy.</p>
+<p>This data also collected the information of the types of passengers: solo, couple, family, and business.</p>
+<div id="cell-15" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>data.iloc[:,:<span class="dv">6</span>].hist(grid<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>plt.tight_layout()</span>
+<span id="cb10-3"><a href="#cb10-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="msds_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="are-the-classes-in-recommended-equalbalanced" class="level4">
+<h4 class="anchored" data-anchor-id="are-the-classes-in-recommended-equalbalanced">Are the classes in <code>Recommended</code> equal/balanced?</h4>
+<div id="cell-17" class="cell" data-execution_count="56">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>class_counts <span class="op">=</span> data[<span class="st">'Recommended'</span>].value_counts()</span>
+<span id="cb11-2"><a href="#cb11-2"></a></span>
+<span id="cb11-3"><a href="#cb11-3"></a>plt.bar(class_counts.index, class_counts.values) <span class="co"># type: ignore</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>plt.xlabel(<span class="st">'Recommended'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>plt.ylabel(<span class="st">'Count'</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a>plt.title(<span class="st">'Class Imbalance in Target Variable'</span>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a></span>
+<span id="cb11-8"><a href="#cb11-8"></a>total <span class="op">=</span> <span class="bu">sum</span>(class_counts.values)</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="cf">for</span> i, count <span class="kw">in</span> <span class="bu">enumerate</span>(class_counts.values):</span>
+<span id="cb11-10"><a href="#cb11-10"></a>     percentage <span class="op">=</span> count <span class="op">/</span> total <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a>     plt.text(i, count, <span class="ss">f'</span><span class="sc">{</span>percentage<span class="sc">:.2f}</span><span class="ss">%'</span>, ha<span class="op">=</span><span class="st">'center'</span>, va<span class="op">=</span><span class="st">'bottom'</span>)</span>
+<span id="cb11-12"><a href="#cb11-12"></a></span>
+<span id="cb11-13"><a href="#cb11-13"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="msds_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="correlation-matrix-of-features" class="level3">
+<h3 class="anchored" data-anchor-id="correlation-matrix-of-features">Correlation Matrix of Features</h3>
+<div id="cell-19" class="cell" data-execution_count="88">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>correlation_matrix <span class="op">=</span> X.corr()</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a>corr_matrix <span class="op">=</span> X.corr()</span>
+<span id="cb12-4"><a href="#cb12-4"></a></span>
+<span id="cb12-5"><a href="#cb12-5"></a>mask <span class="op">=</span> np.triu(np.ones_like(corr_matrix, dtype<span class="op">=</span><span class="bu">bool</span>))</span>
+<span id="cb12-6"><a href="#cb12-6"></a></span>
+<span id="cb12-7"><a href="#cb12-7"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb12-8"><a href="#cb12-8"></a></span>
+<span id="cb12-9"><a href="#cb12-9"></a>sns.heatmap(corr_matrix, mask<span class="op">=</span>mask, cmap<span class="op">=</span><span class="st">'coolwarm'</span>, annot<span class="op">=</span><span class="va">True</span>, fmt<span class="op">=</span><span class="st">".2f"</span>, linewidths<span class="op">=</span><span class="fl">0.5</span>, ax<span class="op">=</span>ax)</span>
+<span id="cb12-10"><a href="#cb12-10"></a></span>
+<span id="cb12-11"><a href="#cb12-11"></a>plt.title(<span class="st">'Correlation Matrix Heatmap'</span>)</span>
+<span id="cb12-12"><a href="#cb12-12"></a></span>
+<span id="cb12-13"><a href="#cb12-13"></a>plt.show()</span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="bu">print</span>(correlation_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="msds_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                   Seat Comfort  Cabin Staff Service  \
+Seat Comfort                           1.000000             0.590066   
+Cabin Staff Service                    0.590066             1.000000   
+Ground Service                         0.536967             0.516243   
+Food &amp; Beverages                       0.622409             0.701508   
+Inflight Entertainment                 0.589565             0.507780   
+Value For Money                        0.677088             0.645067   
+Review Sentiment                       0.479911             0.466739   
+Seat_Types_Business Class              0.060381             0.079852   
+Seat_Types_Economy Class              -0.187760            -0.115893   
+Seat_Types_First Class                 0.169310             0.120904   
+Seat_Types_Premium Economy             0.058434            -0.033901   
+Type_of_Travellers_Business           -0.142421            -0.137160   
+Type_of_Travellers_Couple Leisure      0.035523             0.040170   
+Type_of_Travellers_Family Leisure      0.007163             0.009658   
+Type_of_Travellers_Solo Leisure        0.085439             0.073975   
+
+                                   Ground Service  Food &amp; Beverages  \
+Seat Comfort                             0.536967          0.622409   
+Cabin Staff Service                      0.516243          0.701508   
+Ground Service                           1.000000          0.516186   
+Food &amp; Beverages                         0.516186          1.000000   
+Inflight Entertainment                   0.448999          0.603902   
+Value For Money                          0.660748          0.701166   
+Review Sentiment                         0.478378          0.463599   
+Seat_Types_Business Class                0.063076          0.108190   
+Seat_Types_Economy Class                -0.092228         -0.143914   
+Seat_Types_First Class                   0.052993          0.094198   
+Seat_Types_Premium Economy               0.007755         -0.010056   
+Type_of_Travellers_Business             -0.117916         -0.145018   
+Type_of_Travellers_Couple Leisure        0.035160          0.046412   
+Type_of_Travellers_Family Leisure       -0.019009         -0.021785   
+Type_of_Travellers_Solo Leisure          0.083900          0.098668   
+
+                                   Inflight Entertainment  Value For Money  \
+Seat Comfort                                     0.589565         0.677088   
+Cabin Staff Service                              0.507780         0.645067   
+Ground Service                                   0.448999         0.660748   
+Food &amp; Beverages                                 0.603902         0.701166   
+Inflight Entertainment                           1.000000         0.564129   
+Value For Money                                  0.564129         1.000000   
+Review Sentiment                                 0.375436         0.547447   
+Seat_Types_Business Class                        0.026326         0.035228   
+Seat_Types_Economy Class                        -0.082557        -0.056349   
+Seat_Types_First Class                           0.074612         0.057381   
+Seat_Types_Premium Economy                       0.025859        -0.010558   
+Type_of_Travellers_Business                     -0.140922        -0.155812   
+Type_of_Travellers_Couple Leisure                0.042407         0.028444   
+Type_of_Travellers_Family Leisure               -0.000721        -0.011163   
+Type_of_Travellers_Solo Leisure                  0.082992         0.118869   
+
+                                   Review Sentiment  \
+Seat Comfort                               0.479911   
+Cabin Staff Service                        0.466739   
+Ground Service                             0.478378   
+Food &amp; Beverages                           0.463599   
+Inflight Entertainment                     0.375436   
+Value For Money                            0.547447   
+Review Sentiment                           1.000000   
+Seat_Types_Business Class                  0.061783   
+Seat_Types_Economy Class                  -0.122840   
+Seat_Types_First Class                     0.072589   
+Seat_Types_Premium Economy                 0.038518   
+Type_of_Travellers_Business               -0.063078   
+Type_of_Travellers_Couple Leisure          0.010679   
+Type_of_Travellers_Family Leisure         -0.034055   
+Type_of_Travellers_Solo Leisure            0.071650   
+
+                                   Seat_Types_Business Class  \
+Seat Comfort                                        0.060381   
+Cabin Staff Service                                 0.079852   
+Ground Service                                      0.063076   
+Food &amp; Beverages                                    0.108190   
+Inflight Entertainment                              0.026326   
+Value For Money                                     0.035228   
+Review Sentiment                                    0.061783   
+Seat_Types_Business Class                           1.000000   
+Seat_Types_Economy Class                           -0.634137   
+Seat_Types_First Class                             -0.195152   
+Seat_Types_Premium Economy                         -0.263647   
+Type_of_Travellers_Business                         0.183581   
+Type_of_Travellers_Couple Leisure                   0.049301   
+Type_of_Travellers_Family Leisure                  -0.075462   
+Type_of_Travellers_Solo Leisure                    -0.158087   
+
+                                   Seat_Types_Economy Class  \
+Seat Comfort                                      -0.187760   
+Cabin Staff Service                               -0.115893   
+Ground Service                                    -0.092228   
+Food &amp; Beverages                                  -0.143914   
+Inflight Entertainment                            -0.082557   
+Value For Money                                   -0.056349   
+Review Sentiment                                  -0.122840   
+Seat_Types_Business Class                         -0.634137   
+Seat_Types_Economy Class                           1.000000   
+Seat_Types_First Class                            -0.282296   
+Seat_Types_Premium Economy                        -0.381378   
+Type_of_Travellers_Business                       -0.169550   
+Type_of_Travellers_Couple Leisure                 -0.077805   
+Type_of_Travellers_Family Leisure                  0.139088   
+Type_of_Travellers_Solo Leisure                    0.126287   
+
+                                   Seat_Types_First Class  \
+Seat Comfort                                     0.169310   
+Cabin Staff Service                              0.120904   
+Ground Service                                   0.052993   
+Food &amp; Beverages                                 0.094198   
+Inflight Entertainment                           0.074612   
+Value For Money                                  0.057381   
+Review Sentiment                                 0.072589   
+Seat_Types_Business Class                       -0.195152   
+Seat_Types_Economy Class                        -0.282296   
+Seat_Types_First Class                           1.000000   
+Seat_Types_Premium Economy                      -0.117367   
+Type_of_Travellers_Business                      0.011291   
+Type_of_Travellers_Couple Leisure                0.045540   
+Type_of_Travellers_Family Leisure               -0.054291   
+Type_of_Travellers_Solo Leisure                 -0.015785   
+
+                                   Seat_Types_Premium Economy  \
+Seat Comfort                                         0.058434   
+Cabin Staff Service                                 -0.033901   
+Ground Service                                       0.007755   
+Food &amp; Beverages                                    -0.010056   
+Inflight Entertainment                               0.025859   
+Value For Money                                     -0.010558   
+Review Sentiment                                     0.038518   
+Seat_Types_Business Class                           -0.263647   
+Seat_Types_Economy Class                            -0.381378   
+Seat_Types_First Class                              -0.117367   
+Seat_Types_Premium Economy                           1.000000   
+Type_of_Travellers_Business                         -0.008351   
+Type_of_Travellers_Couple Leisure                    0.011122   
+Type_of_Travellers_Family Leisure                   -0.058250   
+Type_of_Travellers_Solo Leisure                      0.040632   
+
+                                   Type_of_Travellers_Business  \
+Seat Comfort                                         -0.142421   
+Cabin Staff Service                                  -0.137160   
+Ground Service                                       -0.117916   
+Food &amp; Beverages                                     -0.145018   
+Inflight Entertainment                               -0.140922   
+Value For Money                                      -0.155812   
+Review Sentiment                                     -0.063078   
+Seat_Types_Business Class                             0.183581   
+Seat_Types_Economy Class                             -0.169550   
+Seat_Types_First Class                                0.011291   
+Seat_Types_Premium Economy                           -0.008351   
+Type_of_Travellers_Business                           1.000000   
+Type_of_Travellers_Couple Leisure                    -0.378300   
+Type_of_Travellers_Family Leisure                    -0.214117   
+Type_of_Travellers_Solo Leisure                      -0.340358   
+
+                                   Type_of_Travellers_Couple Leisure  \
+Seat Comfort                                                0.035523   
+Cabin Staff Service                                         0.040170   
+Ground Service                                              0.035160   
+Food &amp; Beverages                                            0.046412   
+Inflight Entertainment                                      0.042407   
+Value For Money                                             0.028444   
+Review Sentiment                                            0.010679   
+Seat_Types_Business Class                                   0.049301   
+Seat_Types_Economy Class                                   -0.077805   
+Seat_Types_First Class                                      0.045540   
+Seat_Types_Premium Economy                                  0.011122   
+Type_of_Travellers_Business                                -0.378300   
+Type_of_Travellers_Couple Leisure                           1.000000   
+Type_of_Travellers_Family Leisure                          -0.296640   
+Type_of_Travellers_Solo Leisure                            -0.471536   
+
+                                   Type_of_Travellers_Family Leisure  \
+Seat Comfort                                                0.007163   
+Cabin Staff Service                                         0.009658   
+Ground Service                                             -0.019009   
+Food &amp; Beverages                                           -0.021785   
+Inflight Entertainment                                     -0.000721   
+Value For Money                                            -0.011163   
+Review Sentiment                                           -0.034055   
+Seat_Types_Business Class                                  -0.075462   
+Seat_Types_Economy Class                                    0.139088   
+Seat_Types_First Class                                     -0.054291   
+Seat_Types_Premium Economy                                 -0.058250   
+Type_of_Travellers_Business                                -0.214117   
+Type_of_Travellers_Couple Leisure                          -0.296640   
+Type_of_Travellers_Family Leisure                           1.000000   
+Type_of_Travellers_Solo Leisure                            -0.266888   
+
+                                   Type_of_Travellers_Solo Leisure  
+Seat Comfort                                              0.085439  
+Cabin Staff Service                                       0.073975  
+Ground Service                                            0.083900  
+Food &amp; Beverages                                          0.098668  
+Inflight Entertainment                                    0.082992  
+Value For Money                                           0.118869  
+Review Sentiment                                          0.071650  
+Seat_Types_Business Class                                -0.158087  
+Seat_Types_Economy Class                                  0.126287  
+Seat_Types_First Class                                   -0.015785  
+Seat_Types_Premium Economy                                0.040632  
+Type_of_Travellers_Business                              -0.340358  
+Type_of_Travellers_Couple Leisure                        -0.471536  
+Type_of_Travellers_Family Leisure                        -0.266888  
+Type_of_Travellers_Solo Leisure                           1.000000  </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="support-vector-model" class="level1">
+<h1>Support Vector Model</h1>
+<div id="cell-21" class="cell" data-execution_count="57">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb14-2"><a href="#cb14-2"></a></span>
+<span id="cb14-3"><a href="#cb14-3"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb14-4"><a href="#cb14-4"></a>y <span class="op">=</span> label_encoder.fit_transform(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-22" class="cell" data-execution_count="58">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb15-4"><a href="#cb15-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb15-5"><a href="#cb15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6"></a>SEED <span class="op">=</span> <span class="dv">123</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a></span>
+<span id="cb15-8"><a href="#cb15-8"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span> SEED, stratify<span class="op">=</span>y)</span>
+<span id="cb15-9"><a href="#cb15-9"></a></span>
+<span id="cb15-10"><a href="#cb15-10"></a>params_grid <span class="op">=</span> {</span>
+<span id="cb15-11"><a href="#cb15-11"></a>     <span class="st">'C'</span> : [<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>],</span>
+<span id="cb15-12"><a href="#cb15-12"></a>     <span class="st">'kernel'</span> : [<span class="st">'linear'</span>, <span class="st">'poly'</span>, <span class="st">'rbf'</span>, <span class="st">'sigmoid'</span>],</span>
+<span id="cb15-13"><a href="#cb15-13"></a>     <span class="st">'gamma'</span> : [<span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>],</span>
+<span id="cb15-14"><a href="#cb15-14"></a>     }</span>
+<span id="cb15-15"><a href="#cb15-15"></a></span>
+<span id="cb15-16"><a href="#cb15-16"></a>svc <span class="op">=</span> SVC(random_state<span class="op">=</span>SEED)</span>
+<span id="cb15-17"><a href="#cb15-17"></a></span>
+<span id="cb15-18"><a href="#cb15-18"></a>grid_search <span class="op">=</span> GridSearchCV(svc, params_grid, cv <span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb15-19"><a href="#cb15-19"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb15-20"><a href="#cb15-20"></a></span>
+<span id="cb15-21"><a href="#cb15-21"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
+<span id="cb15-22"><a href="#cb15-22"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{'C': 1, 'gamma': 0.01, 'kernel': 'rbf'}</code></pre>
+</div>
+</div>
+<div id="cell-23" class="cell" data-execution_count="67">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>model <span class="op">=</span> SVC(C<span class="op">=</span><span class="dv">1</span>, gamma<span class="op">=</span><span class="fl">0.01</span>, kernel<span class="op">=</span><span class="st">'rbf'</span>)</span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a>model.fit(X_train,y_train)</span>
+<span id="cb17-4"><a href="#cb17-4"></a></span>
+<span id="cb17-5"><a href="#cb17-5"></a>y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb17-6"><a href="#cb17-6"></a></span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="bu">print</span>(<span class="ss">f'SVM Classifier Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>SVM Classifier Accuracy: 93.678%</code></pre>
+</div>
+</div>
+<div id="cell-24" class="cell" data-execution_count="89">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="89">
+<pre><code>array([1., 1.])</code></pre>
+</div>
+</div>
+</section>
+<section id="comparison-of-decision-tree-random-forest-and-support-vector-machine-for-classification" class="level1">
+<h1>Comparison of Decision Tree, Random Forest and Support Vector Machine for Classification</h1>
+<p>Recall from hw2, that the models’ accuracies were:</p>
+<ul>
+<li><p>DT Model 1 Accuracy: 90.805%</p></li>
+<li><p>DT Model 2 Accuracy: 87.356%</p></li>
+<li><p>RandomForestClassifier Model Accuracy: 92.816%</p></li>
+</ul>
+<p>In this analysis, we compare the performance of two popular models the SVM classifier and RF classifier. The results of these models was based on their accuracies on the test set. The SVM classifier exhibited an accuracy of 93.678%, slightly higher than the RF classifier with an accuracy of 92.816%. The difference in accuracy showcases that the SVM has a marginally better predictive power.</p>
+<p>The selection of the two models depends on the specific goals of the task. If the main goal is to provide a model whose outcomes can be easily explained and interpreted by decision-makers, the RF model would be prefered. Conversely, if we aim to achieve the highest level of predictiv accuracy, the SVM model is the better choice.</p>
+<p>For this task, our analysis recommends the use of the RF model for its interpretability and comparable accuracy on the test set.</p>
+<hr>
+</section>
+<section id="comparative-analysis" class="level1">
+<h1>Comparative Analysis</h1>
+<p>Provided Articles: * https://www.hindawi.com/journals/complexity/2021/5550344/ * https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8137961/</p>
+<p>The use of Decision Trees and Support Vector Machine on COVID-19 Infection Predicition</p>
+<p>Direct Marketing Campaigns with DT and SVM: (found via google scholar)</p>
+<ul>
+<li>https://www.scirp.org/html/6-9301587_30463.htm</li>
+<li>https://www.sciencedirect.com/science/article/abs/pii/S0167865510003648</li>
+<li>https://www.mdpi.com/0718-1876/17/3/51</li>
+<li>https://www.frontiersin.org/journals/neuroscience/articles/10.3389/fnins.2018.00076/full</li>
+</ul>
+<p>After undertaking this analysis, it became evident that SVM models hold the predictive edge over decision trees. However, despspite its better performance metrics, SVM falls short in its interpretability. The complexity of SVM especially when using the kernel trick to deal with nonlinear data makes it difficult to explain how decision are made, which can be important when dealing with an audience outside this domain.</p>
+<p>The two articles provided demonstrates the use case of support vector machines and decision tree with a goal to predict COVID-19 infections. Each article investigates the effectiveness of each machine learning methods using laboratory tests data. The main focus of both articles encountered with the imbalance of classes meaning there are more data for one class relative to the rest. The research articles utilized performance metrics such as the F-statistic, precision, recall, area under the precision-recall curve and area under the receiver operating characteristic curve. It found that ensemble models were, on average, performed better for imbalanced data.</p>
+<p>For instance, the COVID-19 prediction with decision trees of this <a href="https://www.hindawi.com/journals/complexity/2021/5550344/#results-and-discussion">study</a>, they incorporated resampling techniques to manage the data imbalance. Then, fitted models like XGBoost, Random Forest, and other boosted and bagged decision trees. A remarkable finding was that using age as an important feature resulted in the a performance across the model, which is a leading indicator that demongraphic data such as age paired with laboratory data can greatly improve the models predictive capabilities.</p>
+<p>Whereas, using SVM for COVID-19 prediction in this <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8137961/">study</a>. the SVM model not only showed strong predictive metrics but also outperformed other ml models such as random forest, KNN, decision tree, naive bayes, and adaboost. Looking at the confusion matrix towards the end of the paper, it demonstrates that the SVM model consistently classifies the correct 3 classes compared to the other models which are inconsistent in their classification.</p>
+<p>Another application of decision trees can be found in this <a href="https://www.scirp.org/html/6-9301587_30463.htm">study</a> analysis for direct marketing campaigns. In this paper, it explores the effectiveness of decision trees and naive bayes model to create decision for direct marketing. Throughout, the study it compares these algorithms based on the metrics such as accuracy, precision and AUC, surprisely no recall, and the use of data mining to enhance marketing campaigns. Specifically, it explores how the alogrithms can be used to predict customer behavior such as subscribing to term deposit.</p>
+<p>These academic articles all showcase the strengths and weaknesse of SVM and DT models in prediction COVID-19 infections and their application in other industries in this case was for marketing campaign purposes. These studies indicate that SVM tend to have the better predictions over decision tres and other models, we know SVM can handle nonlinear and more complex datasets. However, the complexity of SVMs especially when using kernel trick for nonlinear boundaries raises a difficulty in interpretability, which is pivotal when conveying findings or insights to laymen. We saw how both machine learning models addressing class imbalance in the data, with some implementing resampling techiniques and other using performance metrics that can properly gauge the performance of the model. Metrics such as the F1 score, precision, recall, AUPR, and AUROC. As seen in these articles of differing application from healthcare to business marketing, the choice between SVM and decision tree can decide by balancing the prediction power and interpretability.</p>
+<hr>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
