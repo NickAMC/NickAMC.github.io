@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-04-30">
+<meta name="dcterms.date" content="2024-05-01">
 
 <title>SVM Classifier</title>
 <style>
@@ -115,7 +115,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 30, 2024</p>
+      <p class="date">May 1, 2024</p>
     </div>
   </div>
   
@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Why?</p></li>
 </ul></li>
 </ol>
-<div id="cell-3" class="cell" data-execution_count="50">
+<div id="cell-3" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd </span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt </span>
@@ -157,9 +157,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="exploratory-data-analysis" class="level2">
 <h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
-<div id="cell-6" class="cell" data-execution_count="52">
+<div id="cell-6" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a>data.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="52">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
 
@@ -287,11 +287,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="cell-7" class="cell" data-execution_count="53">
+<div id="cell-7" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>X <span class="op">=</span> data.drop(<span class="st">'Recommended'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a>y <span class="op">=</span> data[<span class="st">'Recommended'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-8" class="cell" data-execution_count="79">
+<div id="cell-8" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>data.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
@@ -319,7 +319,7 @@ dtypes: float64(13), int64(2), object(1)
 memory usage: 217.5+ KB</code></pre>
 </div>
 </div>
-<div id="cell-9" class="cell" data-execution_count="83">
+<div id="cell-9" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="bu">print</span>(<span class="ss">f'This dataset has </span><span class="sc">{</span>data<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> rows and </span><span class="sc">{</span>data<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> columns!!!'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>This dataset has 1739 rows and 16 columns!!!</code></pre>
@@ -327,7 +327,7 @@ memory usage: 217.5+ KB</code></pre>
 </div>
 <section id="boxplots-for-each-attribute-of-the-airline" class="level4">
 <h4 class="anchored" data-anchor-id="boxplots-for-each-attribute-of-the-airline">Boxplots for each Attribute of the Airline</h4>
-<div id="cell-11" class="cell" data-execution_count="54">
+<div id="cell-11" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>sns.boxplot(data.iloc[:,:<span class="dv">6</span>], orient<span class="op">=</span><span class="st">'h'</span>)</span>
 <span id="cb8-2"><a href="#cb8-2"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
@@ -341,9 +341,9 @@ memory usage: 217.5+ KB</code></pre>
 </section>
 <section id="distribution-of-the-attributes" class="level4">
 <h4 class="anchored" data-anchor-id="distribution-of-the-attributes">Distribution of the Attributes</h4>
-<div id="cell-13" class="cell" data-execution_count="86">
+<div id="cell-13" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a>data.describe().T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="86">
+<div class="cell-output cell-output-display" data-execution_count="8">
 <div>
 
 
@@ -536,7 +536,7 @@ memory usage: 217.5+ KB</code></pre>
 <p>There are 7 rated features of each review ranging from 1-5.</p>
 <p>For seat types are there are 4 unique classes: Economy, Business, First Class, and Premium Economy.</p>
 <p>This data also collected the information of the types of passengers: solo, couple, family, and business.</p>
-<div id="cell-15" class="cell" data-execution_count="61">
+<div id="cell-15" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a>data.iloc[:,:<span class="dv">6</span>].hist(grid<span class="op">=</span><span class="va">False</span>)</span>
 <span id="cb10-2"><a href="#cb10-2"></a>plt.tight_layout()</span>
 <span id="cb10-3"><a href="#cb10-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -551,7 +551,7 @@ memory usage: 217.5+ KB</code></pre>
 </section>
 <section id="are-the-classes-in-recommended-equalbalanced" class="level4">
 <h4 class="anchored" data-anchor-id="are-the-classes-in-recommended-equalbalanced">Are the classes in <code>Recommended</code> equal/balanced?</h4>
-<div id="cell-17" class="cell" data-execution_count="56">
+<div id="cell-17" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a>class_counts <span class="op">=</span> data[<span class="st">'Recommended'</span>].value_counts()</span>
 <span id="cb11-2"><a href="#cb11-2"></a></span>
 <span id="cb11-3"><a href="#cb11-3"></a>plt.bar(class_counts.index, class_counts.values) <span class="co"># type: ignore</span></span>
@@ -576,7 +576,7 @@ memory usage: 217.5+ KB</code></pre>
 </section>
 <section id="correlation-matrix-of-features" class="level3">
 <h3 class="anchored" data-anchor-id="correlation-matrix-of-features">Correlation Matrix of Features</h3>
-<div id="cell-19" class="cell" data-execution_count="88">
+<div id="cell-19" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a>correlation_matrix <span class="op">=</span> X.corr()</span>
 <span id="cb12-2"><a href="#cb12-2"></a></span>
 <span id="cb12-3"><a href="#cb12-3"></a>corr_matrix <span class="op">=</span> X.corr()</span>
@@ -589,8 +589,7 @@ memory usage: 217.5+ KB</code></pre>
 <span id="cb12-10"><a href="#cb12-10"></a></span>
 <span id="cb12-11"><a href="#cb12-11"></a>plt.title(<span class="st">'Correlation Matrix Heatmap'</span>)</span>
 <span id="cb12-12"><a href="#cb12-12"></a></span>
-<span id="cb12-13"><a href="#cb12-13"></a>plt.show()</span>
-<span id="cb12-14"><a href="#cb12-14"></a><span class="bu">print</span>(correlation_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-13"><a href="#cb12-13"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -598,265 +597,54 @@ memory usage: 217.5+ KB</code></pre>
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                                   Seat Comfort  Cabin Staff Service  \
-Seat Comfort                           1.000000             0.590066   
-Cabin Staff Service                    0.590066             1.000000   
-Ground Service                         0.536967             0.516243   
-Food &amp; Beverages                       0.622409             0.701508   
-Inflight Entertainment                 0.589565             0.507780   
-Value For Money                        0.677088             0.645067   
-Review Sentiment                       0.479911             0.466739   
-Seat_Types_Business Class              0.060381             0.079852   
-Seat_Types_Economy Class              -0.187760            -0.115893   
-Seat_Types_First Class                 0.169310             0.120904   
-Seat_Types_Premium Economy             0.058434            -0.033901   
-Type_of_Travellers_Business           -0.142421            -0.137160   
-Type_of_Travellers_Couple Leisure      0.035523             0.040170   
-Type_of_Travellers_Family Leisure      0.007163             0.009658   
-Type_of_Travellers_Solo Leisure        0.085439             0.073975   
-
-                                   Ground Service  Food &amp; Beverages  \
-Seat Comfort                             0.536967          0.622409   
-Cabin Staff Service                      0.516243          0.701508   
-Ground Service                           1.000000          0.516186   
-Food &amp; Beverages                         0.516186          1.000000   
-Inflight Entertainment                   0.448999          0.603902   
-Value For Money                          0.660748          0.701166   
-Review Sentiment                         0.478378          0.463599   
-Seat_Types_Business Class                0.063076          0.108190   
-Seat_Types_Economy Class                -0.092228         -0.143914   
-Seat_Types_First Class                   0.052993          0.094198   
-Seat_Types_Premium Economy               0.007755         -0.010056   
-Type_of_Travellers_Business             -0.117916         -0.145018   
-Type_of_Travellers_Couple Leisure        0.035160          0.046412   
-Type_of_Travellers_Family Leisure       -0.019009         -0.021785   
-Type_of_Travellers_Solo Leisure          0.083900          0.098668   
-
-                                   Inflight Entertainment  Value For Money  \
-Seat Comfort                                     0.589565         0.677088   
-Cabin Staff Service                              0.507780         0.645067   
-Ground Service                                   0.448999         0.660748   
-Food &amp; Beverages                                 0.603902         0.701166   
-Inflight Entertainment                           1.000000         0.564129   
-Value For Money                                  0.564129         1.000000   
-Review Sentiment                                 0.375436         0.547447   
-Seat_Types_Business Class                        0.026326         0.035228   
-Seat_Types_Economy Class                        -0.082557        -0.056349   
-Seat_Types_First Class                           0.074612         0.057381   
-Seat_Types_Premium Economy                       0.025859        -0.010558   
-Type_of_Travellers_Business                     -0.140922        -0.155812   
-Type_of_Travellers_Couple Leisure                0.042407         0.028444   
-Type_of_Travellers_Family Leisure               -0.000721        -0.011163   
-Type_of_Travellers_Solo Leisure                  0.082992         0.118869   
-
-                                   Review Sentiment  \
-Seat Comfort                               0.479911   
-Cabin Staff Service                        0.466739   
-Ground Service                             0.478378   
-Food &amp; Beverages                           0.463599   
-Inflight Entertainment                     0.375436   
-Value For Money                            0.547447   
-Review Sentiment                           1.000000   
-Seat_Types_Business Class                  0.061783   
-Seat_Types_Economy Class                  -0.122840   
-Seat_Types_First Class                     0.072589   
-Seat_Types_Premium Economy                 0.038518   
-Type_of_Travellers_Business               -0.063078   
-Type_of_Travellers_Couple Leisure          0.010679   
-Type_of_Travellers_Family Leisure         -0.034055   
-Type_of_Travellers_Solo Leisure            0.071650   
-
-                                   Seat_Types_Business Class  \
-Seat Comfort                                        0.060381   
-Cabin Staff Service                                 0.079852   
-Ground Service                                      0.063076   
-Food &amp; Beverages                                    0.108190   
-Inflight Entertainment                              0.026326   
-Value For Money                                     0.035228   
-Review Sentiment                                    0.061783   
-Seat_Types_Business Class                           1.000000   
-Seat_Types_Economy Class                           -0.634137   
-Seat_Types_First Class                             -0.195152   
-Seat_Types_Premium Economy                         -0.263647   
-Type_of_Travellers_Business                         0.183581   
-Type_of_Travellers_Couple Leisure                   0.049301   
-Type_of_Travellers_Family Leisure                  -0.075462   
-Type_of_Travellers_Solo Leisure                    -0.158087   
-
-                                   Seat_Types_Economy Class  \
-Seat Comfort                                      -0.187760   
-Cabin Staff Service                               -0.115893   
-Ground Service                                    -0.092228   
-Food &amp; Beverages                                  -0.143914   
-Inflight Entertainment                            -0.082557   
-Value For Money                                   -0.056349   
-Review Sentiment                                  -0.122840   
-Seat_Types_Business Class                         -0.634137   
-Seat_Types_Economy Class                           1.000000   
-Seat_Types_First Class                            -0.282296   
-Seat_Types_Premium Economy                        -0.381378   
-Type_of_Travellers_Business                       -0.169550   
-Type_of_Travellers_Couple Leisure                 -0.077805   
-Type_of_Travellers_Family Leisure                  0.139088   
-Type_of_Travellers_Solo Leisure                    0.126287   
-
-                                   Seat_Types_First Class  \
-Seat Comfort                                     0.169310   
-Cabin Staff Service                              0.120904   
-Ground Service                                   0.052993   
-Food &amp; Beverages                                 0.094198   
-Inflight Entertainment                           0.074612   
-Value For Money                                  0.057381   
-Review Sentiment                                 0.072589   
-Seat_Types_Business Class                       -0.195152   
-Seat_Types_Economy Class                        -0.282296   
-Seat_Types_First Class                           1.000000   
-Seat_Types_Premium Economy                      -0.117367   
-Type_of_Travellers_Business                      0.011291   
-Type_of_Travellers_Couple Leisure                0.045540   
-Type_of_Travellers_Family Leisure               -0.054291   
-Type_of_Travellers_Solo Leisure                 -0.015785   
-
-                                   Seat_Types_Premium Economy  \
-Seat Comfort                                         0.058434   
-Cabin Staff Service                                 -0.033901   
-Ground Service                                       0.007755   
-Food &amp; Beverages                                    -0.010056   
-Inflight Entertainment                               0.025859   
-Value For Money                                     -0.010558   
-Review Sentiment                                     0.038518   
-Seat_Types_Business Class                           -0.263647   
-Seat_Types_Economy Class                            -0.381378   
-Seat_Types_First Class                              -0.117367   
-Seat_Types_Premium Economy                           1.000000   
-Type_of_Travellers_Business                         -0.008351   
-Type_of_Travellers_Couple Leisure                    0.011122   
-Type_of_Travellers_Family Leisure                   -0.058250   
-Type_of_Travellers_Solo Leisure                      0.040632   
-
-                                   Type_of_Travellers_Business  \
-Seat Comfort                                         -0.142421   
-Cabin Staff Service                                  -0.137160   
-Ground Service                                       -0.117916   
-Food &amp; Beverages                                     -0.145018   
-Inflight Entertainment                               -0.140922   
-Value For Money                                      -0.155812   
-Review Sentiment                                     -0.063078   
-Seat_Types_Business Class                             0.183581   
-Seat_Types_Economy Class                             -0.169550   
-Seat_Types_First Class                                0.011291   
-Seat_Types_Premium Economy                           -0.008351   
-Type_of_Travellers_Business                           1.000000   
-Type_of_Travellers_Couple Leisure                    -0.378300   
-Type_of_Travellers_Family Leisure                    -0.214117   
-Type_of_Travellers_Solo Leisure                      -0.340358   
-
-                                   Type_of_Travellers_Couple Leisure  \
-Seat Comfort                                                0.035523   
-Cabin Staff Service                                         0.040170   
-Ground Service                                              0.035160   
-Food &amp; Beverages                                            0.046412   
-Inflight Entertainment                                      0.042407   
-Value For Money                                             0.028444   
-Review Sentiment                                            0.010679   
-Seat_Types_Business Class                                   0.049301   
-Seat_Types_Economy Class                                   -0.077805   
-Seat_Types_First Class                                      0.045540   
-Seat_Types_Premium Economy                                  0.011122   
-Type_of_Travellers_Business                                -0.378300   
-Type_of_Travellers_Couple Leisure                           1.000000   
-Type_of_Travellers_Family Leisure                          -0.296640   
-Type_of_Travellers_Solo Leisure                            -0.471536   
-
-                                   Type_of_Travellers_Family Leisure  \
-Seat Comfort                                                0.007163   
-Cabin Staff Service                                         0.009658   
-Ground Service                                             -0.019009   
-Food &amp; Beverages                                           -0.021785   
-Inflight Entertainment                                     -0.000721   
-Value For Money                                            -0.011163   
-Review Sentiment                                           -0.034055   
-Seat_Types_Business Class                                  -0.075462   
-Seat_Types_Economy Class                                    0.139088   
-Seat_Types_First Class                                     -0.054291   
-Seat_Types_Premium Economy                                 -0.058250   
-Type_of_Travellers_Business                                -0.214117   
-Type_of_Travellers_Couple Leisure                          -0.296640   
-Type_of_Travellers_Family Leisure                           1.000000   
-Type_of_Travellers_Solo Leisure                            -0.266888   
-
-                                   Type_of_Travellers_Solo Leisure  
-Seat Comfort                                              0.085439  
-Cabin Staff Service                                       0.073975  
-Ground Service                                            0.083900  
-Food &amp; Beverages                                          0.098668  
-Inflight Entertainment                                    0.082992  
-Value For Money                                           0.118869  
-Review Sentiment                                          0.071650  
-Seat_Types_Business Class                                -0.158087  
-Seat_Types_Economy Class                                  0.126287  
-Seat_Types_First Class                                   -0.015785  
-Seat_Types_Premium Economy                                0.040632  
-Type_of_Travellers_Business                              -0.340358  
-Type_of_Travellers_Couple Leisure                        -0.471536  
-Type_of_Travellers_Family Leisure                        -0.266888  
-Type_of_Travellers_Solo Leisure                           1.000000  </code></pre>
-</div>
 </div>
 </section>
 </section>
 <section id="support-vector-model" class="level1">
 <h1>Support Vector Model</h1>
-<div id="cell-21" class="cell" data-execution_count="57">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
-<span id="cb14-2"><a href="#cb14-2"></a></span>
-<span id="cb14-3"><a href="#cb14-3"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
-<span id="cb14-4"><a href="#cb14-4"></a>y <span class="op">=</span> label_encoder.fit_transform(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-21" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb13-2"><a href="#cb13-2"></a></span>
+<span id="cb13-3"><a href="#cb13-3"></a>label_encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb13-4"><a href="#cb13-4"></a>y <span class="op">=</span> label_encoder.fit_transform(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-22" class="cell" data-execution_count="58">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
-<span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
-<span id="cb15-3"><a href="#cb15-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
-<span id="cb15-4"><a href="#cb15-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
-<span id="cb15-5"><a href="#cb15-5"></a></span>
-<span id="cb15-6"><a href="#cb15-6"></a>SEED <span class="op">=</span> <span class="dv">123</span></span>
-<span id="cb15-7"><a href="#cb15-7"></a></span>
-<span id="cb15-8"><a href="#cb15-8"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span> SEED, stratify<span class="op">=</span>y)</span>
-<span id="cb15-9"><a href="#cb15-9"></a></span>
-<span id="cb15-10"><a href="#cb15-10"></a>params_grid <span class="op">=</span> {</span>
-<span id="cb15-11"><a href="#cb15-11"></a>     <span class="st">'C'</span> : [<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>],</span>
-<span id="cb15-12"><a href="#cb15-12"></a>     <span class="st">'kernel'</span> : [<span class="st">'linear'</span>, <span class="st">'poly'</span>, <span class="st">'rbf'</span>, <span class="st">'sigmoid'</span>],</span>
-<span id="cb15-13"><a href="#cb15-13"></a>     <span class="st">'gamma'</span> : [<span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>],</span>
-<span id="cb15-14"><a href="#cb15-14"></a>     }</span>
-<span id="cb15-15"><a href="#cb15-15"></a></span>
-<span id="cb15-16"><a href="#cb15-16"></a>svc <span class="op">=</span> SVC(random_state<span class="op">=</span>SEED)</span>
-<span id="cb15-17"><a href="#cb15-17"></a></span>
-<span id="cb15-18"><a href="#cb15-18"></a>grid_search <span class="op">=</span> GridSearchCV(svc, params_grid, cv <span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)</span>
-<span id="cb15-19"><a href="#cb15-19"></a>grid_search.fit(X_train, y_train)</span>
-<span id="cb15-20"><a href="#cb15-20"></a></span>
-<span id="cb15-21"><a href="#cb15-21"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
-<span id="cb15-22"><a href="#cb15-22"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-22" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">from</span> sklearn.svm <span class="im">import</span> SVC</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> GridSearchCV</span>
+<span id="cb14-5"><a href="#cb14-5"></a></span>
+<span id="cb14-6"><a href="#cb14-6"></a>SEED <span class="op">=</span> <span class="dv">123</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a></span>
+<span id="cb14-8"><a href="#cb14-8"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X,y, test_size <span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span> SEED, stratify<span class="op">=</span>y)</span>
+<span id="cb14-9"><a href="#cb14-9"></a></span>
+<span id="cb14-10"><a href="#cb14-10"></a>params_grid <span class="op">=</span> {</span>
+<span id="cb14-11"><a href="#cb14-11"></a>     <span class="st">'C'</span> : [<span class="fl">0.1</span>, <span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">100</span>],</span>
+<span id="cb14-12"><a href="#cb14-12"></a>     <span class="st">'kernel'</span> : [<span class="st">'linear'</span>, <span class="st">'poly'</span>, <span class="st">'rbf'</span>, <span class="st">'sigmoid'</span>],</span>
+<span id="cb14-13"><a href="#cb14-13"></a>     <span class="st">'gamma'</span> : [<span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.1</span>],</span>
+<span id="cb14-14"><a href="#cb14-14"></a>     }</span>
+<span id="cb14-15"><a href="#cb14-15"></a></span>
+<span id="cb14-16"><a href="#cb14-16"></a>svc <span class="op">=</span> SVC(random_state<span class="op">=</span>SEED)</span>
+<span id="cb14-17"><a href="#cb14-17"></a></span>
+<span id="cb14-18"><a href="#cb14-18"></a>grid_search <span class="op">=</span> GridSearchCV(svc, params_grid, cv <span class="op">=</span><span class="dv">5</span>, scoring<span class="op">=</span><span class="st">'accuracy'</span>)</span>
+<span id="cb14-19"><a href="#cb14-19"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb14-20"><a href="#cb14-20"></a></span>
+<span id="cb14-21"><a href="#cb14-21"></a>best_params <span class="op">=</span> grid_search.best_params_</span>
+<span id="cb14-22"><a href="#cb14-22"></a><span class="bu">print</span>(best_params)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{'C': 1, 'gamma': 0.01, 'kernel': 'rbf'}</code></pre>
 </div>
 </div>
-<div id="cell-23" class="cell" data-execution_count="67">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a>model <span class="op">=</span> SVC(C<span class="op">=</span><span class="dv">1</span>, gamma<span class="op">=</span><span class="fl">0.01</span>, kernel<span class="op">=</span><span class="st">'rbf'</span>)</span>
-<span id="cb17-2"><a href="#cb17-2"></a></span>
-<span id="cb17-3"><a href="#cb17-3"></a>model.fit(X_train,y_train)</span>
-<span id="cb17-4"><a href="#cb17-4"></a></span>
-<span id="cb17-5"><a href="#cb17-5"></a>y_pred <span class="op">=</span> model.predict(X_test)</span>
-<span id="cb17-6"><a href="#cb17-6"></a></span>
-<span id="cb17-7"><a href="#cb17-7"></a><span class="bu">print</span>(<span class="ss">f'SVM Classifier Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-23" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>model <span class="op">=</span> SVC(C<span class="op">=</span><span class="dv">1</span>, gamma<span class="op">=</span><span class="fl">0.01</span>, kernel<span class="op">=</span><span class="st">'rbf'</span>)</span>
+<span id="cb16-2"><a href="#cb16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3"></a>model.fit(X_train,y_train)</span>
+<span id="cb16-4"><a href="#cb16-4"></a></span>
+<span id="cb16-5"><a href="#cb16-5"></a>y_pred <span class="op">=</span> model.predict(X_test)</span>
+<span id="cb16-6"><a href="#cb16-6"></a></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="bu">print</span>(<span class="ss">f'SVM Classifier Accuracy: </span><span class="sc">{</span>accuracy_score(y_test, y_pred)<span class="sc">:.3%}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>SVM Classifier Accuracy: 93.678%</code></pre>
-</div>
-</div>
-<div id="cell-24" class="cell" data-execution_count="89">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="89">
-<pre><code>array([1., 1.])</code></pre>
 </div>
 </div>
 </section>
