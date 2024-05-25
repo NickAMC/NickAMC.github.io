@@ -70,4 +70,4 @@ In my Data Science Master’s program at CUNY, I’ve progressed through a compr
 ## Contact Me
 
 You can reach me via:
-- **Email**: [nickclimaco1618@gmail.com](mailto:nickclimaco1618@gmail.com)
+- **Email**: nickclimaco1618 [at] gmail [dot] com
