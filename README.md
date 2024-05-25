@@ -28,9 +28,8 @@ In my Data Science Master’s program at CUNY, I’ve progressed through a compr
 **Master of Science, Data Science**  
 *City University of New York - School of Professional Studies*  
 
-**Bachelor of Science, Mathematics**  
+**Bachelor of Science, Applied Mathematics**  
 *City University of New York - Brooklyn College*  
-*Concentration: Applied Math*
 
 ## Academic Projects
 
