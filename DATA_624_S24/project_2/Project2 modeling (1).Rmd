@@ -1,0 +1,534 @@
+---
+title: "Predicting the PH Of Beverages"
+date: "`r Sys.Date()`"
+author: "Moiya Josephs, Mohamed Hassan-El Serafi, Mohammed Rahman, Nick Climaco and Umer Farooq"
+output:
+  rmdformats::readthedown:
+    highlight: kate
+---
+
+```{r setup, include=FALSE}
+## Global options
+knitr::opts_chunk$set(cache = TRUE)
+library(glmnet)
+library(tidyverse)
+library(caret)
+library(dplyr)
+library(mice)
+library(kernlab)
+library(corrplot)
+library(earth)
+library(nnet)
+library(neuralnet)
+library(Cubist)
+library(kableExtra)
+library(gbm)
+library(ipred)
+library(openxlsx)
+library(party)
+library(partykit)
+library(randomForest)
+library(rpart)
+```
+
+
+
+# **Introduction:**
+
+As a data scientist tasked with developing a predictive model for pH regulation in manufacturing processes, the overarching objective is to leverage data-driven insights to enhance operational efficiency, ensure regulatory compliance, and optimize product quality. By harnessing advanced analytics and machine learning techniques, we aim to empower decision-makers with actionable insights that enable proactive management of pH fluctuations throughout the production cycle.
+
+# **Goal:**
+
+The goal of this project is to identify relevant features and engineer variables that capture the predictive factors influencing pH variations. Utilize statistical methods and domain expertise to select the most informative features for model development. We will also try to develop and train predictive models using appropriate algorithms such as regression, time series analysis, or machine learning classifiers. Employ rigorous evaluation techniques, including cross-validation and performance metrics, to assess model accuracy and generalization ability. Our goal is also to ensure transparency and interpret-ability of the predictive model by employing techniques such as feature importance analysis, model visualization, and explanation methods to elucidate the factors driving pH predictions. We will also suggest how to integrate the predictive model with existing decision support systems or manufacturing control systems to enable automated decision-making based on pH forecasts. Facilitate seamless communication between the data science team and operational stakeholders.
+
+By pursuing these goals, we aim to establish a robust data science framework for pH predictive modeling that not only meets regulatory obligations but also drives innovation, efficiency, and excellence in manufacturing operations.
+
+# **Data Acquisition and Exploration:**
+
+In this phase we will collect and integrate diverse data sets encompassing raw materials, process parameters, environmental conditions, and historical pH measurements to build a comprehensive understanding of the manufacturing process. In our case we were provided with a data set but obviously the data set provided was not ready to be fed to an algorithm to train a model. The data set provided was in .xlsx format and we stored on remote location i.e. Github repository, for reproducibility in a comma separated values (.csv) format. The below code chunk loads the provided data set into our environment where we can preprocess and make the data ready for the algorithms.
+
+## **Loading The Dataset:**
+
+```{r warning=FALSE, message=FALSE}
+df <- read_csv("https://raw.githubusercontent.com/Umerfarooq122/Using-Predictive-analytics-to-predict-PH-of-beverages/main/StudentData%20-%20Copy.csv")
+```
+
+
+## **Data Exploration:**
+
+Let's check out the first few rows of the data set to confirm that all the features and observations are loaded correctly.
+
+```{r}
+knitr::kable(head(df))
+```
+
+We can see that everything loaded correctly let's check the structure of the data set to confirm that data types of the features.
+
+```{r, warning=FALSE, message=FALSE}
+glimpse(df)
+```
+
+We can see that most of the data did have the right format apart from the feature `Brand Code`. which needs to be fixed. Everything else looks good so far when it comes to data type but we can observe that some of the data has missing values when it comes to few variables or features like `MFR`,`Brand Code`, and `Filler Speed` e.t.c
+
+### **Descriptive Summary:**
+
+```{r}
+summary(df)
+```
+
+
+### Visual Analytics of Features:
+
+Since we have a lot of numeric predictors so let's plot the histogram to see how they are distributed.
+
+```{r warning=FALSE}
+df %>%
+  keep(is.numeric) %>%
+  gather() %>%
+  ggplot(aes(value)) + 
+  geom_histogram(bins = 15) + 
+  facet_wrap(~key, scales = "free") +
+  ggtitle("Histograms of Numerical Predictors")
+```
+As we can see that predictors like `Carb Pressure`, `Carb Temp`, `Carb Volume`, `Pressure Vaccum`, `PC Volume`, are `Fill Ounces` are almost normally distributed and so does our target variable `PH`. Since our aim is to predict the `PH` which is a continuous number so we are dealing with a regression problem which in turn mean that we can apply linear regression. Application of linear regression should give us good results but we can see that most of the predictors that are not linearly distributed and it can be transformed to get good results but we might not spend that much time on each predictor if the linear regression model required a lot of improvement. At that point we might use other regression techniques like multivariate adaptive regression splines (MARS), Support vector machines (SVM), Boosted Trees, Random Forest and Neural Networks e.t.c.
+
+Let's check out the `Brand Code` column now but we need to fix the data type before we plot the column.
+
+```{r}
+df$`Brand Code` <- as.factor(df$`Brand Code`)
+df %>%
+  ggplot() + 
+  geom_bar(aes(x = `Brand Code`)) + 
+  ggtitle("Distribution of the Brand Codes")
+```
+we can see that we have four different brand codes i.e. A,B,C and D. A lot of observations are from brand code B. We can also see that we have a bunch of missing values in our brand codes. In the next section we will take care of the missing values in our Data set.
+
+## **Pre-processing Dataset:**
+
+In previous section we saw that we had a lot missing values in certain columns and in this section we will use different techniques to impute those missing values. Before imputation let's check out the number of missing values in each column.
+
+### **Checking Missing Values:**
+
+```{r}
+df %>%
+  summarise_all(list(~ sum(is.na(.)))) %>%
+  gather(variable, value) %>%
+  filter(value != 0) %>%
+  arrange(-value) 
+```
+
+We can see that our `MFR` column has the highest number of missing values which almost equal to 8.24% of the total observations. In general it preferred by a lot of data scientist to remove columns that have missing more than 5% of the total observations. `Brand Code` also has missing values of around 4.6% of total observations. Now in order to impute these missing values we would use mice package from R but before that we have to fix the column names and remove the spacing in between the names since it is not compatible with mice package functions.
+
+
+### **Fixing Column Names:**
+
+In this section we will create a list to hold the column names and then use that list to replace all the column names in the data frame.
+
+```{r}
+names<- c("Brand_Code", "Carb_Volume", "Fill_Ounces","PC_Volume", "Carb_Pressure", "Carb_Temp","PSC" ,  "PSC_Fill", "PSC_CO2", "Mnf_Flow",  "Carb_Pressure1", "Fill_Pressure", "Hyd_Pressure1", "Hyd_Pressure2", "Hyd_Pressure3", "Hyd_Pressure4", "Filler_Level", "Filler_Speed" , "Temperature", "Usage_cont", "Carb_Flow", "Density", "MFR",  "Balling", "Pressure_Vacuum", "PH", "Oxygen_Filler", "Bowl_Setpoint",  
+ "Pressure_Setpoint", "Air_Pressurer", "Alch_Rel" , "Carb_Rel", "Balling_Lvl")
+```
+
+```{r}
+colnames(df) <- names
+```
+
+Now we replace the column names and we can go ahead the check the first rows of the columns
+
+```{r}
+knitr::kable(head(df))
+```
+
+We can see that the column names have been updated.
+
+### **Imputing Missing values:**
+
+Now that our data set is ready for the imputation we can go ahead and use mice package with Random Forest (RF). RF is particularly advantageous due to its capability to handle complex relationships, including non-linearities and interactions among variables. This robustness makes it suitable for data sets with mixed data types, as RF can seamlessly manage both continuous and categorical variables without requiring pre-processing. By employing an ensemble of decision trees, RF reduces bias compared to simpler imputation methods like mean or median imputation, yielding more accurate estimates for missing values. Moreover, RF provides insights into variable importance, aiding in variable selection and enhancing interpretability. Integrated with built-in cross-validation in the mice package, RF imputation optimizes model hyper-parameters, ensuring generalizability to unseen data. Overall, RF imputation in mice offers a versatile and effective approach to handling missing data, contributing to more robust statistical analyses and modeling.
+
+
+```{r}
+set.seed(100)
+
+df <- mice(df, m = 1, method = 'rf', print = FALSE) %>% complete()
+```
+
+After taking care of the missing values we will then remove the columns that have low to almost zero variance since it might not help us in the predictions. Removing zero variance columns from a dataset before modeling serves several important purposes. First and foremost, these columns, which contain no variability as all values are the same, offer no discriminatory power to the model, essentially conveying no useful information for classification or prediction tasks. By eliminating them, the efficiency of the modeling process is enhanced, as computational resources are not wasted on training with non-informative features. Additionally, excluding zero variance columns helps avoid potential issues with certain algorithms that may encounter numerical instabilities or errors when confronted with such features. Furthermore, simplifying the model's interpretation becomes more feasible when irrelevant features are removed, allowing for a clearer understanding of the relationship between predictors and outcomes. This process also aids in reducing redundancy and multi-collinearity within the dataset, thereby improving the stability and performance of the model.
+
+```{r}
+# filtering low frequencies
+df <- df[, -nearZeroVar(df)]
+```
+
+In this case, only `Hyd_Pressure1` was removed because of its low variance. Now that our data set is ready we can go ahead check the correlation among different columns and with our target column `PH`
+
+# **Features Selection:**
+
+## **Correlation Among Features:**
+
+Since it is a regression problem so we will need to check the colinearity among the variables and we might use Linear regression too and for linear regression co-linearity and multi-colinearity does affect the performance of the model a lot. We can drop some weak predictors or predictors that highly corelated with other predictors too.
+
+
+```{r}
+# Option 1: Removing non-numeric columns before calculating correlation
+numeric_df <- df %>%
+  select_if(is.numeric)
+
+# Calculate correlation matrix and plot
+correlation_matrix <- cor(numeric_df)
+corrplot(correlation_matrix, title = "Correlation between Variables")
+
+
+```
+
+We can see that `PH` does not have a strong positive correlation with a lot of features. It has a moderate correlation with features like `Filler_Level`, `Pressure_Vaccum`, `Oxygen_Filler` and `Bowl_Setpoint`. We can also observe multi-colinearity among `Density`,`Balling`, `Alch_Rel`,`Hyd_Pressure3` and `Baling_Lvl` e.t.c. Which can cause problems if we using a linear regression since multi-colinearity affects. We can counter that by carrying out principle component analysis (PCA). PCA will reduce the dimension and get rid of multi-colinearity but even then we would need other predictor to strongly correlate for linear regression. If we instead start to drop the column there is higher chance of getting a very low $R^2$ which means that the variance in the data might not get captured by the linear regression. So we will try not remove any columns and in combination with linear regression we will try other models like Trees and regulation rules, Support vector machines, and Neural networks e.t.c. These algorithms are not limited by multi-colinearity. We might not get a good performance from neural network either since it requires a lot of data points and for this particular study we only have 2571 observations which be further cut down into training and testing data sets.
+
+# **Model Development And Evaluation:**
+
+In this section we will develop our models. First we will split the data into 20-80. 20% for testing the algorithm's performance while 80% for training the algorithm. Once we are done with the split we can go ahead and train our models. For this study we will use linear regression, robust linear regression, multivariate adaptive regression splines, support vector machines, decision tree, random forests, Cubist, boosting and neural networks
+
+## **Splitting The Data:**
+
+```{r}
+set.seed(123)
+index <- createDataPartition(df$PH, p = .8, list = FALSE)
+
+# train 
+train_x <- df[index, ] |> select(-PH)
+train_y <- df[index, 'PH']
+
+# test
+test_x <- df[-index, ] |> select(-PH)
+test_y <- df[-index, 'PH']
+```
+
+
+## {.tabset}
+
+### **Linear Regression**
+
+```{r}
+ctrl <- trainControl(method = "cv", number = 10)
+suppressMessages({
+set.seed(123)
+lmtuned <- train(train_x,train_y,  method = 'lm', preProcess = c("center","scale"), trControl = ctrl)
+
+lmpred <- predict(lmtuned, test_x)
+})
+postResample(lmpred,test_y)
+```
+
+### **Robust Linear Regression**
+
+```{r}
+set.seed(123)
+rlmPCA <- train(train_x, train_y, method = "rlm", preProcess = c("center","scale"), trControl = ctrl)
+
+rlmpred <- predict(rlmPCA, test_x)
+
+postResample(rlmpred, test_y)
+```
+
+
+### **Boosted Trees**
+
+```{r}
+set.seed(123)
+gbmGrid <- expand.grid(interaction.depth = seq(1, 7, by = 2),
+                       n.trees = seq(100, 1000, by = 50),
+                       shrinkage = c(0.01, 0.1),
+                       n.minobsinnode = 10)
+
+
+gbmTune <- train(train_x,  train_y,
+                 method = "gbm",
+                 tuneGrid = gbmGrid,
+                 preProcess = c("center", "scale"),
+                 verbose = FALSE)
+
+gbmPred <- predict(gbmTune, test_x)
+
+postResample(gbmPred, test_y)
+```
+
+### **Random Forest**
+
+
+```{r}
+set.seed(100)
+suppressMessages({
+rfGrid1 <- expand.grid(
+  mtry = c(2, 4, 6,8,10,12,14,16,18,20)#,  
+  #ntree = c(500, 1000),  
+ # nodesize = c(1, 5)  
+)
+
+# Set up control parameters
+ctrl <- trainControl(
+  method = "cv", 
+  number = 5,  
+  verboseIter = TRUE  
+)
+
+# Train the random forest model
+set.seed(123)  
+rfTune <- train(
+  train_x,  
+  train_y,  
+  method = "rf", 
+  preProcess = c("center", "scale"),
+  tuneGrid = rfGrid1,  
+  trControl = ctrl  
+)
+
+
+rfPred <- predict(rfTune, test_x)
+})
+postResample(rfPred, test_y)
+```
+
+
+### **MARS**
+
+```{r}
+marsGrid <- expand.grid(.degree = 1:2, .nprune = 2:38)
+
+set.seed(100)
+
+# tune
+marsTune <- train(train_x,train_y,
+                  method = "earth",
+                  tuneGrid = marsGrid,
+                  preProcess = c("center", "scale"),
+                  trControl = trainControl(method = "cv"))
+
+marsPred <- predict(marsTune, test_x)
+
+postResample(marsPred, test_y)
+```
+
+### **Cubist**
+
+```{r}
+set.seed(123)
+cubistTuned <- train(train_x, train_y,
+                     preProcess = c("center", "scale"), 
+                     method = "cubist")
+
+cubistPred <- predict(cubistTuned, test_x)
+
+postResample(cubistPred, test_y)
+```
+
+### **Neural Network**
+
+```{r}
+suppressMessages({
+# remove predictors to ensure maximum abs pairwise corr between predictors < 0.75
+tooHigh <-findCorrelation(cor(train_x[, -1]), cutoff = .75)
+
+# removing 9 variables and the factored variable
+train_x_nnet <- train_x[, -tooHigh]
+test_x_nnet <- test_x[, -tooHigh]
+
+# create a tuning grid
+nnetGrid <- expand.grid(.decay = c(0, 0.01, .1),
+                        .size = c(1:10))
+
+
+set.seed(123)
+
+# tune
+nnetTune <- train(train_x_nnet, train_y,
+                  method = "nnet",
+                  tuneGrid = nnetGrid,
+                  trControl = ctrl,
+                  preProc = c("center", "scale"),
+                  linout = TRUE,
+                  trace = FALSE,
+                  MaxNWts = 84851,
+                  maxit = 500)
+
+nnPred <- predict(nnetTune, test_x_nnet)
+})
+postResample(nnPred, test_y)
+```
+
+
+### **Support Vector Machines**
+
+```{r}
+
+
+set.seed(123)
+
+# tune
+svmRTune <- train(train_x[, -1], train_y,
+                  method = "svmRadial",
+                  tuneLength = 14,
+                  preProcess = c("center", "scale"),
+                  trControl = trainControl(method = "cv"))
+
+svmRPred <- predict(svmRTune, test_x[, -1])
+
+postResample(svmRPred, test_y)
+```
+
+
+# **Evaluation:**
+
+## **Model Selection:**
+
+In regression analysis, evaluating the performance of models is crucial for understanding how well they capture the relationship between predictor variables and the target variable. Commonly used metrics such as Mean Squared Error (MSE), Root Mean Squared Error (RMSE), and Mean Absolute Error (MAE) provide insights into the accuracy of predictions, while R-squared (R²) measures the proportion of variance explained by the model. Residual analysis and cross-validation techniques further aid in assessing model assumptions and generalization to new data. By considering these evaluation metrics and techniques, analysts can make informed decisions about model selection, refinement, and interpretation, ultimately ensuring the reliability and validity of regression models in capturing underlying patterns in the data.
+
+```{r}
+models_summary = rbind(LinearRegression = postResample(lmpred, test_y),
+      RobustLinearRegression = postResample(rlmpred, test_y),
+      NeuralNetworks = postResample(nnPred, test_y),
+      MARS = postResample(marsPred, test_y),
+      SupportVectorMachineRegression = postResample(svmRPred, test_y),
+      RandomForest = postResample(rfPred, test_y),
+      BoostedTress = postResample(gbmPred, test_y),
+      Cubist = postResample(cubistPred, test_y))
+
+kbl(models_summary) |>
+  kable_styling()
+```
+
+
+**Linear Model (lm):** The linear model shows moderate performance, with a RMSE of 0.1326 and an Rsquared of 0.4241. While it provides a simple and interpretable model, it may struggle to capture complex relationships in the data.
+
+**Robust Linear Model (rlm):** The robust linear model exhibits similar performance to the linear model but with slightly lower RMSE (0.1324) and slightly higher Rsquared (0.4281). It offers improved robustness against outliers compared to the standard linear model.
+
+**Neural Network (nn):** The neural network model demonstrates better predictive performance than linear models, with a lower RMSE of 0.1300 and a higher Rsquared of 0.4514. Neural networks can capture nonlinear relationships in the data, making them suitable for complex datasets.
+
+**Multivariate Adaptive Regression Splines (mars):** MARS outperforms lm, rlm and nn with a lower RMSE of 0.1260 and the highest Rsquared of 0.4797. MARS is capable of capturing nonlinear and interaction effects in the data, making it a powerful tool for predictive modeling.
+
+**Support Vector Machine Regression (svmR):** SVM regression shows competitive performance with a lower RMSE of 0.1197 and a relatively high Rsquared of 0.5323. SVMs excel in capturing complex patterns in high-dimensional spaces, offering robustness and generalization capabilities.
+
+**Random Forest:** Random forest emerges as the top-performing model with the lowest RMSE of 0.0949 and the highest Rsquared of 0.7203. Random forests leverage ensemble learning to combine multiple decision trees, providing excellent predictive accuracy and resilience to overfitting.
+
+**Boosted Regression Trees (boosted):** Boosted regression trees offer good predictive performance with a lower RMSE than linear models but slightly lower R-squared compared to random forest. Boosted models iteratively improve predictive accuracy by combining weak learners, making them effective for complex datasets.
+
+**Cubist:** Cubist regression demonstrates performance similar to boosted regression trees, with a slightly lower RMSE and slightly higher R-squared. Cubist models use a combination of regression trees and linear models to capture complex relationships in the data.
+
+In summary, while linear models offer simplicity and interpretability, more complex models like neural networks, MARS, SVM, random forest, boosted regression trees, and cubist provide superior predictive performance, especially for datasets with nonlinear relationships and interactions. The choice of the best model depends on factors such as the nature of the data, computational resources, interpretability requirements, and the desired balance between bias and variance. In our case, overall, random forest appears to be the best-performing model based on RMSE and R-squared metrics
+
+## **Important Parameter According to Random Forest:**
+
+```{r message=FALSE}
+set.seed(123)
+rf_model_importance <- varImp(rfTune)$importance |>
+  as.data.frame() |>
+  rownames_to_column("Variable") |>
+  top_n(10) |>
+  arrange(desc(Overall)) |>
+  mutate(importance = row_number())
+set.seed(123)
+varImp(rfTune) %>%
+  plot(., top = max(rf_model_importance$importance), main = "Top Ten Informative Predictors of Random Forest Model")
+```
+
+The provided graph displays the importance of various variables in predicting an outcome, ranked from highest to lowest importance. Here's a discussion on each variable based on their importance scores:
+
+**Mnf_Flow:** This variable stands out as the most important predictor, with an overall importance score of 100. It likely has a significant impact on the outcome being predicted, suggesting that variations in manufacturing flow have a strong association with the target variable.
+
+**Brand_Code:** Brand code emerges as the second most important predictor, with a relatively high importance score of 40.43. This suggests that the brand of the product or equipment being analyzed plays a substantial role in influencing the outcome.
+
+**Usage_cont:** With an importance score of 39.45, usage context ranks third in importance. This variable likely captures contextual factors related to how the product or equipment is used, indicating its relevance in predicting the outcome.
+
+**Oxygen_Filler:** Oxygen filler ranks fourth in importance, with a score of 22.96. This variable likely represents the presence or characteristics of oxygen filling mechanisms, indicating its influence on the predicted outcome.
+
+**Carb_Rel:** Carbonation relevance follows closely behind with an importance score of 21.90. It likely denotes the significance of carbonation-related factors in determining the outcome.
+
+**Temperature:** Temperature emerges as the sixth most important predictor, with a score of 20.96. This suggests that variations in temperature may have a notable impact on the outcome being predicted.
+
+**Alch_Rel:** Alcohol relevance ranks seventh in importance, with a score of 20.08. This variable likely pertains to the relevance or presence of alcohol-related factors, indicating their importance in the prediction process.
+
+**Pressure_Vacuum:** Pressure vacuum ranks eighth in importance, with a score of 18.46. This variable likely represents pressure and vacuum-related characteristics, highlighting their role in predicting the outcome.
+
+**Balling_Lvl:** With a score of 17.56, balling level ranks ninth in importance. This variable likely refers to the level or measurement of balling, indicating its influence on the predicted outcome.
+
+**Air_Pressurer:** Air pressurer rounds out the top ten predictors with an importance score of 17.38. This variable likely denotes the relevance or characteristics of air pressure mechanisms, suggesting its impact on the predicted outcome.
+
+Overall, these variables collectively provide insights into the factors that are most influential in predicting the outcome of interest. Understanding their relative importance can guide further analysis and decision-making processes in the relevant domain.
+
+
+# **Predictions:**
+
+In this section we will use the evaluation data set to make prediction. We might carry out some kind of pre-processing in order to make the data set favorable or workable with our random forest model.
+
+## **Loading And Preprocessing The Evaluation Dataset:**
+
+```{r}
+df_EvalData <- read.csv('https://raw.githubusercontent.com/Umerfarooq122/Using-Predictive-analytics-to-predict-PH-of-beverages/main/StudentEvaluation%20-%20Copy.csv',
+                           na.strings = c("", NA))
+```
+
+Let's check if we have any missing values in our evaluation data set
+
+```{r}
+colSums(is.na(df_EvalData))
+```
+We certainly do have some missing values so let's use mice package just like we did it for training data but before that let's fix the data type and column names
+
+```{r}
+df_EvalData$Brand.Code <- as.factor(df_EvalData$Brand.Code)
+```
+
+```{r}
+colnames(df_EvalData) <- names
+```
+
+```{r}
+df_EvalData <- df_EvalData %>%
+  select(-PH) %>%
+  mice(., m = 1, method = 'rf', print = FALSE) %>% complete()
+```
+
+```{r}
+df_EvalData <- df_EvalData %>%
+  select(-Hyd_Pressure1) %>%
+  mutate(PH = "")
+```
+
+## **Prediction with Random Forest:**
+
+
+```{r}
+# predict PH
+prediction <- predict(rfTune, df_EvalData)
+
+head(prediction)
+```
+
+
+```{r}
+df_EvalData$PH <- prediction
+
+#average ph
+df_EvalData %>%
+  group_by(Brand_Code) %>%
+  summarise(`Average PH` = mean(PH))
+```
+
+## **Writing The Predictions:**
+
+```{r}
+write.xlsx(list('PH' = prediction, 'EvalData_complete' = df_EvalData), file = 'predictions_DJO.xlsx')
+```
+
+
+# **Conclusion:**
+
+In conclusion, the predictive modeling project aimed to enhance operational efficiency and product quality in manufacturing processes by developing a robust pH regulation model. Through meticulous data exploration, pre-processing, and model development, we embarked on a journey to uncover the predictive factors influencing pH variations.
+
+Our analysis revealed the importance of leveraging advanced analytics and machine learning techniques to extract actionable insights from complex datasets. We explored various regression algorithms, including linear models, robust regression, neural networks, support vector machines, and ensemble methods like random forest and boosted regression trees. Each algorithm offered unique strengths and performance metrics, underscoring the importance of selecting models tailored to the specific characteristics of the data.
+
+Furthermore, feature selection played a pivotal role in model development, with the random forest algorithm highlighting key predictors such as manufacturing flow, brand code, usage context, and temperature. Understanding the relative importance of these factors provided valuable insights into the underlying dynamics of pH regulation in manufacturing processes.
+
+In evaluating model performance, metrics such as RMSE, R-squared, and mean absolute error provided a comprehensive view of predictive accuracy and generalization ability. While each model exhibited strengths and weaknesses, ensemble methods like random forest consistently outperformed other algorithms, offering superior predictive accuracy and resilience to overfitting.
+
+The conclusion of our analysis underscores the importance of data-driven decision-making and the critical role of predictive modeling in driving innovation and efficiency in manufacturing operations. By leveraging the insights gained from this project, stakeholders can make informed decisions, optimize production processes, and ensure regulatory compliance.
+
+Moving forward, further research and refinement of predictive models will continue to enhance our understanding of pH regulation in manufacturing processes, paving the way for continuous improvement and innovation in industrial settings. Through collaborative efforts between data scientists, domain experts, and operational stakeholders, we can harness the power of predictive analytics to unlock new opportunities and drive sustainable growth in the manufacturing industry.
+
