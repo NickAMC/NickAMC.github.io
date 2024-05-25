@@ -5,21 +5,18 @@ In my Data Science Master’s program at CUNY, I’ve progressed through a compr
 
 ## Technical Skills 
 
-**Programming Languages**
-
+**Programming Languages**  
 - Python: Pandas, NumPy, Scikit-Learn, Matplotlib, Seaborn, TensorFlow, Keras, PyTorch
 - R: Tidyverse, ggplot2, dplyr, e1071, Caret, RandomForest, xgboost
 - SQL: MySQL, PostgreSQL, SQLite
 
-**Machine Learning & Data Analysis**
-
+**Machine Learning & Data Analysis**  
 - Libraries and Frameworks: Scikit-Learn, XGBoost, TensorFlow, Keras, PyTorch, Caret
 - Data Wrangling and Manipulation: Pandas, dplyr, Tidyverse
 - Feature Engineering: Techniques for feature selection and creation
 - Statistical Analysis: Regression analysis, hypothesis testing, ANOVA, time series analysis
 
-**Data Visualization**
-
+**Data Visualization**  
 - Tools: Matplotlib, Seaborn, Plotly, ggplot2, Shiny, Tableau, Power BI
 - Business Intelligence Tools: Power BI, Tableau
 
