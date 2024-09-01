@@ -1,1 +1,4 @@
 ds_env/
+/.vscode/
+.env
+README*
