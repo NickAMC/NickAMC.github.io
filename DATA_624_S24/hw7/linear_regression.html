@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Nick Climaco">
-<meta name="dcterms.date" content="2024-03-31">
+<meta name="dcterms.date" content="2024-09-03">
 
 <title>Linear Regression</title>
 <style>
@@ -130,7 +130,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 31, 2024</p>
+      <p class="date">September 3, 2024</p>
     </div>
   </div>
   
@@ -1749,82 +1749,86 @@ Elastic Model R-squared : 0.2031244000136866</code></pre>
 <p>Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.</p>
 <p>What is the optimal value of the performance metric?</p>
 <p>Since the each feature has on a unique scale, standard scaling is required to ensure that features equallycontribute to the model leading to a unbiased model.</p>
-<div id="cell-62" class="cell" data-execution_count="70">
+<div id="cell-62" class="cell" data-execution_count="38">
 <div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1"></a>X_filtered <span class="op">=</span> remove_near_zero_var(X, threshold<span class="op">=</span><span class="fl">0.2</span>) <span class="co"># removes variance less than 0.2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-63" class="cell" data-execution_count="130">
+<div id="cell-63" class="cell" data-execution_count="39">
 <div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb52-2"><a href="#cb52-2"></a>scaler  <span class="op">=</span> StandardScaler()</span>
 <span id="cb52-3"><a href="#cb52-3"></a>X_scaled <span class="op">=</span> scaler.fit_transform(X_filtered)</span>
 <span id="cb52-4"><a href="#cb52-4"></a>X_scaled_df <span class="op">=</span> pd.DataFrame(X_scaled, columns <span class="op">=</span> X_filtered.columns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-64" class="cell" data-execution_count="89">
-<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a><span class="co"># mean should be around 0 and std to be 1</span></span>
-<span id="cb53-2"><a href="#cb53-2"></a>np.mean(X_scaled), np.std(X_scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="89">
+<div id="cell-64" class="cell" data-execution_count="43">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb53-1"><a href="#cb53-1"></a>chem_man_pp_df <span class="op">=</span> pd.concat([X_scaled_df, pd.DataFrame(y)], axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb53-2"><a href="#cb53-2"></a>chem_man_pp_df.to_csv(<span class="st">'chem_man_pp_data.csv'</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="cell-66" class="cell" data-execution_count="40">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># mean should be around 0 and std to be 1</span></span>
+<span id="cb54-2"><a href="#cb54-2"></a>np.mean(X_scaled), np.std(X_scaled)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="40">
 <pre><code>(-1.0092936587501423e-16, 1.0)</code></pre>
 </div>
 </div>
-<div id="cell-65" class="cell" data-execution_count="126">
-<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_scaled_df, y, test_size <span class="op">=</span> <span class="fl">0.2</span>, shuffle <span class="op">=</span> <span class="va">True</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-67" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(X_scaled_df, y, test_size <span class="op">=</span> <span class="fl">0.2</span>, shuffle <span class="op">=</span> <span class="va">True</span>, random_state<span class="op">=</span><span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-66" class="cell" data-execution_count="131">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1"></a>X_scaled_df.shape, X_pca_scaled.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="131">
-<pre><code>((176, 47), (176, 47))</code></pre>
+<div id="cell-68" class="cell" data-execution_count="42">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1"></a>X_scaled_df.shape, X_pca_scaled.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>NameError: name 'X_pca_scaled' is not defined</code></pre>
 </div>
 </div>
-<div id="cell-67" class="cell" data-execution_count="127">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1"></a>pls <span class="op">=</span> PLSRegression()</span>
-<span id="cb58-2"><a href="#cb58-2"></a></span>
-<span id="cb58-3"><a href="#cb58-3"></a>param_grid <span class="op">=</span> {</span>
-<span id="cb58-4"><a href="#cb58-4"></a>    <span class="st">'n_components'</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">20</span>)  </span>
-<span id="cb58-5"><a href="#cb58-5"></a>}</span>
-<span id="cb58-6"><a href="#cb58-6"></a></span>
-<span id="cb58-7"><a href="#cb58-7"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span><span class="st">'r2'</span>, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'mean_squared_error'</span>)</span>
-<span id="cb58-8"><a href="#cb58-8"></a>grid_search.fit(X_train, y_train)</span>
-<span id="cb58-9"><a href="#cb58-9"></a></span>
-<span id="cb58-10"><a href="#cb58-10"></a>results <span class="op">=</span> grid_search.cv_results_</span>
-<span id="cb58-11"><a href="#cb58-11"></a>optimal_n_components <span class="op">=</span> pls_cv.best_params_[<span class="st">'n_components'</span>]</span>
-<span id="cb58-12"><a href="#cb58-12"></a></span>
-<span id="cb58-13"><a href="#cb58-13"></a></span>
-<span id="cb58-14"><a href="#cb58-14"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
-<span id="cb58-15"><a href="#cb58-15"></a>best_r2 <span class="op">=</span> grid_search.best_score_</span>
-<span id="cb58-16"><a href="#cb58-16"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
-<span id="cb58-17"><a href="#cb58-17"></a><span class="bu">print</span>(<span class="st">"Best R2:"</span>, best_r2)</span>
-<span id="cb58-18"><a href="#cb58-18"></a>results_df <span class="op">=</span> pd.DataFrame(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-69" class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb59-1"><a href="#cb59-1"></a>pls <span class="op">=</span> PLSRegression()</span>
+<span id="cb59-2"><a href="#cb59-2"></a></span>
+<span id="cb59-3"><a href="#cb59-3"></a>param_grid <span class="op">=</span> {</span>
+<span id="cb59-4"><a href="#cb59-4"></a>    <span class="st">'n_components'</span>: <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">20</span>)  </span>
+<span id="cb59-5"><a href="#cb59-5"></a>}</span>
+<span id="cb59-6"><a href="#cb59-6"></a></span>
+<span id="cb59-7"><a href="#cb59-7"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span><span class="st">'r2'</span>, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'mean_squared_error'</span>)</span>
+<span id="cb59-8"><a href="#cb59-8"></a>grid_search.fit(X_train, y_train)</span>
+<span id="cb59-9"><a href="#cb59-9"></a></span>
+<span id="cb59-10"><a href="#cb59-10"></a>results <span class="op">=</span> grid_search.cv_results_</span>
+<span id="cb59-11"><a href="#cb59-11"></a>optimal_n_components <span class="op">=</span> pls_cv.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb59-12"><a href="#cb59-12"></a></span>
+<span id="cb59-13"><a href="#cb59-13"></a></span>
+<span id="cb59-14"><a href="#cb59-14"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb59-15"><a href="#cb59-15"></a>best_r2 <span class="op">=</span> grid_search.best_score_</span>
+<span id="cb59-16"><a href="#cb59-16"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
+<span id="cb59-17"><a href="#cb59-17"></a><span class="bu">print</span>(<span class="st">"Best R2:"</span>, best_r2)</span>
+<span id="cb59-18"><a href="#cb59-18"></a>results_df <span class="op">=</span> pd.DataFrame(results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Optimal Number of Components: 4
 Best R2: 0.4107344665711775</code></pre>
 </div>
 </div>
-<div id="cell-68" class="cell" data-execution_count="128">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
-<span id="cb60-2"><a href="#cb60-2"></a>plt.plot(results_df.param_n_components, results_df.mean_test_score, marker<span class="op">=</span><span class="st">'o'</span>)</span>
-<span id="cb60-3"><a href="#cb60-3"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
-<span id="cb60-4"><a href="#cb60-4"></a>plt.ylabel(<span class="st">'R2 (Cross-Validation)'</span>)</span>
-<span id="cb60-5"><a href="#cb60-5"></a>plt.title(<span class="ss">f"Best Training Set R2 at </span><span class="sc">{</span>best_n_components<span class="sc">}</span><span class="ss"> Components"</span>)</span>
-<span id="cb60-6"><a href="#cb60-6"></a>plt.axvline(best_n_components, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>) </span>
-<span id="cb60-7"><a href="#cb60-7"></a>plt.grid()</span>
-<span id="cb60-8"><a href="#cb60-8"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-70" class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb61-2"><a href="#cb61-2"></a>plt.plot(results_df.param_n_components, results_df.mean_test_score, marker<span class="op">=</span><span class="st">'o'</span>)</span>
+<span id="cb61-3"><a href="#cb61-3"></a>plt.xlabel(<span class="st">'Number of Components'</span>)</span>
+<span id="cb61-4"><a href="#cb61-4"></a>plt.ylabel(<span class="st">'R2 (Cross-Validation)'</span>)</span>
+<span id="cb61-5"><a href="#cb61-5"></a>plt.title(<span class="ss">f"Best Training Set R2 at </span><span class="sc">{</span>best_n_components<span class="sc">}</span><span class="ss"> Components"</span>)</span>
+<span id="cb61-6"><a href="#cb61-6"></a>plt.axvline(best_n_components, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>) </span>
+<span id="cb61-7"><a href="#cb61-7"></a>plt.grid()</span>
+<span id="cb61-8"><a href="#cb61-8"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="linear_regression_files/figure-html/cell-45-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="linear_regression_files/figure-html/cell-47-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<div id="cell-69" class="cell" data-execution_count="142">
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb61-1"><a href="#cb61-1"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)  </span>
-<span id="cb61-2"><a href="#cb61-2"></a>grid_search.fit(X_train, y_train) </span>
-<span id="cb61-3"><a href="#cb61-3"></a></span>
-<span id="cb61-4"><a href="#cb61-4"></a>results <span class="op">=</span> pd.DataFrame(grid_search.cv_results_)</span>
-<span id="cb61-5"><a href="#cb61-5"></a></span>
-<span id="cb61-6"><a href="#cb61-6"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
-<span id="cb61-7"><a href="#cb61-7"></a>best_rmse <span class="op">=</span> np.sqrt(<span class="op">-</span>grid_search.best_score_) <span class="co"># dont forget to convert back to RMSE</span></span>
-<span id="cb61-8"><a href="#cb61-8"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
-<span id="cb61-9"><a href="#cb61-9"></a><span class="bu">print</span>(<span class="st">"Best RMSE:"</span>, best_rmse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-71" class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1"></a>grid_search <span class="op">=</span> GridSearchCV(pls, param_grid, scoring<span class="op">=</span>scoring, cv<span class="op">=</span>cv, refit<span class="op">=</span><span class="st">'neg_mean_squared_error'</span>)  </span>
+<span id="cb62-2"><a href="#cb62-2"></a>grid_search.fit(X_train, y_train) </span>
+<span id="cb62-3"><a href="#cb62-3"></a></span>
+<span id="cb62-4"><a href="#cb62-4"></a>results <span class="op">=</span> pd.DataFrame(grid_search.cv_results_)</span>
+<span id="cb62-5"><a href="#cb62-5"></a></span>
+<span id="cb62-6"><a href="#cb62-6"></a>best_n_components <span class="op">=</span> grid_search.best_params_[<span class="st">'n_components'</span>]</span>
+<span id="cb62-7"><a href="#cb62-7"></a>best_rmse <span class="op">=</span> np.sqrt(<span class="op">-</span>grid_search.best_score_) <span class="co"># dont forget to convert back to RMSE</span></span>
+<span id="cb62-8"><a href="#cb62-8"></a><span class="bu">print</span>(<span class="st">"Optimal Number of Components:"</span>, best_n_components)</span>
+<span id="cb62-9"><a href="#cb62-9"></a><span class="bu">print</span>(<span class="st">"Best RMSE:"</span>, best_rmse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Optimal Number of Components: 4
 Best RMSE: 1.3248062816568802</code></pre>
@@ -1834,13 +1838,13 @@ Best RMSE: 1.3248062816568802</code></pre>
 <section id="d-1" class="level3">
 <h3 class="anchored" data-anchor-id="d-1">D</h3>
 <p>Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?</p>
-<div id="cell-71" class="cell" data-execution_count="195">
-<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb63-1"><a href="#cb63-1"></a>pls_model <span class="op">=</span> PLSRegression(n_components<span class="op">=</span><span class="dv">4</span>)</span>
-<span id="cb63-2"><a href="#cb63-2"></a></span>
-<span id="cb63-3"><a href="#cb63-3"></a>pls_model.fit(X_train,y_train)</span>
-<span id="cb63-4"><a href="#cb63-4"></a>y_pred <span class="op">=</span> pls_model.predict(X_test)</span>
-<span id="cb63-5"><a href="#cb63-5"></a></span>
-<span id="cb63-6"><a href="#cb63-6"></a><span class="bu">print</span>(<span class="ss">f'RMSE: </span><span class="sc">{</span>mean_squared_error(y_test,y_pred)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-73" class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1"></a>pls_model <span class="op">=</span> PLSRegression(n_components<span class="op">=</span><span class="dv">4</span>)</span>
+<span id="cb64-2"><a href="#cb64-2"></a></span>
+<span id="cb64-3"><a href="#cb64-3"></a>pls_model.fit(X_train,y_train)</span>
+<span id="cb64-4"><a href="#cb64-4"></a>y_pred <span class="op">=</span> pls_model.predict(X_test)</span>
+<span id="cb64-5"><a href="#cb64-5"></a></span>
+<span id="cb64-6"><a href="#cb64-6"></a><span class="bu">print</span>(<span class="ss">f'RMSE: </span><span class="sc">{</span>mean_squared_error(y_test,y_pred)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>RMSE: 1.547730653575556</code></pre>
 </div>
@@ -1852,27 +1856,27 @@ Best RMSE: 1.3248062816568802</code></pre>
 <h3 class="anchored" data-anchor-id="e-1">E</h3>
 <p>Which predictors are most important in the model you have trained?</p>
 <p>Do either the biological or process predictors dominate the list?</p>
-<div id="cell-74" class="cell" data-execution_count="196">
-<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb65-1"><a href="#cb65-1"></a>coef_df <span class="op">=</span> pd.DataFrame(pls_model.coef_, columns <span class="op">=</span> X_train.columns).T</span>
-<span id="cb65-2"><a href="#cb65-2"></a>coef_df.columns <span class="op">=</span> [<span class="st">'Importance'</span>]</span>
-<span id="cb65-3"><a href="#cb65-3"></a>coef_df <span class="op">=</span> coef_df.sort_values(<span class="st">'Importance'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-76" class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>coef_df <span class="op">=</span> pd.DataFrame(pls_model.coef_, columns <span class="op">=</span> X_train.columns).T</span>
+<span id="cb66-2"><a href="#cb66-2"></a>coef_df.columns <span class="op">=</span> [<span class="st">'Importance'</span>]</span>
+<span id="cb66-3"><a href="#cb66-3"></a>coef_df <span class="op">=</span> coef_df.sort_values(<span class="st">'Importance'</span>, ascending <span class="op">=</span> <span class="va">False</span>).reset_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-75" class="cell" data-execution_count="197">
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1"></a>coef_df.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-77" class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb67-1"><a href="#cb67-1"></a>coef_df.columns</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="197">
 <pre><code>Index(['index', 'Importance'], dtype='object')</code></pre>
 </div>
 </div>
-<div id="cell-76" class="cell" data-execution_count="198">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1"></a>plt.barh(coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>), coef_df[<span class="st">'Importance'</span>].head(<span class="dv">10</span>)) </span>
-<span id="cb68-2"><a href="#cb68-2"></a>plt.xlabel(<span class="st">'Importance'</span>)</span>
-<span id="cb68-3"><a href="#cb68-3"></a>plt.title(<span class="st">'Top 10 Feature Importances'</span>)</span>
-<span id="cb68-4"><a href="#cb68-4"></a>plt.gca().invert_yaxis()</span>
-<span id="cb68-5"><a href="#cb68-5"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-78" class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a>plt.barh(coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>), coef_df[<span class="st">'Importance'</span>].head(<span class="dv">10</span>)) </span>
+<span id="cb69-2"><a href="#cb69-2"></a>plt.xlabel(<span class="st">'Importance'</span>)</span>
+<span id="cb69-3"><a href="#cb69-3"></a>plt.title(<span class="st">'Top 10 Feature Importances'</span>)</span>
+<span id="cb69-4"><a href="#cb69-4"></a>plt.gca().invert_yaxis()</span>
+<span id="cb69-5"><a href="#cb69-5"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="linear_regression_files/figure-html/cell-50-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="linear_regression_files/figure-html/cell-52-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1883,30 +1887,30 @@ Best RMSE: 1.3248062816568802</code></pre>
 <h3 class="anchored" data-anchor-id="f-1">F</h3>
 <p>Explore the relationships between each of the top predictors and the response.</p>
 <p>How could this information be helpful in improving yield in future runs of the manufacturing process?</p>
-<div id="cell-79" class="cell" data-execution_count="199">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb69-1"><a href="#cb69-1"></a>feature_names <span class="op">=</span> coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>).tolist()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-81" class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a>feature_names <span class="op">=</span> coef_df[<span class="st">'index'</span>].head(<span class="dv">10</span>).tolist()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="cell-80" class="cell" data-execution_count="200">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1"></a>num_plots <span class="op">=</span> <span class="bu">len</span>(feature_names)</span>
-<span id="cb70-2"><a href="#cb70-2"></a>rows <span class="op">=</span> <span class="dv">5</span></span>
-<span id="cb70-3"><a href="#cb70-3"></a>cols <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb70-4"><a href="#cb70-4"></a></span>
-<span id="cb70-5"><a href="#cb70-5"></a>fig, axes <span class="op">=</span> plt.subplots(rows, cols, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
-<span id="cb70-6"><a href="#cb70-6"></a></span>
-<span id="cb70-7"><a href="#cb70-7"></a><span class="cf">for</span> i, feature <span class="kw">in</span> <span class="bu">enumerate</span>(feature_names):</span>
-<span id="cb70-8"><a href="#cb70-8"></a>    row <span class="op">=</span> i <span class="op">//</span> cols</span>
-<span id="cb70-9"><a href="#cb70-9"></a>    col <span class="op">=</span> i <span class="op">%</span> cols</span>
-<span id="cb70-10"><a href="#cb70-10"></a>    axes[row, col].scatter(X[feature], y[<span class="st">'Yield'</span>])</span>
-<span id="cb70-11"><a href="#cb70-11"></a>    axes[row, col].set_xlabel(feature)</span>
-<span id="cb70-12"><a href="#cb70-12"></a>    axes[row, col].set_ylabel(<span class="st">'response'</span>)</span>
-<span id="cb70-13"><a href="#cb70-13"></a>    axes[row, col].set_title(<span class="ss">f'</span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> and Response'</span>)</span>
-<span id="cb70-14"><a href="#cb70-14"></a></span>
-<span id="cb70-15"><a href="#cb70-15"></a>plt.tight_layout()</span>
-<span id="cb70-16"><a href="#cb70-16"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="cell-82" class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb71-1"><a href="#cb71-1"></a>num_plots <span class="op">=</span> <span class="bu">len</span>(feature_names)</span>
+<span id="cb71-2"><a href="#cb71-2"></a>rows <span class="op">=</span> <span class="dv">5</span></span>
+<span id="cb71-3"><a href="#cb71-3"></a>cols <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb71-4"><a href="#cb71-4"></a></span>
+<span id="cb71-5"><a href="#cb71-5"></a>fig, axes <span class="op">=</span> plt.subplots(rows, cols, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">12</span>))</span>
+<span id="cb71-6"><a href="#cb71-6"></a></span>
+<span id="cb71-7"><a href="#cb71-7"></a><span class="cf">for</span> i, feature <span class="kw">in</span> <span class="bu">enumerate</span>(feature_names):</span>
+<span id="cb71-8"><a href="#cb71-8"></a>    row <span class="op">=</span> i <span class="op">//</span> cols</span>
+<span id="cb71-9"><a href="#cb71-9"></a>    col <span class="op">=</span> i <span class="op">%</span> cols</span>
+<span id="cb71-10"><a href="#cb71-10"></a>    axes[row, col].scatter(X[feature], y[<span class="st">'Yield'</span>])</span>
+<span id="cb71-11"><a href="#cb71-11"></a>    axes[row, col].set_xlabel(feature)</span>
+<span id="cb71-12"><a href="#cb71-12"></a>    axes[row, col].set_ylabel(<span class="st">'response'</span>)</span>
+<span id="cb71-13"><a href="#cb71-13"></a>    axes[row, col].set_title(<span class="ss">f'</span><span class="sc">{</span>feature<span class="sc">}</span><span class="ss"> and Response'</span>)</span>
+<span id="cb71-14"><a href="#cb71-14"></a></span>
+<span id="cb71-15"><a href="#cb71-15"></a>plt.tight_layout()</span>
+<span id="cb71-16"><a href="#cb71-16"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="linear_regression_files/figure-html/cell-52-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="linear_regression_files/figure-html/cell-54-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
